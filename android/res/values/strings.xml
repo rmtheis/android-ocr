@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (C) 2010 ZXing authors
+ Copyright 2011 Robert Theis
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ -->
+<resources>
+  <string name="app_name">OCR Test</string>
+  <string name="button_done">Done</string>
+  <string name="msg_unmount_usb">Sorry, the SD card is not accessible.</string>
+  <string name="ocr_msg_capture_status_bottom">Resize viewfinder rectangle to place text inside, and press camera button.</string>
+  <string name="ocr_msg_capture_status_top"></string>
+  <string name="preferences_title">Preferences</string>
+  <string name="preferences_settings_for_text_recognition">Text recognition settings</string>
+  <string name="preferences_settings_for_translation">Translation settings</string>
+  <string name="preference_text_recognition_language">Select language</string>
+  <string name="preference_text_recognition_language_summary">Chinese (Simplified)</string>
+  <string name="preference_text_recognition_language_dialogtitle">Select language</string>
+  <string name="preference_translation_target_language">Translate to</string>
+  <string name="preference_translation_target_language_summary">English</string>
+  <string name="preference_translation_target_language_dialogtitle">Select language</string>
+  <string name="preference_translation_toggle_translation">Translate</string>
+</resources>
