@@ -713,8 +713,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       setProgressBarVisibility(true);
       
       // Get the translation asynchronously
-      new TranslateAsyncTask(this, translationTextView, progressView, translationLanguageTextView,
-          sourceLanguageCodeTranslation, targetLanguageCodeTranslation, ocrResult.getText()).execute();
+      new TranslateAsyncTask(this, sourceLanguageCodeTranslation, targetLanguageCodeTranslation, 
+          ocrResult.getText()).execute();
     } else {
       translationLanguageLabelTextView.setVisibility(View.GONE);
       translationLanguageTextView.setVisibility(View.GONE);

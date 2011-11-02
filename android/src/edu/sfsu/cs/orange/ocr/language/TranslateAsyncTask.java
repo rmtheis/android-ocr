@@ -38,19 +38,19 @@ public final class TranslateAsyncTask extends AsyncTask<String, String, Boolean>
   private String sourceText;
   private String translatedText = "";
 
-  public TranslateAsyncTask(CaptureActivity activity, TextView textView, View progressView, 
-      TextView targetLanguageTextView, String sourceLanguageCode, String targetLanguageCode, String sourceText) {
+  public TranslateAsyncTask(CaptureActivity activity, String sourceLanguageCode, String targetLanguageCode, 
+      String sourceText) {
     this.activity = activity;
-    this.textView = textView;
-    this.progressView = progressView;
-    this.targetLanguageTextView = targetLanguageTextView;
     this.sourceLanguageCode = sourceLanguageCode;
     this.targetLanguageCode = targetLanguageCode;
     this.sourceText = sourceText;
+    textView = (TextView) activity.findViewById(R.id.translation_text_view);
+    progressView = (View) activity.findViewById(R.id.indeterminate_progress_indicator_view);
+    targetLanguageTextView = (TextView) activity.findViewById(R.id.translation_language_text_view);
   }
   
   @Override
-  protected synchronized Boolean doInBackground(String... arg0) { // TODO is synchronized OK here?
+  protected Boolean doInBackground(String... arg0) {
     translatedText = Translator.translate(activity, sourceLanguageCode, targetLanguageCode, sourceText);
 
     // Check for failed translations.
