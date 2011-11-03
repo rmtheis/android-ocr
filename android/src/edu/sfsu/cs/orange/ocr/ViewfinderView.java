@@ -49,6 +49,7 @@ public final class ViewfinderView extends View {
   private OcrResultText resultText;
   List<Rect> wordBoundingBoxes;
   List<Rect> characterBoundingBoxes;
+  List<Rect> textlineBoundingBoxes;
   Rect bounds;
 
   // This constructor is used when the class is built from an XML resource.
@@ -67,6 +68,10 @@ public final class ViewfinderView extends View {
 
   @Override
   public void onDraw(Canvas canvas) {
+    CameraManager cameraManager = CameraManager.get();
+    if (cameraManager == null) {
+      return;
+    }
     Rect frame = CameraManager.get().getFramingRect();
     if (frame == null) {
       return;
@@ -84,6 +89,7 @@ public final class ViewfinderView extends View {
     if (resultText != null) {
       wordBoundingBoxes = resultText.getWordBoundingBoxes();
       characterBoundingBoxes = resultText.getCharacterBoundingBoxes();
+      textlineBoundingBoxes = resultText.getTextlineBoundingBoxes();
 
       Rect previewFrame = CameraManager.get().getFramingRectInPreview();
       float scaleX = frame.width() / (float) previewFrame.width();
@@ -160,18 +166,18 @@ public final class ViewfinderView extends View {
         }
       }    
 
-      //      // Draw bounding boxes around each character
-      //      for (int i = 0; i < characterBoundingBoxes.size(); i++) {
-      //        paint.setAlpha(0xA0);
-      //        paint.setColor(0xFF00FF00);
-      //        paint.setStyle(Style.STROKE);
-      //        paint.setStrokeWidth(1);
-      //        Rect r = characterBoundingBoxes.get(i);
-      //        canvas.drawRect(frame.left + r.left * scaleX,
-      //            frame.top + r.top * scaleY, 
-      //            frame.left + r.right * scaleX, 
-      //            frame.top + r.bottom * scaleY, paint);
-      //      }
+//      // Draw bounding boxes around each character
+//      for (int c = 0; c < characterBoundingBoxes.size(); c++) {
+//        paint.setAlpha(0xA0);
+//        paint.setColor(0xFF00FF00);
+//        paint.setStyle(Style.STROKE);
+//        paint.setStrokeWidth(1);
+//        Rect characterRect = characterBoundingBoxes.get(c);
+//        canvas.drawRect(frame.left + characterRect.left * scaleX,
+//            frame.top + characterRect.top * scaleY, 
+//            frame.left + characterRect.right * scaleX, 
+//            frame.top + characterRect.bottom * scaleY, paint);
+//      }
 
       //      // Draw letters individually
       //      for (int i = 0; i < characterBoundingBoxes.size(); i++) {
@@ -226,6 +232,21 @@ public final class ViewfinderView extends View {
       //          e.printStackTrace();
       //        }
       //      }
+
+
+      // Draw each textline
+      for (int i = 0; i < textlineBoundingBoxes.size(); i++) {
+        paint.setAlpha(0xA0);
+        paint.setColor(Color.RED);
+        paint.setStyle(Style.STROKE);
+        paint.setStrokeWidth(1);
+        Rect r = textlineBoundingBoxes.get(i);
+        canvas.drawRect(frame.left + r.left * scaleX,
+            frame.top + r.top * scaleY, 
+            frame.left + r.right * scaleX, 
+            frame.top + r.bottom * scaleY, paint);
+      }
+
     }
 
     // Draw a two pixel solid border inside the framing rect
@@ -263,67 +284,4 @@ public final class ViewfinderView extends View {
   public void removeResultText() {
     resultText = null;
   }
-
-  // From: http://catchthecows.com/?p=72
-  //  @Override
-  //  protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-  //      super.onSizeChanged(w, h, oldw, oldh);
-  //   
-  //      // save view size
-  //      mViewWidth = w;
-  //      mViewHeight = h;
-  //   
-  //      // first determine font point size
-  //      adjustTextSize();
-  //      // then determine width scaling
-  //      // this is done in two steps in case the
-  //      // point size change affects the width boundary
-  //      adjustTextScale();
-  //  }
-
-  //  void adjustTextSize(Rect bounds, char c) {
-  //    paint.setTextSize(100);
-  //    paint.setTextScaleX(1.0f);
-  //
-  //    // ask the paint for the bounding rect if it were to draw this
-  //    // text
-  //    paint.getTextBounds(Character.toString(c), 0, 1, bounds);
-  // 
-  //    // get the height that would have been produced
-  //    int h = bounds.bottom - bounds.top;
-  // 
-  //    // make the text text up 70% of the height
-  //    float target = (float)h*.7f;
-  // 
-  //    // figure out what textSize setting would create that height
-  //    // of text
-  //    float size  = ((target/h)*100f);
-  // 
-  //    // and set it into the paint
-  //    paint.setTextSize(size);
-  //  }
-
-  //  void adjustTextScale(Rect bounds, char c) {
-  //    // do calculation with scale of 1.0 (no scale)
-  //    mTextPaint.setTextScaleX(1.0f);
-  //
-  //    // ask the paint for the bounding rect if it were to draw this
-  //    // text.
-  //    mTextPaint.getTextBounds(c, 0, 1, bounds);
-  // 
-  //    // determine the width
-  //    int w = bounds.right - bounds.left;
-  // 
-  //    // calculate the baseline to use so that the
-  //    // entire text is visible including the descenders
-  //    int text_h = bounds.bottom-bounds.top;
-  //    mTextBaseline=bounds.bottom+((mViewHeight-text_h)/2);
-  // 
-  //    // determine how much to scale the width to fit the view
-  //    float xscale = ((float) (mViewWidth-getPaddingLeft()-getPaddingRight())) / w;
-  // 
-  //    // set the scale for the text paint
-  //    mTextPaint.setTextScaleX(xscale);
-  //  }
-
 }
