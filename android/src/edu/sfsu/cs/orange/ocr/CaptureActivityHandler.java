@@ -182,7 +182,10 @@ final class CaptureActivityHandler extends Handler {
   
   void quitSynchronously() {    
     state = State.DONE;
-    CameraManager.get().stopPreview();
+    CameraManager cameraManager = CameraManager.get();
+    if (cameraManager != null) {
+      CameraManager.get().stopPreview();
+    }
 
     try {
       Message quit = Message.obtain(decodeThread.getHandler(), R.id.quit);
