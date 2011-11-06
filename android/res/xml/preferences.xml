@@ -48,7 +48,7 @@
 		<ListPreference android:key="preference_translator" 
 			android:title="Translator"
 		    android:dependency="preference_translation_toggle_translation"
-			android:defaultValue="Google Translate"
+			android:defaultValue="Bing Translator"
 			android:entries="@array/translators" 
 			android:entryValues="@array/translators" />
 						
@@ -57,12 +57,12 @@
 	<!-- ADVANCED SETTINGS -->
 	<PreferenceCategory android:title="Advanced settings">
 
-	    <ListPreference android:key="preference_accuracy_vs_speed_mode"
-			android:title="Accuracy vs. speed"
-			android:defaultValue="Most accurate"
-			android:entries="@array/accuracyvsspeedmodes"
-			android:entryValues="@array/accuracyvsspeedmodes" />
-
+	    <ListPreference android:key="preference_ocr_engine_mode"
+	        android:title="OCR engine"
+	        android:defaultValue="Tesseract"
+	        android:entries="@array/ocrenginemodes"
+	        android:entryValues="@array/ocrenginemodes" />
+	    
 	    <CheckBoxPreference
             android:key="preferences_play_beep"
             android:defaultValue="true"
@@ -78,7 +78,7 @@
 
 	    <ListPreference android:key="preference_page_segmentation_mode"
 			android:title="Page segmentation"
-			android:defaultValue="Auto"
+			android:defaultValue="Single block"
 			android:entries="@array/pagesegmentationmodes"
 			android:entryValues="@array/pagesegmentationmodes" />
 
@@ -86,7 +86,7 @@
             android:key="preferences_reverse_image"
             android:defaultValue="false"
             android:title="Reversed camera image"
-            android:summary="Enable on devices with only a front camera"/>
+            android:summary="For devices with only a front camera"/>
 	    
 	</PreferenceCategory>
 	

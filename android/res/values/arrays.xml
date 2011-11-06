@@ -27,11 +27,13 @@
         <item>Single column</item>
         <item>Single line</item>
         <item>Single word</item>
+        <item>Vertical block</item>
     </string-array>
     
-    <string-array name="accuracyvsspeedmodes">
-        <item>Fastest</item>
-        <item>Most accurate</item>
+    <string-array name="ocrenginemodes">
+        <item>Tesseract</item>
+        <item>Cube</item>
+        <item>Both</item>
     </string-array>
 
 	<string-array name="translators">
@@ -41,6 +43,7 @@
 
 	<!-- The elements in this array must match to the iso6393 array. -->
 	<string-array name="languagenames">
+		<item>Arabic</item>
 		<item>Bulgarian</item>
 		<item>Catalan</item>
 		<item>Chinese (Simplified)</item>
@@ -53,6 +56,7 @@
 		<item>French</item>
 		<item>German</item>
 		<item>Greek</item>
+		<item>Hindi</item>
 		<item>Hungarian</item>
 		<item>Indonesian</item>
 		<item>Italian</item>
@@ -71,6 +75,7 @@
 		<item>Spanish</item>
 		<item>Swedish</item>
 		<item>Tagalog</item>
+		<item>Thai</item>
 		<item>Turkish</item>
 		<item>Ukrainian</item>
 		<item>Vietnamese</item>
@@ -78,6 +83,7 @@
 
 	<!-- The elements in this array must match to the languagenames array. -->
 	<string-array name="iso6393">
+		<item>ara</item> <!-- Arabic -->
 		<item>bul</item> <!-- Bulgarian -->
 		<item>cat</item> <!-- Catalan -->
 		<item>chi_sim</item> <!-- Chinese (Simplified) -->
@@ -90,6 +96,7 @@
 		<item>fra</item> <!-- French -->
 		<item>deu</item> <!-- German -->
 		<item>ell</item> <!-- Greek -->
+		<item>hin</item> <!-- Hindi -->
 		<item>hun</item> <!-- Hungarian -->
 		<item>ind</item> <!-- Indonesian -->
 		<item>ita</item> <!-- Italian -->
@@ -108,6 +115,7 @@
 		<item>spa</item> <!-- Spanish -->
 		<item>swe</item> <!-- Swedish -->
 		<item>tgl</item> <!-- Tagalog -->
+		<item>tha</item> <!-- Thai -->
 		<item>tur</item> <!-- Turkish -->
 		<item>ukr</item> <!-- Ukrainian -->
 		<item>vie</item> <!-- Vietnamese -->

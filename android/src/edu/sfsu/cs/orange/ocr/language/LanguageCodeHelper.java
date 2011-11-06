@@ -51,7 +51,9 @@ public class LanguageCodeHelper {
 	 * @return ISO 639-1 language code
 	 */
 	public static String mapLanguageCode(String languageCode) {	  
-	  if (languageCode.equals("bul")) { // Bulgarian
+	  if (languageCode.equals("ara")) { // Arabic
+	    return "ar";
+	  } else if (languageCode.equals("bul")) { // Bulgarian
 	    return "bg";
 	  } else if (languageCode.equals("cat")) { // Catalan
 	    return "ca";
@@ -75,6 +77,10 @@ public class LanguageCodeHelper {
       return "de";
     } else if (languageCode.equals("ell")) { // Greek
       return "el";
+    } else if (languageCode.equals("heb")) { // Hebrew
+      return "he";
+    } else if (languageCode.equals("hin")) { // Hindi
+      return "hi";
     } else if (languageCode.equals("hun")) { // Hungarian
       return "hu";
     } else if (languageCode.equals("ind")) { // Indonesian
@@ -111,6 +117,8 @@ public class LanguageCodeHelper {
       return "sv";
     } else if (languageCode.equals("tgl")) { // Tagalog
       return "tl";
+    } else if (languageCode.equals("tha")) { // Thai
+      return "th";
     } else if (languageCode.equals("tur")) { // Turkish
       return "tr";
     } else if (languageCode.equals("ukr")) { // Ukranian

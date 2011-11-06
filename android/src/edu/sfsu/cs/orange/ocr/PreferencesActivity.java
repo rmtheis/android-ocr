@@ -40,13 +40,12 @@ public class PreferencesActivity extends PreferenceActivity implements
   public static final String KEY_SOURCE_LANGUAGE_PREFERENCE = "sourceLanguageCodeOcrPref";
   public static final String KEY_TARGET_LANGUAGE_PREFERENCE = "targetLanguageCodeTranslationPref";
   public static final String KEY_TOGGLE_TRANSLATION = "preference_translation_toggle_translation";
-  //public static final String KEY_CAPTURE_MODE = "preference_capture_mode"; // old preference
   public static final String KEY_CONTINUOUS_PREVIEW = "preference_capture_continuous";
   public static final String KEY_PAGE_SEGMENTATION_MODE = "preference_page_segmentation_mode";
-  public static final String KEY_ACCURACY_VS_SPEED_MODE = "preference_accuracy_vs_speed_mode";
+  public static final String KEY_OCR_ENGINE_MODE = "preference_ocr_engine_mode";
   public static final String KEY_CHARACTER_BLACKLIST = "preference_character_blacklist";
   public static final String KEY_CHARACTER_WHITELIST = "preference_character_whitelist";
-  public static final String KEY_TOGGLE_LIGHT = "preference_toggle_light";
+  //public static final String KEY_TOGGLE_LIGHT = "preference_toggle_light";
   public static final String KEY_TRANSLATOR = "preference_translator";
   
   // Preference keys carried over from ZXing project
@@ -55,10 +54,6 @@ public class PreferencesActivity extends PreferenceActivity implements
   public static final String KEY_REVERSE_IMAGE = "preferences_reverse_image";
   public static final String KEY_PLAY_BEEP = "preferences_play_beep";
   public static final String KEY_VIBRATE = "preferences_vibrate";
-  
-  
-  public static final String AVS_MODE_FASTEST = "Fastest"; // TODO Have these strings in a central place--get them from arrays.xml, or get them from here, not both
-  public static final String AVS_MODE_MOST_ACCURATE = "Most accurate";
 
   public static final String CAPTURE_MODE_CONTINUOUS = "Continuous";
   public static final String CAPTURE_MODE_SINGLE_SHOT = "Single shot";
@@ -71,7 +66,7 @@ public class PreferencesActivity extends PreferenceActivity implements
   private ListPreference listPreferenceSourceLanguage;
   private ListPreference listPreferenceTargetLanguage;
   private ListPreference listPreferencePageSegmentationMode;
-  private ListPreference listPreferenceAccuracyVsSpeed;
+  private ListPreference listPreferenceOcrEngineMode;
   private EditTextPreference editTextPreferenceCharacterBlacklist;
   private EditTextPreference editTextPreferenceCharacterWhitelist;
   private SharedPreferences sharedPreferences;
@@ -94,7 +89,7 @@ public class PreferencesActivity extends PreferenceActivity implements
     listPreferenceSourceLanguage = (ListPreference) getPreferenceScreen().findPreference(KEY_SOURCE_LANGUAGE_PREFERENCE);
     listPreferenceTargetLanguage = (ListPreference) getPreferenceScreen().findPreference(KEY_TARGET_LANGUAGE_PREFERENCE);
     listPreferencePageSegmentationMode = (ListPreference) getPreferenceScreen().findPreference(KEY_PAGE_SEGMENTATION_MODE);
-    listPreferenceAccuracyVsSpeed = (ListPreference) getPreferenceScreen().findPreference(KEY_ACCURACY_VS_SPEED_MODE);
+    listPreferenceOcrEngineMode = (ListPreference) getPreferenceScreen().findPreference(KEY_OCR_ENGINE_MODE);
     editTextPreferenceCharacterBlacklist = (EditTextPreference) getPreferenceScreen().findPreference(KEY_CHARACTER_BLACKLIST);
     editTextPreferenceCharacterWhitelist = (EditTextPreference) getPreferenceScreen().findPreference(KEY_CHARACTER_WHITELIST);
     
@@ -112,6 +107,7 @@ public class PreferencesActivity extends PreferenceActivity implements
    * @param key
    *            the key of the preference that was changed, added, or removed
    */
+  @Override
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
       String key) {
     
@@ -124,8 +120,8 @@ public class PreferencesActivity extends PreferenceActivity implements
       listPreferenceTargetLanguage.setSummary(LanguageCodeHelper.getTranslationLanguageName(this, sharedPreferences.getString(key, CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE)));
     } else if (key.equals(KEY_PAGE_SEGMENTATION_MODE)) {
       listPreferencePageSegmentationMode.setSummary(sharedPreferences.getString(key, CaptureActivity.DEFAULT_PAGE_SEGMENTATION_MODE));
-    } else if (key.equals(KEY_ACCURACY_VS_SPEED_MODE)) {
-      listPreferenceAccuracyVsSpeed.setSummary(sharedPreferences.getString(key, CaptureActivity.DEFAULT_ACCURACY_VS_SPEED_MODE));
+    } else if (key.equals(KEY_OCR_ENGINE_MODE)) {
+      listPreferenceOcrEngineMode.setSummary(sharedPreferences.getString(key, CaptureActivity.DEFAULT_OCR_ENGINE_MODE_SUMMARY_TEXT));
     } else if (key.equals(KEY_CHARACTER_BLACKLIST)) {
       editTextPreferenceCharacterBlacklist.setSummary(sharedPreferences.getString(key, CaptureActivity.DEFAULT_CHARACTER_BLACKLIST));
     } else if (key.equals(KEY_CHARACTER_WHITELIST)) {
@@ -213,7 +209,7 @@ public class PreferencesActivity extends PreferenceActivity implements
     listPreferenceSourceLanguage.setSummary(LanguageCodeHelper.getLanguageName(this, sharedPreferences.getString(KEY_SOURCE_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE)));
     listPreferenceTargetLanguage.setSummary(LanguageCodeHelper.getTranslationLanguageName(this, sharedPreferences.getString(KEY_TARGET_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE)));
     listPreferencePageSegmentationMode.setSummary(sharedPreferences.getString(KEY_PAGE_SEGMENTATION_MODE, CaptureActivity.DEFAULT_PAGE_SEGMENTATION_MODE));
-    listPreferenceAccuracyVsSpeed.setSummary(sharedPreferences.getString(KEY_ACCURACY_VS_SPEED_MODE, CaptureActivity.DEFAULT_ACCURACY_VS_SPEED_MODE));
+    listPreferenceOcrEngineMode.setSummary(sharedPreferences.getString(KEY_OCR_ENGINE_MODE, CaptureActivity.DEFAULT_OCR_ENGINE_MODE_SUMMARY_TEXT));
     editTextPreferenceCharacterBlacklist.setSummary(sharedPreferences.getString(KEY_CHARACTER_BLACKLIST, CaptureActivity.DEFAULT_CHARACTER_BLACKLIST));
     editTextPreferenceCharacterWhitelist.setSummary(sharedPreferences.getString(KEY_CHARACTER_WHITELIST, CaptureActivity.DEFAULT_CHARACTER_WHITELIST));
     

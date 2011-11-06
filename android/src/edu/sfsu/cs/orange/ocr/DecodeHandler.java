@@ -85,9 +85,15 @@ final class DecodeHandler extends Handler {
  
     beepManager.playBeepSoundAndVibrate();
     
+    // Set up the indeterminate progress dialog box
     ProgressDialog indeterminateDialog = new ProgressDialog(activity);
-    indeterminateDialog.setTitle("Please wait");
-    indeterminateDialog.setMessage("Performing OCR...");
+    indeterminateDialog.setTitle("Please wait");    		
+    String ocrEngineModeName = activity.getOcrEngineModeName();
+    if (ocrEngineModeName.equals("Both")) {
+      indeterminateDialog.setMessage("Performing OCR using Cube and Tesseract...");
+    } else {
+      indeterminateDialog.setMessage("Performing OCR using " + ocrEngineModeName + "...");
+    }
     indeterminateDialog.setCancelable(false);
     indeterminateDialog.show();
     

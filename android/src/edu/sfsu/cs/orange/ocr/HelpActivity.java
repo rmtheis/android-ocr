@@ -49,6 +49,7 @@ public final class HelpActivity extends Activity {
   private WebView webView;
 
   private final Button.OnClickListener doneListener = new Button.OnClickListener() {
+    @Override
     public void onClick(View view) {
       finish();
     }

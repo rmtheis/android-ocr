@@ -85,16 +85,29 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   private static final String TAG = CaptureActivity.class.getSimpleName();
   
-  // Note these values might be overridden by the ones in preferences.xml
+  // Note these values will be overridden by the ones in preferences.xml
   public static final String DEFAULT_SOURCE_LANGUAGE_CODE = "eng";
   public static final String DEFAULT_TARGET_LANGUAGE_CODE = "es";
   public static final boolean DEFAULT_TOGGLE_CONTINUOUS = false;
-  public static final String DEFAULT_ACCURACY_VS_SPEED_MODE = PreferencesActivity.AVS_MODE_MOST_ACCURATE;
+  public static final String DEFAULT_OCR_ENGINE_MODE_SUMMARY_TEXT = "Tesseract only";
   public static final String DEFAULT_CHARACTER_BLACKLIST = "";
   public static final String DEFAULT_CHARACTER_WHITELIST = "";
-  public static final String DEFAULT_PAGE_SEGMENTATION_MODE = "Auto";
-  public static final String DEFAULT_TRANSLATOR = PreferencesActivity.TRANSLATOR_GOOGLE;
+  public static final String DEFAULT_PAGE_SEGMENTATION_MODE = "Single block";
+  public static final String DEFAULT_TRANSLATOR = PreferencesActivity.TRANSLATOR_BING;
 
+  /** Languages for which Cube data is available. */
+  static final String[] CUBE_SUPPORTED_LANGUAGES = { 
+    "ara", // Arabic
+    "eng", // English
+    "hin" // Hindi
+  };
+
+  /** Languages that require Cube, and cannot run using Tesseract. */
+  private static final String[] CUBE_REQUIRED_LANGUAGES = { 
+    "ara", // Arabic
+    "hin" // Hindi
+  };
+  
   // Minimum mean confidence score necessary to not reject single-shot OCR result
   public static final int MINIMUM_MEAN_CONFIDENCE = 0; // 0 means don't reject any scored results
   
@@ -132,7 +145,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private String targetLanguageCodeTranslation; // ISO 639-1 language code
   private String targetLanguageReadable; // Language name, for example, "English"
   private int pageSegmentationMode = TessBaseAPI.PSM_AUTO;
-  private Integer accuracyVsSpeedMode = TessBaseAPI.AVS_MOST_ACCURATE;
+  private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
   private String characterBlacklist;
   private String characterWhitelist;
   private ShutterButton shutterButton;
@@ -338,6 +351,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     resetStatusView();
     
     String previousSourceLanguageCodeOcr = sourceLanguageCodeOcr;
+    int previousOcrEngineMode = ocrEngineMode;
+    
     retrievePreferences();
     beepManager.updatePrefs();
     
@@ -355,7 +370,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     // Comment out the following block to test non-OCR functions without an SD card
     
     // Do OCR engine initialization, if necessary
-    boolean doNewInit = (baseApi == null) || !sourceLanguageCodeOcr.equals(previousSourceLanguageCodeOcr);
+    boolean doNewInit = (baseApi == null) || !sourceLanguageCodeOcr.equals(previousSourceLanguageCodeOcr) || 
+        ocrEngineMode != previousOcrEngineMode;
     if (doNewInit) {      
       // Initialize the OCR engine
       File storageDirectory = getStorageDirectory();
@@ -382,7 +398,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
     if (baseApi != null) {
       baseApi.setPageSegMode(pageSegmentationMode);
-      baseApi.setVariable(TessBaseAPI.VAR_ACCURACYVSPEED, accuracyVsSpeedMode.toString());
+//      baseApi.setVariable(TessBaseAPI.VAR_ACCURACYVSPEED, accuracyVsSpeedMode.toString());
       baseApi.setVariable(TessBaseAPI.VAR_CHAR_BLACKLIST, characterBlacklist);
       baseApi.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, characterWhitelist);
     }
@@ -563,14 +579,19 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         pageSegmentationMode = TessBaseAPI.PSM_SINGLE_LINE;
       } else if (pageSegmentationModeName.equals(pageSegmentationModes[5])) {
         pageSegmentationMode = TessBaseAPI.PSM_SINGLE_WORD;
+      } else if (pageSegmentationModeName.equals(pageSegmentationModes[6])) {
+        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_BLOCK_VERT_TEXT;
       }
-
-      // Retrieve from preferences, and set in this Activity, the accuracy vs. speed preference
-      String accuracyVsSpeedModeName = prefs.getString(PreferencesActivity.KEY_ACCURACY_VS_SPEED_MODE, PreferencesActivity.AVS_MODE_MOST_ACCURATE);
-      if (accuracyVsSpeedModeName.equals(PreferencesActivity.AVS_MODE_FASTEST)) {
-        accuracyVsSpeedMode = TessBaseAPI.AVS_FASTEST;
-      } else {
-        accuracyVsSpeedMode = TessBaseAPI.AVS_MOST_ACCURATE;
+      
+      // Retrieve from preferences, and set in this Activity, the OCR engine mode
+      String[] ocrEngineModes = getResources().getStringArray(R.array.ocrenginemodes);
+      String ocrEngineModeName = prefs.getString(PreferencesActivity.KEY_OCR_ENGINE_MODE, ocrEngineModes[0]);
+      if (ocrEngineModeName.equals(ocrEngineModes[0])) {
+        ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
+      } else if (ocrEngineModeName.equals(ocrEngineModes[1])) {
+        ocrEngineMode = TessBaseAPI.OEM_CUBE_ONLY;
+      } else if (ocrEngineModeName.equals(ocrEngineModes[2])) {
+        ocrEngineMode = TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED;
       }
       
       // Retrieve from preferences, and set in this Activity, the character blacklist and whitelist
@@ -634,13 +655,47 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     
     isEngineReady = false;
     
+    // Set up the dialog box for the thermometer-style download progress indicator
     if (dialog != null) {
       dialog.dismiss();
     }
     dialog = new ProgressDialog(this);
+    
+    // If we have a language that only runs using Cube, then set the ocrEngineMode to Cube
+    if (ocrEngineMode != TessBaseAPI.OEM_CUBE_ONLY) {
+      for (String s : CUBE_REQUIRED_LANGUAGES) {
+        if (s.equals(languageCode)) {
+          ocrEngineMode = TessBaseAPI.OEM_CUBE_ONLY;
+          SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+          prefs.edit().putString(PreferencesActivity.KEY_OCR_ENGINE_MODE, getOcrEngineModeName()).commit();
+        }
+      }
+    }
+
+    // If our language doesn't support Cube, then set the ocrEngineMode to Tesseract
+    if (ocrEngineMode != TessBaseAPI.OEM_TESSERACT_ONLY) {
+      boolean cubeOk = false;
+      for (String s : CUBE_SUPPORTED_LANGUAGES) {
+        if (s.equals(languageCode)) {
+          cubeOk = true;
+        }
+      }
+      if (!cubeOk) {
+        ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.edit().putString(PreferencesActivity.KEY_OCR_ENGINE_MODE, getOcrEngineModeName()).commit();
+      }
+    }
+    
+    // Display the name of the OCR engine we're initializing in the indeterminate progress dialog box
     indeterminateDialog = new ProgressDialog(this);
     indeterminateDialog.setTitle("Please wait");
-    indeterminateDialog.setMessage("Initializing OCR engine for " + languageName + "...");
+    String ocrEngineModeName = getOcrEngineModeName();
+    if (ocrEngineModeName.equals("Both")) {
+      indeterminateDialog.setMessage("Initializing Cube and Tesseract OCR engines for " + languageName + "...");
+    } else {
+      indeterminateDialog.setMessage("Initializing " + ocrEngineModeName + " OCR engine for " + languageName + "...");
+    }
     indeterminateDialog.setCancelable(false);
     indeterminateDialog.show();
     
@@ -650,10 +705,23 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   
     // Start AsyncTask to install language data and init OCR
     baseApi = new TessBaseAPI();
-    new OcrInitAsyncTask(this, baseApi, dialog, indeterminateDialog, languageCode, languageName)
-      .execute(storageRoot.toString()); // TODO don't pass the dialog here
+    new OcrInitAsyncTask(this, baseApi, dialog, indeterminateDialog, languageCode, languageName, ocrEngineMode)
+      .execute(storageRoot.toString());
   }
 
+  String getOcrEngineModeName() {
+    String ocrEngineModeName = "";
+    String[] ocrEngineModes = getResources().getStringArray(R.array.ocrenginemodes);
+    if (ocrEngineMode == TessBaseAPI.OEM_TESSERACT_ONLY) {
+      ocrEngineModeName = ocrEngineModes[0];
+    } else if (ocrEngineMode == TessBaseAPI.OEM_CUBE_ONLY) {
+      ocrEngineModeName = ocrEngineModes[1];
+    } else if (ocrEngineMode == TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED) {
+      ocrEngineModeName = ocrEngineModes[2];
+    }
+    return ocrEngineModeName;
+  }
+  
   boolean handleOcrDecode(OcrResult ocrResult) {
     lastResult = ocrResult;
     
@@ -734,7 +802,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
                                                    ocrResult.getWordConfidences(),
                                                    ocrResult.getMeanConfidence(),
                                                    ocrResult.getCharacterBoundingBoxes(),
-                                                   ocrResult.getWordBoundingBoxes()));
+                                                   ocrResult.getWordBoundingBoxes(),
+                                                   ocrResult.getTextlineBoundingBoxes()));
     
     // Display the recognized text on the screen
     statusViewTop.setText(ocrResult.getText());
@@ -850,6 +919,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     shutterButton.setVisibility(View.VISIBLE);
 //    torchButton.setVisibility(View.VISIBLE);
     lastResult = null;
+    viewfinderView.removeResultText();
   }
   
   void showLanguageName() {   
@@ -946,223 +1016,4 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	    .setPositiveButton( "Done", new FinishListener(this))
 	    .show();
   }
-
-//  /**
-//   * A valid barcode has been found, so give an indication of success and show the results.
-//   *
-//   * @param rawResult The contents of the barcode.
-//   * @param barcode   A greyscale bitmap of the camera data which was decoded.
-//   */
-//  public void handleDecode(Result rawResult, Bitmap barcode) {
-//    //inactivityTimer.onActivity();
-//    //lastResult = rawResult; // Can't do this because we changed lastResult from being a Result to an ocrResult
-//    ResultHandler resultHandler = ResultHandlerFactory.makeResultHandler(this, rawResult);
-//    historyManager.addHistoryItem(rawResult, resultHandler);
-//  
-//    if (barcode == null) {
-//      // This is from history -- no saved barcode
-//      handleDecodeInternally(rawResult, resultHandler, null);
-//    } else {
-//      beepManager.playBeepSoundAndVibrate();
-//      drawResultPoints(barcode, rawResult);
-//      switch (source) {
-//        case NATIVE_APP_INTENT:
-//        case PRODUCT_SEARCH_LINK:
-//          handleDecodeExternally(rawResult, resultHandler, barcode);
-//          break;
-//        case ZXING_LINK:
-//          if (returnUrlTemplate == null){
-//            handleDecodeInternally(rawResult, resultHandler, barcode);
-//          } else {
-//            handleDecodeExternally(rawResult, resultHandler, barcode);
-//          }
-//          break;
-//        case NONE:
-//          SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//          if (prefs.getBoolean(PreferencesActivity.KEY_BULK_MODE, false)) {
-//            Toast.makeText(this, R.string.msg_bulk_mode_scanned, Toast.LENGTH_SHORT).show();
-//            // Wait a moment or else it will scan the same barcode continuously about 3 times
-//            if (handler != null) {
-//              handler.sendEmptyMessageDelayed(R.id.restart_preview, BULK_MODE_SCAN_DELAY_MS);
-//            }
-//            resetStatusView();
-//          } else {
-//            handleDecodeInternally(rawResult, resultHandler, barcode);
-//          }
-//          break;
-//      }
-//    }
-//  }
-
-//  /**
-//   * Superimpose a line for 1D or dots for 2D to highlight the key features of the barcode.
-//   *
-//   * @param barcode   A bitmap of the captured image.
-//   * @param rawResult The decoded results which contains the points to draw.
-//   */
-//  private void drawResultPoints(Bitmap barcode, Result rawResult) {
-//    ResultPoint[] points = rawResult.getResultPoints();
-//    if (points != null && points.length > 0) {
-//      Canvas canvas = new Canvas(barcode);
-//      Paint paint = new Paint();
-//      paint.setColor(getResources().getColor(R.color.result_image_border));
-//      paint.setStrokeWidth(3.0f);
-//      paint.setStyle(Paint.Style.STROKE);
-//      Rect border = new Rect(2, 2, barcode.getWidth() - 2, barcode.getHeight() - 2);
-//      canvas.drawRect(border, paint);
-//  
-//      paint.setColor(getResources().getColor(R.color.result_points));
-//      if (points.length == 2) {
-//        paint.setStrokeWidth(4.0f);
-//        drawLine(canvas, paint, points[0], points[1]);
-//      } else if (points.length == 4 &&
-//                 (rawResult.getBarcodeFormat().equals(BarcodeFormat.UPC_A) ||
-//                  rawResult.getBarcodeFormat().equals(BarcodeFormat.EAN_13))) {
-//        // Hacky special case -- draw two lines, for the barcode and metadata
-//        drawLine(canvas, paint, points[0], points[1]);
-//        drawLine(canvas, paint, points[2], points[3]);
-//      } else {
-//        paint.setStrokeWidth(10.0f);
-//        for (ResultPoint point : points) {
-//          canvas.drawPoint(point.getX(), point.getY(), paint);
-//        }
-//      }
-//    }
-//  }
-
-//  private static void drawLine(Canvas canvas, Paint paint, ResultPoint a, ResultPoint b) {
-//    canvas.drawLine(a.getX(), a.getY(), b.getX(), b.getY(), paint);
-//  }
-
-//  // Put up our own UI for how to handle the decoded contents.
-//  private void handleDecodeInternally(Result rawResult, ResultHandler resultHandler, Bitmap barcode) {
-//    statusViewBottom.setVisibility(View.GONE);
-//    statusViewTop.setVisibility(View.GONE);
-//    cameraButtonView.setVisibility(View.GONE);
-//    viewfinderView.setVisibility(View.GONE);
-//    resultView.setVisibility(View.VISIBLE);
-//  
-//    ImageView barcodeImageView = (ImageView) findViewById(R.id.barcode_image_view);
-//    if (barcode == null) {
-//      barcodeImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(),
-//          R.drawable.launcher_icon));
-//    } else {
-//      barcodeImageView.setImageBitmap(barcode);
-//    }
-//  
-//    TextView formatTextView = (TextView) findViewById(R.id.format_text_view);
-//    formatTextView.setText(rawResult.getBarcodeFormat().toString());
-//  
-//    TextView typeTextView = (TextView) findViewById(R.id.type_text_view);
-//    typeTextView.setText(resultHandler.getType().toString());
-//  
-//    DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-//    String formattedTime = formatter.format(new Date(rawResult.getTimestamp()));
-//    TextView timeTextView = (TextView) findViewById(R.id.time_text_view);
-//    timeTextView.setText(formattedTime);
-//  
-//  
-//    TextView metaTextView = (TextView) findViewById(R.id.meta_text_view);
-//    View metaTextViewLabel = findViewById(R.id.meta_text_view_label);
-//    metaTextView.setVisibility(View.GONE);
-//    metaTextViewLabel.setVisibility(View.GONE);
-//    Map<ResultMetadataType,Object> metadata =
-//        (Map<ResultMetadataType,Object>) rawResult.getResultMetadata();
-//    if (metadata != null) {
-//      StringBuilder metadataText = new StringBuilder(20);
-//      for (Map.Entry<ResultMetadataType,Object> entry : metadata.entrySet()) {
-//        if (DISPLAYABLE_METADATA_TYPES.contains(entry.getKey())) {
-//          metadataText.append(entry.getValue()).append('\n');
-//        }
-//      }
-//      if (metadataText.length() > 0) {
-//        metadataText.setLength(metadataText.length() - 1);
-//        metaTextView.setText(metadataText);
-//        metaTextView.setVisibility(View.VISIBLE);
-//        metaTextViewLabel.setVisibility(View.VISIBLE);
-//      }
-//    }
-//  
-//    TextView contentsTextView = (TextView) findViewById(R.id.contents_text_view);
-//    CharSequence displayContents = resultHandler.getDisplayContents();
-//    contentsTextView.setText(displayContents);
-//    // Crudely scale betweeen 22 and 32 -- bigger font for shorter text
-//    int scaledSize = Math.max(22, 32 - displayContents.length() / 4);
-//    contentsTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
-//  
-//    TextView supplementTextView = (TextView) findViewById(R.id.contents_supplement_text_view);
-//    supplementTextView.setText("");
-//    supplementTextView.setOnClickListener(null);
-//    if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(
-//        PreferencesActivity.KEY_SUPPLEMENTAL, true)) {
-//      SupplementalInfoRetriever.maybeInvokeRetrieval(supplementTextView, resultHandler.getResult(),
-//          handler, this);
-//    }
-//  
-//    int buttonCount = resultHandler.getButtonCount();
-//    ViewGroup buttonView = (ViewGroup) findViewById(R.id.result_button_view);
-//    buttonView.requestFocus();
-//    for (int x = 0; x < ResultHandler.MAX_BUTTON_COUNT; x++) {
-//      TextView button = (TextView) buttonView.getChildAt(x);
-//      if (x < buttonCount) {
-//        button.setVisibility(View.VISIBLE);
-//        button.setText(resultHandler.getButtonText(x));
-//        button.setOnClickListener(new ResultButtonListener(resultHandler, x));
-//      } else {
-//        button.setVisibility(View.GONE);
-//      }
-//    }
-//  
-//    if (copyToClipboard && !resultHandler.areContentsSecure()) {
-//      ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-//      clipboard.setText(displayContents);
-//    }
-//  }
-//
-//  // Briefly show the contents of the barcode, then handle the result outside Barcode Scanner.
-//  private void handleDecodeExternally(Result rawResult, ResultHandler resultHandler, Bitmap barcode) {
-//    viewfinderView.drawResultBitmap(barcode);
-//  
-//    // Since this message will only be shown for a second, just tell the user what kind of
-//    // barcode was found (e.g. contact info) rather than the full contents, which they won't
-//    // have time to read.
-//    statusViewBottom.setText(getString(resultHandler.getDisplayTitle()));
-//    statusViewTop.setText("");
-//  
-//    if (copyToClipboard && !resultHandler.areContentsSecure()) {
-//      ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-//      clipboard.setText(resultHandler.getDisplayContents());
-//    }
-//  
-//    if (source == Source.NATIVE_APP_INTENT) {
-//      // Hand back whatever action they requested - this can be changed to Intents.Scan.ACTION when
-//      // the deprecated intent is retired.
-//      Intent intent = new Intent(getIntent().getAction());
-//      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-//      intent.putExtra(Intents.Scan.RESULT, rawResult.toString());
-//      intent.putExtra(Intents.Scan.RESULT_FORMAT, rawResult.getBarcodeFormat().toString());
-//      byte[] rawBytes = rawResult.getRawBytes();
-//      if (rawBytes != null && rawBytes.length > 0) {
-//        intent.putExtra(Intents.Scan.RESULT_BYTES, rawBytes);
-//      }
-//      Message message = Message.obtain(handler, R.id.return_scan_result);
-//      message.obj = intent;
-//      handler.sendMessageDelayed(message, INTENT_RESULT_DURATION);
-//    } else if (source == Source.PRODUCT_SEARCH_LINK) {
-//      // Reformulate the URL which triggered us into a query, so that the request goes to the same
-//      // TLD as the scan URL.
-//      Message message = Message.obtain(handler, R.id.launch_product_query);
-//      int end = sourceUrl.lastIndexOf("/scan");
-//      message.obj = sourceUrl.substring(0, end) + "?q=" +
-//          resultHandler.getDisplayContents().toString() + "&source=zxing";
-//      handler.sendMessageDelayed(message, INTENT_RESULT_DURATION);
-//    } else if (source == Source.ZXING_LINK) {
-//      // Replace each occurrence of RETURN_CODE_PLACEHOLDER in the returnUrlTemplate
-//      // with the scanned code. This allows both queries and REST-style URLs to work.
-//      Message message = Message.obtain(handler, R.id.launch_product_query);
-//      message.obj = returnUrlTemplate.replace(RETURN_CODE_PLACEHOLDER,
-//          resultHandler.getDisplayContents().toString());
-//      handler.sendMessageDelayed(message, INTENT_RESULT_DURATION);
-//    }
-//  }
 }

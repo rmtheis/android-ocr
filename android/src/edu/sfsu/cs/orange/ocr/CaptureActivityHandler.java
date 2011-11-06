@@ -186,13 +186,17 @@ final class CaptureActivityHandler extends Handler {
     if (cameraManager != null) {
       CameraManager.get().stopPreview();
     }
-
+    Message quit = Message.obtain(decodeThread.getHandler(), R.id.quit);
     try {
-      Message quit = Message.obtain(decodeThread.getHandler(), R.id.quit);
-      quit.sendToTarget();
-      decodeThread.join();
+      //quit.sendToTarget(); // This always gives "sending message to a Handler on a dead thread"
+      
+      // Wait at most half a second; should be enough time, and onPause() will timeout quickly
+      decodeThread.join(500L);
     } catch (InterruptedException e) {
       Log.w(TAG, "Caught InterruptedException in quitSyncronously()", e);
+      // continue
+    } catch (RuntimeException e) {
+      Log.w(TAG, "Caught RuntimeException in quitSyncronously()", e);
       // continue
     } catch (Exception e) {
       Log.w(TAG, "Caught unknown Exception in quitSynchronously()", e);
