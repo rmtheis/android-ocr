@@ -29,17 +29,20 @@ public final class OcrResultText {
   private final int meanConfidence;
   private final List<Rect> wordBoundingBoxes;
   private final List<Rect> characterBoundingBoxes;
+  private final List<Rect> textlineBoundingBoxes;
   
   public OcrResultText(String text,
                    int[] wordConfidences,
                    int meanConfidence,
                    List<Rect> characterBoundingBoxes,
-                   List<Rect> wordBoundingBoxes) {
+                   List<Rect> wordBoundingBoxes,
+                   List<Rect> textlineBoundingBoxes) {
     this.text = text;
     this.wordConfidences = wordConfidences;
     this.meanConfidence = meanConfidence;
     this.characterBoundingBoxes = characterBoundingBoxes;
     this.wordBoundingBoxes = wordBoundingBoxes;
+    this.textlineBoundingBoxes = textlineBoundingBoxes;
   }
 
   public String getText() {
@@ -56,6 +59,10 @@ public final class OcrResultText {
 
   public List<Rect> getCharacterBoundingBoxes() {
     return characterBoundingBoxes;
+  }
+  
+  public List<Rect> getTextlineBoundingBoxes() {
+    return textlineBoundingBoxes;
   }
   
   public List<Rect> getWordBoundingBoxes() {

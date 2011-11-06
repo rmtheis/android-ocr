@@ -19,7 +19,7 @@ import java.util.List;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
-import edu.sfsu.cs.orange.ocr.camera.CameraManager;
+import edu.sfsu.cs.orange.ocr.language.PseudoTranslator;
 
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
@@ -65,7 +65,7 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
     start = System.currentTimeMillis();
     end = start;
     
-    try {
+    try {     
       baseApi.setImage(bitmap);
       textResult = baseApi.getUTF8Text();
       wordConfidences = baseApi.wordConfidences();
@@ -83,8 +83,9 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
     }
 
     // Get bounding boxes for characters and words
-    List<Rect> words = baseApi.getWords().getBoxRects();
-    List<Rect> characters = baseApi.getCharacters().getBoxRects();
+    List<Rect> wordBoxes = baseApi.getWords().getBoxRects();
+    List<Rect> characterBoxes = baseApi.getCharacters().getBoxRects();
+    List<Rect> textlineBoxes = baseApi.getTextlines().getBoxRects();
     
 //    long getRegionsStart = System.currentTimeMillis();
 //    List<Rect> regions = baseApi.getRegions().getBoxRects();
@@ -134,8 +135,11 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
       ocrResultFailure = new OcrResultFailure(end - start);
       return false;
     } else {  
-      // TODO See about re-using the same OcrResult object
-      ocrResult = new OcrResult(bitmap, textResult, wordConfidences, overallConf, characters, words, (end - start));
+
+      //textResult = PseudoTranslator.translate(textResult);
+
+      ocrResult = new OcrResult(bitmap, textResult, wordConfidences, overallConf, characterBoxes, 
+          textlineBoxes, wordBoxes, (end - start));
     }
     
     if (wordConfidences != null) {

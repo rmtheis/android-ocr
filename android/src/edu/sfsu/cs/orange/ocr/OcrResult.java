@@ -32,6 +32,7 @@ public final class OcrResult {
   
   private final List<Rect> wordBoundingBoxes;
   private final List<Rect> characterBoundingBoxes;
+  private final List<Rect> textlineBoundingBoxes;
   
   private final long timestamp;
   private final long recognitionTimeRequired;
@@ -43,6 +44,7 @@ public final class OcrResult {
                    int[] wordConfidences,
                    int meanConfidence,
                    List<Rect> characterBoundingBoxes,
+                   List<Rect> textlineBoundingBoxes,
                    List<Rect> wordBoundingBoxes,
                    long recognitionTimeRequired) {
     this.bitmap = bitmap;
@@ -50,6 +52,7 @@ public final class OcrResult {
     this.wordConfidences = wordConfidences;
     this.meanConfidence = meanConfidence;
     this.characterBoundingBoxes = characterBoundingBoxes;
+    this.textlineBoundingBoxes = textlineBoundingBoxes;
     this.wordBoundingBoxes = wordBoundingBoxes;
     this.recognitionTimeRequired = recognitionTimeRequired;
     this.timestamp = System.currentTimeMillis();
@@ -109,6 +112,10 @@ public final class OcrResult {
   
   public List<Rect> getCharacterBoundingBoxes() {
     return characterBoundingBoxes;
+  }
+  
+  public List<Rect> getTextlineBoundingBoxes() {
+    return textlineBoundingBoxes;
   }
   
   public List<Rect> getWordBoundingBoxes() {
