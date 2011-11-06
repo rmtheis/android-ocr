@@ -135,6 +135,11 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
         destinationFilenameBase = "tesseract-ocr-3.01." + languageCode + ".tar";
       }
     }
+    
+    // Hack for Thai, which is a Tesseract-only language but packaged as a tar.
+    if (languageCode.equals("tha")) {
+      destinationFilenameBase = "tesseract-ocr-3.01.tha.tar";
+    }
 
     // Check for, and create if necessary, folder to hold model data
     String destinationDirBase = params[0]; // The storage directory, minus the
