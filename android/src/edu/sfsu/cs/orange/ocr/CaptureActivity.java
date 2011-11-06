@@ -104,8 +104,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   /** Languages that require Cube, and cannot run using Tesseract. */
   private static final String[] CUBE_REQUIRED_LANGUAGES = { 
-    "ara", // Arabic
-    "hin" // Hindi
+    "ara" // Arabic
   };
   
   // Minimum mean confidence score necessary to not reject single-shot OCR result

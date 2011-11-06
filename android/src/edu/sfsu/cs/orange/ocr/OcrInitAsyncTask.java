@@ -58,7 +58,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
     ".cube.lm", 
     ".cube.nn", 
     ".cube.params", 
-    ".cube.size",
+    //".cube.size",
     ".cube.word-freq", 
     ".tesseract_cube.nn", 
     ".traineddata"
@@ -256,13 +256,13 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
     for (String s : CUBE_DATA_FILES) {
       badFile = new File(tessdataDir.toString() + File.separator + languageCode + s);
       if (badFile.exists()) {
-        Log.d(TAG, "Deleting existing file " + s);
+        Log.d(TAG, "Deleting existing file " + badFile.toString());
         badFile.delete();
       }
       badFile = new File(tessdataDir.toString() + File.separator + "tesseract-ocr-3.01." 
           + languageCode + ".tar");
       if (badFile.exists()) {
-        Log.d(TAG, "Deleting existing file " + s);
+        Log.d(TAG, "Deleting existing file " + badFile.toString());
         badFile.delete();
       }
     }
