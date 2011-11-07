@@ -105,7 +105,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
   }
 
   @Override
-  protected synchronized void onPreExecute() {
+  protected void onPreExecute() {
     super.onPreExecute();
     dialog.setTitle("Please wait");
     dialog.setMessage("Checking for language data installation...");
@@ -629,7 +629,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
   }
 
   @Override
-  protected synchronized void onPostExecute(Boolean result) {
+  protected void onPostExecute(Boolean result) {
     super.onPostExecute(result);
     indeterminateDialog.dismiss();
 

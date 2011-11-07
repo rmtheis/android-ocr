@@ -132,7 +132,6 @@ public final class HelpActivity extends Activity {
               i.setType("message/rfc822");
               i.putExtra(Intent.EXTRA_EMAIL, new String[]{mt.getTo()});
               i.putExtra(Intent.EXTRA_SUBJECT, mt.getSubject());
-              // TODO see about including phone model info
               context.startActivity(i);
               view.reload();
         }
@@ -151,7 +150,7 @@ public final class HelpActivity extends Activity {
             return true;
       } else {
         // Open external URLs in Browser.
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
         return true;
       }
     }

@@ -23,7 +23,6 @@ import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.Camera;
-import android.os.Build;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.SurfaceHolder;
@@ -48,20 +47,7 @@ public final class CameraManager {
   private static final int MAX_FRAME_HEIGHT = 600; // originally 360
 
   private static CameraManager cameraManager;
-
-  static final int SDK_INT; // Later we can use Build.VERSION.SDK_INT
-  static {
-    int sdkInt;
-    try {
-      sdkInt = Integer.parseInt(Build.VERSION.SDK);
-    } catch (NumberFormatException nfe) {
-      // Just to be safe
-      sdkInt = 10000;
-    }
-    SDK_INT = sdkInt;
-  }
-
-  private final CaptureActivity activity;
+  
   private final Context context;
   private final CameraConfigurationManager configManager;
   private Camera camera;
@@ -70,7 +56,7 @@ public final class CameraManager {
   private boolean initialized;
   private boolean previewing;
   private boolean reverseImage;
-  private final boolean useOneShotPreviewCallback;
+
   /**
    * Preview frames are delivered here, which we pass on to the registered handler. Make sure to
    * clear the handler so it will only receive one message.
@@ -109,17 +95,9 @@ public final class CameraManager {
 
   private CameraManager(CaptureActivity activity) {
 
-    this.activity = activity;
     this.context = activity.getBaseContext();
     this.configManager = new CameraConfigurationManager(context);
-
-    // Camera.setOneShotPreviewCallback() has a race condition in Cupcake, so we use the older
-    // Camera.setPreviewCallback() on 1.5 and earlier. For Donut and later, we need to use
-    // the more efficient one shot callback, as the older one can swamp the system and cause it
-    // to run out of memory. We can't use SDK_INT because it was introduced in the Donut SDK.
-    useOneShotPreviewCallback = Integer.parseInt(Build.VERSION.SDK) > 3; // 3 = Cupcake
-
-    previewCallback = new PreviewCallback(configManager, useOneShotPreviewCallback);
+    previewCallback = new PreviewCallback(configManager);
     autoFocusCallback = new AutoFocusCallback();
 
   }
@@ -260,9 +238,6 @@ public final class CameraManager {
    */
   public void stopPreview() {
     if (camera != null && previewing) {
-      if (!useOneShotPreviewCallback) {
-        camera.setPreviewCallback(null);
-      }
 //      disableLight();
       camera.stopPreview();
       previewCallback.setHandler(null, 0);
@@ -282,11 +257,7 @@ public final class CameraManager {
   public void requestOcrDecode(Handler handler, int message) {
     if (camera != null && previewing) {
       previewCallback.setHandler(handler, message);
-      if (useOneShotPreviewCallback) {
-        camera.setOneShotPreviewCallback(previewCallback);
-      } else {
-        camera.setPreviewCallback(previewCallback); // Android 1.5 and earlier only // TODO Take this stuff out throughout, because we're not supporting Android 1.5
-      }
+      camera.setOneShotPreviewCallback(previewCallback);
     }
   }
   
@@ -371,28 +342,6 @@ public final class CameraManager {
     framingRect = new Rect(leftOffset, topOffset, leftOffset + newWidth, topOffset + newHeight);
     framingRectInPreview = null;
   }
-  
-//  /**
-//   * Allows third party apps to specify the scanning rectangle dimensions, rather than determine
-//   * them automatically based on screen resolution.
-//   *
-//   * @param width The width in pixels to scan.
-//   * @param height The height in pixels to scan.
-//   */
-//  public void setManualFramingRect(int width, int height) {
-//    Point screenResolution = configManager.getScreenResolution();
-//    if (width > screenResolution.x) {
-//      width = screenResolution.x;
-//    }
-//    if (height > screenResolution.y) {
-//      height = screenResolution.y;
-//    }
-//    int leftOffset = (screenResolution.x - width) / 2;
-//    int topOffset = (screenResolution.y - height) / 2;
-//    framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
-//    //Log.d(TAG, "Calculated manual framing rect: " + framingRect);
-//    framingRectInPreview = null;
-//  }
 
   /**
    * A factory method to build the appropriate LuminanceSource object based on the format

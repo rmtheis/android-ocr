@@ -82,8 +82,6 @@ public class PreferencesActivity extends PreferenceActivity implements
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     addPreferencesFromResource(R.xml.preferences);
-
-    PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     listPreferenceTranslator = (ListPreference) getPreferenceScreen().findPreference(KEY_TRANSLATOR);
     listPreferenceSourceLanguage = (ListPreference) getPreferenceScreen().findPreference(KEY_SOURCE_LANGUAGE_PREFERENCE);

@@ -186,7 +186,7 @@ final class CaptureActivityHandler extends Handler {
     if (cameraManager != null) {
       CameraManager.get().stopPreview();
     }
-    Message quit = Message.obtain(decodeThread.getHandler(), R.id.quit);
+    //Message quit = Message.obtain(decodeThread.getHandler(), R.id.quit);
     try {
       //quit.sendToTarget(); // This always gives "sending message to a Handler on a dead thread"
       

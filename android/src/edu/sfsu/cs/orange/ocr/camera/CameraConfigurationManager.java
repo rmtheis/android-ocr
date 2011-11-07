@@ -176,13 +176,6 @@ final class CameraConfigurationManager {
   }
 
   private void setFlash(Camera.Parameters parameters) {
-    // This is a hack to turn the flash off on the Samsung Galaxy and the Behold II
-    // as advised by Samsung, neither of which respected the official parameter.
-    if (Build.MODEL.contains("Behold II") && CameraManager.SDK_INT == 3) { // 3 = Cupcake
-      parameters.set("flash-value", 1);
-    } else {
-      parameters.set("flash-value", 2);
-    }
     // This is the standard setting to turn the flash off that all devices should honor.
     parameters.set("flash-mode", "off");
   }

@@ -1,5 +1,6 @@
 .settings
 .svn
+ant.properties
 local.properties
 orig-build.xml
 android/proguard
@@ -10,6 +11,7 @@ android/src/com/
 bin/
 gen/
 PauseButton.java
+PseudoTranslator.java
 TranslatorBing.java
 TranslatorGoogle.java
 actionscript/

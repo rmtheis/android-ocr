@@ -17,7 +17,6 @@
 
 package edu.sfsu.cs.orange.ocr;
 
-//import com.google.zxing.ResultPointCallback;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import edu.sfsu.cs.orange.ocr.CaptureActivity;
@@ -32,21 +31,15 @@ import java.util.concurrent.CountDownLatch;
  */
 final class DecodeThread extends Thread {
 
-  //public static final String BARCODE_BITMAP = "barcode_bitmap";
-  //public static final String OCR_BITMAP = "ocr_result";
-
   private final CaptureActivity activity;
-//  private final Hashtable<DecodeHintType, Object> hints;
   private Handler handler;
   private final CountDownLatch handlerInitLatch;
   private final TessBaseAPI baseApi;
 
-  DecodeThread(CaptureActivity activity, //ResultPointCallback resultPointCallback,
-               TessBaseAPI baseApi) {
+  DecodeThread(CaptureActivity activity, TessBaseAPI baseApi) {
     this.activity = activity;
     this.baseApi = baseApi;
     handlerInitLatch = new CountDownLatch(1);
-//    hints = new Hashtable<DecodeHintType, Object>(3);
   }
 
   Handler getHandler() {
@@ -61,8 +54,7 @@ final class DecodeThread extends Thread {
   @Override
   public void run() {
     Looper.prepare();
-    handler = new DecodeHandler(activity, //hints, 
-        baseApi);
+    handler = new DecodeHandler(activity, baseApi);
     handlerInitLatch.countDown();
     Looper.loop();
   }

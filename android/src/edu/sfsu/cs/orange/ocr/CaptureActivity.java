@@ -186,7 +186,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     handler = null;
     lastResult = null;
     hasSurface = false;
-//    inactivityTimer = new InactivityTimer(this);
     beepManager = new BeepManager(this);
     
     // Camera shutter button
@@ -317,6 +316,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     boolean nullText = false;
     if (isTranslationActive) {
       try {
+        // Check if our last OCR request failed
         lastResult.getText();
       } catch (NullPointerException e) {
         Toast toast = Toast.makeText(this, "OCR failed. Please try again.", Toast.LENGTH_SHORT);
@@ -359,12 +359,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     surfaceView = (SurfaceView) findViewById(R.id.preview_view);
     surfaceHolder = surfaceView.getHolder();
     if (!hasSurface) {
-      //Log.d(TAG, "onResume(): adding the callback...");
       surfaceHolder.addCallback(this);
       surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
-    
-    //Log.v(TAG,"Maximum memory available: " + (Runtime.getRuntime().maxMemory() / 1024 / 1024) + " MB");
     
     // Comment out the following block to test non-OCR functions without an SD card
     
@@ -448,7 +445,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     if (handler != null) {
       handler.quitSynchronously();
     }
-    //    inactivityTimer.onPause();
     
     // Stop using the camera, to avoid conflicting with other camera-based apps
     CameraManager.get().closeDriver();
@@ -462,7 +458,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   @Override
   protected void onDestroy() {
-    //    inactivityTimer.shutdown();
     if (baseApi != null) {
       baseApi.end();
     }
@@ -624,17 +619,17 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
     
     if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-        // We can read and write the media
-    	if (Integer.valueOf(android.os.Build.VERSION.SDK_INT) > 7) {
-    	    // For Android 2.2 and above
-          return getExternalFilesDir(Environment.MEDIA_MOUNTED);
-        } else {
-          // For Android 2.1 and below, explicitly give the path as, for example,
-          // "/mnt/sdcard/Android/data/edu.sfsu.cs.orange.ocr/files/"
-          return new File(Environment.getExternalStorageDirectory().toString() + File.separator + 
-                  "Android" + File.separator + "data" + File.separator + getPackageName() + 
-                  File.separator + "files" + File.separator);
-        }
+      // We can read and write the media
+      //    	if (Integer.valueOf(android.os.Build.VERSION.SDK_INT) > 7) {
+      // For Android 2.2 and above
+      return getExternalFilesDir(Environment.MEDIA_MOUNTED);
+      //        } else {
+      //          // For Android 2.1 and below, explicitly give the path as, for example,
+      //          // "/mnt/sdcard/Android/data/edu.sfsu.cs.orange.ocr/files/"
+      //          return new File(Environment.getExternalStorageDirectory().toString() + File.separator + 
+      //                  "Android" + File.separator + "data" + File.separator + getPackageName() + 
+      //                  File.separator + "files" + File.separator);
+      //        }
     } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
     	// We can only read the media
     	Log.e(TAG, "External storage is read-only");
@@ -648,9 +643,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     return null;
   }
 
-  private void initOcrEngine(File storageRoot, String languageCode, String languageName) {
-    //statusViewTop.setText("Recognition language: " + sourceLanguageReadable);
-    
+  private void initOcrEngine(File storageRoot, String languageCode, String languageName) {    
     isEngineReady = false;
     
     // Set up the dialog box for the thermometer-style download progress indicator
@@ -703,7 +696,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     // Disable continuous mode if we're using Cube. This will prevent bad states for devices 
     // with low memory that crash when running OCR with Cube, and prevent unwanted delays.
-    // Retrieve from preferences, and set in this Activity, the capture mode preference
     if (ocrEngineMode == TessBaseAPI.OEM_CUBE_ONLY || ocrEngineMode == TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED) {
       Log.d(TAG, "Disabling continuous preview");
       isContinuousModeActive = false;
@@ -764,10 +756,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       bitmapImageView.setImageBitmap(lastBitmap);
     }
 
+    // Display the recognized text
     TextView sourceLanguageTextView = (TextView) findViewById(R.id.source_language_text_view);
     sourceLanguageTextView.setText(sourceLanguageReadable);
     TextView ocrResultTextView = (TextView) findViewById(R.id.ocr_result_text_view);
-    //CharSequence displayContents = resultHandler.getDisplayContents();
     ocrResultTextView.setText(ocrResult.getText());
     // Crudely scale betweeen 22 and 32 -- bigger font for shorter text
     int scaledSize = Math.max(22, 32 - ocrResult.getText().length() / 4);
@@ -995,15 +987,15 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     try {
       PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
       int currentVersion = info.versionCode;
-      // Since we're paying to talk to the PackageManager anyway, it makes sense to cache the app
-      // version name here for display in the about box later.
-      //this.versionName = info.versionName;
       SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
       int lastVersion = prefs.getInt(PreferencesActivity.KEY_HELP_VERSION_SHOWN, 0);
       if (currentVersion > lastVersion) {
+        
+        // Record the last version for which we last displayed the What's New (Help) page
         prefs.edit().putInt(PreferencesActivity.KEY_HELP_VERSION_SHOWN, currentVersion).commit();
         Intent intent = new Intent(this, HelpActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        
         // Show the default page on a clean install, and the what's new page on an upgrade.
         String page = lastVersion == 0 ? HelpActivity.DEFAULT_PAGE : HelpActivity.WHATS_NEW_PAGE;
         intent.putExtra(HelpActivity.REQUESTED_PAGE_KEY, page);

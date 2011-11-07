@@ -77,22 +77,22 @@ public abstract class LuminanceSource {
    * @return Whether this subclass supports cropping.
    */
   public boolean isCropSupported() {
-    return false;
+    return true;
   }
 
-//  /**
-//   * Returns a new object with cropped image data. Implementations may keep a reference to the
-//   * original data rather than a copy. Only callable if isCropSupported() is true.
-//   *
-//   * @param left The left coordinate, 0 <= left < getWidth().
-//   * @param top The top coordinate, 0 <= top <= getHeight().
-//   * @param width The width of the rectangle to crop.
-//   * @param height The height of the rectangle to crop.
-//   * @return A cropped version of this object.
-//   */
-//  public LuminanceSource crop(int left, int top, int width, int height) {
-//    throw new RuntimeException("This luminance source does not support cropping.");
-//  }
+  /**
+   * Returns a new object with cropped image data. Implementations may keep a reference to the
+   * original data rather than a copy. Only callable if isCropSupported() is true.
+   *
+   * @param left The left coordinate, 0 <= left < getWidth().
+   * @param top The top coordinate, 0 <= top <= getHeight().
+   * @param width The width of the rectangle to crop.
+   * @param height The height of the rectangle to crop.
+   * @return A cropped version of this object.
+   */
+  public LuminanceSource crop(int left, int top, int width, int height) {
+    throw new RuntimeException("This luminance source does not support cropping.");
+  }
 
   /**
    * @return Whether this subclass supports counter-clockwise rotation.

@@ -21,6 +21,10 @@ package edu.sfsu.cs.orange.ocr;
 //import com.google.zxing.MultiFormatReader;
 //import com.google.zxing.ReaderException;
 //import com.google.zxing.Result;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import edu.sfsu.cs.orange.ocr.BeepManager;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
@@ -33,6 +37,7 @@ import android.app.ProgressDialog;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 final class DecodeHandler extends Handler {
 
@@ -100,6 +105,7 @@ final class DecodeHandler extends Handler {
     // Asyncrhonously launch the OCR process
     PlanarYUVLuminanceSource source = CameraManager.get().buildLuminanceSource(data, width, height);
     new OcrRecognizeAsyncTask(activity, baseApi, indeterminateDialog, source.renderCroppedGreyscaleBitmap()).execute();
+
   }
   
   // Perform an OCR decode for continuous recognition mode.

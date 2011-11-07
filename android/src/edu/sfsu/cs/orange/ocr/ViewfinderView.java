@@ -27,10 +27,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 /**
@@ -47,10 +45,13 @@ public final class ViewfinderView extends View {
   private final int frameColor;
   private final int cornerColor;
   private OcrResultText resultText;
-  List<Rect> wordBoundingBoxes;
-  List<Rect> characterBoundingBoxes;
-  List<Rect> textlineBoundingBoxes;
-  Rect bounds;
+  //  private String[] words;
+  private List<Rect> wordBoundingBoxes;
+  //  private List<Rect> characterBoundingBoxes;
+  private List<Rect> textlineBoundingBoxes;
+  //  Rect bounds;
+  private Rect previewFrame;
+  private Rect rect;
 
   // This constructor is used when the class is built from an XML resource.
   public ViewfinderView(Context context, AttributeSet attrs) {
@@ -63,7 +64,9 @@ public final class ViewfinderView extends View {
     frameColor = resources.getColor(R.color.viewfinder_frame);
     cornerColor = resources.getColor(R.color.viewfinder_corners);
 
-    bounds = new Rect();
+    //    bounds = new Rect();
+    previewFrame = new Rect();
+    rect = new Rect();
   }
 
   @Override
@@ -87,21 +90,24 @@ public final class ViewfinderView extends View {
     canvas.drawRect(0, frame.bottom + 1, width, height, paint);
 
     if (resultText != null) {
+
+      // TODO Check the framing rect from camera manager so we can not draw boxes outside those bounds
+
       wordBoundingBoxes = resultText.getWordBoundingBoxes();
-      characterBoundingBoxes = resultText.getCharacterBoundingBoxes();
+      //      characterBoundingBoxes = resultText.getCharacterBoundingBoxes();
       textlineBoundingBoxes = resultText.getTextlineBoundingBoxes();
 
-      Rect previewFrame = CameraManager.get().getFramingRectInPreview();
+      previewFrame = CameraManager.get().getFramingRectInPreview();
       float scaleX = frame.width() / (float) previewFrame.width();
       float scaleY = frame.height() / (float) previewFrame.height();
 
       // Split the text into words
-      String[] words = resultText.getText().replace("\n"," ").split(" ");
+      //      words = resultText.getText().replace("\n"," ").split(" ");
       //      for (String w : words) {
       //        Log.e("ViewfinderView", "word: " + w);
       //      }
-      Log.d("ViewfinderView", "There are " + words.length + " words in the string array.");
-      Log.d("ViewfinderView", "There are " + wordBoundingBoxes.size() + " words with bounding boxes.");
+      //Log.d("ViewfinderView", "There are " + words.length + " words in the string array.");
+      //Log.d("ViewfinderView", "There are " + wordBoundingBoxes.size() + " words with bounding boxes.");
 
       for (int i = 0; i < wordBoundingBoxes.size(); i++) {
 
@@ -110,74 +116,75 @@ public final class ViewfinderView extends View {
         paint.setColor(0xFF00CCFF);
         paint.setStyle(Style.STROKE);
         paint.setStrokeWidth(1);
-        Rect r = wordBoundingBoxes.get(i);
-        canvas.drawRect(frame.left + r.left * scaleX,
-            frame.top + r.top * scaleY, 
-            frame.left + r.right * scaleX, 
-            frame.top + r.bottom * scaleY, paint);
+        rect = wordBoundingBoxes.get(i);
+        canvas.drawRect(
+            frame.left + rect.left * scaleX,
+            frame.top + rect.top * scaleY, 
+            frame.left + rect.right * scaleX, 
+            frame.top + rect.bottom * scaleY, paint);
 
-        // Draw a white background around each word
-        int[] wordConfidences = resultText.getWordConfidences();
-        paint.setColor(Color.WHITE);
-        paint.setAlpha(wordConfidences[i] * 255 / 100); // Higher confidence = more opaque, less transparent background
-        paint.setStyle(Style.FILL);
-        canvas.drawRect(frame.left + r.left * scaleX,
-            frame.top + r.top * scaleY, 
-            frame.left + r.right * scaleX, 
-            frame.top + r.bottom * scaleY, paint);
-
-        // Draw the word in black text
-        try {
-          paint.setColor(Color.BLACK);
-          paint.setAlpha(0xFF);
-          paint.setAntiAlias(true);
-          paint.setTextAlign(Align.LEFT);
-          // Adjust text size to fill rect
-          paint.setTextSize(100);
-          paint.setTextScaleX(1.0f);
-          // ask the paint for the bounding rect if it were to draw this text
-          Rect bounds = new Rect();
-          paint.getTextBounds(words[i], 0, words[i].length(), bounds);
-          // get the height that would have been produced
-          int h = bounds.bottom - bounds.top;
-          // figure out what textSize setting would create that height of text
-          float size  = (((float)(r.height())/h)*100f);
-          // and set it into the paint
-          paint.setTextSize(size);
-          // Now set the scale.
-          // do calculation with scale of 1.0 (no scale)
-          paint.setTextScaleX(1.0f);
-          // ask the paint for the bounding rect if it were to draw this text.
-          paint.getTextBounds(words[i], 0, words[i].length(), bounds);
-          // determine the width
-          int w = bounds.right - bounds.left;
-          // calculate the baseline to use so that the entire text is visible including the descenders
-          int text_h = bounds.bottom-bounds.top;
-          int baseline =bounds.bottom+((r.height()-text_h)/2);
-          // determine how much to scale the width to fit the view
-          float xscale = ((float) (r.width())) / w;
-          // set the scale for the text paint
-          paint.setTextScaleX(xscale);
-          canvas.drawText(words[i], frame.left + r.left * scaleX, frame.top + r.bottom * scaleY - baseline, paint);
-        } catch (ArrayIndexOutOfBoundsException e) {
-          e.printStackTrace();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
+        //        // Draw a white background around each word
+        //        int[] wordConfidences = resultText.getWordConfidences();
+        //        paint.setColor(Color.WHITE);
+        //        paint.setAlpha(wordConfidences[i] * 255 / 100); // Higher confidence = more opaque, less transparent background
+        //        paint.setStyle(Style.FILL);
+        //        canvas.drawRect(frame.left + r.left * scaleX,
+        //            frame.top + r.top * scaleY, 
+        //            frame.left + r.right * scaleX, 
+        //            frame.top + r.bottom * scaleY, paint);
+        //
+        //        // Draw the word in black text
+        //        try {
+        //          paint.setColor(Color.BLACK);
+        //          paint.setAlpha(0xFF);
+        //          paint.setAntiAlias(true);
+        //          paint.setTextAlign(Align.LEFT);
+        //          // Adjust text size to fill rect
+        //          paint.setTextSize(100);
+        //          paint.setTextScaleX(1.0f);
+        //          // ask the paint for the bounding rect if it were to draw this text
+        //          Rect bounds = new Rect();
+        //          paint.getTextBounds(words[i], 0, words[i].length(), bounds);
+        //          // get the height that would have been produced
+        //          int h = bounds.bottom - bounds.top;
+        //          // figure out what textSize setting would create that height of text
+        //          float size  = (((float)(r.height())/h)*100f);
+        //          // and set it into the paint
+        //          paint.setTextSize(size);
+        //          // Now set the scale.
+        //          // do calculation with scale of 1.0 (no scale)
+        //          paint.setTextScaleX(1.0f);
+        //          // ask the paint for the bounding rect if it were to draw this text.
+        //          paint.getTextBounds(words[i], 0, words[i].length(), bounds);
+        //          // determine the width
+        //          int w = bounds.right - bounds.left;
+        //          // calculate the baseline to use so that the entire text is visible including the descenders
+        //          int text_h = bounds.bottom-bounds.top;
+        //          int baseline =bounds.bottom+((r.height()-text_h)/2);
+        //          // determine how much to scale the width to fit the view
+        //          float xscale = ((float) (r.width())) / w;
+        //          // set the scale for the text paint
+        //          paint.setTextScaleX(xscale);
+        //          canvas.drawText(words[i], frame.left + r.left * scaleX, frame.top + r.bottom * scaleY - baseline, paint);
+        //        } catch (ArrayIndexOutOfBoundsException e) {
+        //          e.printStackTrace();
+        //        } catch (Exception e) {
+        //          e.printStackTrace();
+        //        }
       }    
 
-//      // Draw bounding boxes around each character
-//      for (int c = 0; c < characterBoundingBoxes.size(); c++) {
-//        paint.setAlpha(0xA0);
-//        paint.setColor(0xFF00FF00);
-//        paint.setStyle(Style.STROKE);
-//        paint.setStrokeWidth(1);
-//        Rect characterRect = characterBoundingBoxes.get(c);
-//        canvas.drawRect(frame.left + characterRect.left * scaleX,
-//            frame.top + characterRect.top * scaleY, 
-//            frame.left + characterRect.right * scaleX, 
-//            frame.top + characterRect.bottom * scaleY, paint);
-//      }
+      //      // Draw bounding boxes around each character
+      //      for (int c = 0; c < characterBoundingBoxes.size(); c++) {
+      //        paint.setAlpha(0xA0);
+      //        paint.setColor(0xFF00FF00);
+      //        paint.setStyle(Style.STROKE);
+      //        paint.setStrokeWidth(1);
+      //        Rect characterRect = characterBoundingBoxes.get(c);
+      //        canvas.drawRect(frame.left + characterRect.left * scaleX,
+      //            frame.top + characterRect.top * scaleY, 
+      //            frame.left + characterRect.right * scaleX, 
+      //            frame.top + characterRect.bottom * scaleY, paint);
+      //      }
 
       //      // Draw letters individually
       //      for (int i = 0; i < characterBoundingBoxes.size(); i++) {
@@ -240,11 +247,11 @@ public final class ViewfinderView extends View {
         paint.setColor(Color.RED);
         paint.setStyle(Style.STROKE);
         paint.setStrokeWidth(1);
-        Rect r = textlineBoundingBoxes.get(i);
-        canvas.drawRect(frame.left + r.left * scaleX,
-            frame.top + r.top * scaleY, 
-            frame.left + r.right * scaleX, 
-            frame.top + r.bottom * scaleY, paint);
+        rect = textlineBoundingBoxes.get(i);
+        canvas.drawRect(frame.left + rect.left * scaleX,
+            frame.top + rect.top * scaleY, 
+            frame.left + rect.right * scaleX, 
+            frame.top + rect.bottom * scaleY, paint);
       }
 
     }

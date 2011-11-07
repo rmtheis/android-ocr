@@ -82,96 +82,37 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
       return false;
     }
 
+    // Check for failure to recognize text
+    if (textResult == null || textResult.equals("")) {
+      ocrResultFailure = new OcrResultFailure(end - start);
+      return false;
+    }  
+    
     // Get bounding boxes for characters and words
     List<Rect> wordBoxes = baseApi.getWords().getBoxRects();
     List<Rect> characterBoxes = baseApi.getCharacters().getBoxRects();
     List<Rect> textlineBoxes = baseApi.getTextlines().getBoxRects();
-    
-//    long getRegionsStart = System.currentTimeMillis();
-//    List<Rect> regions = baseApi.getRegions().getBoxRects();
-//    long getRegionsEnd = System.currentTimeMillis();
-//    Log.d(TAG, "getRegions took " + (getRegionsEnd - getRegionsStart) + " ms");
-//
-//    if (words.size() > 0) {
-//      for (int i = 0; i < words.size(); i++) {
-//        Rect r = words.get(i);
-//        Log.d(TAG, "Words Rect " + i + "\n" +
-//            "  left = " + r.left + "\n" +
-//            "  right = " + r.right + "\n" +
-//            "  top = " + r.top + "\n" +
-//            "  bottom = " + r.bottom);
-//      }
-//    } else {
-//      Log.d(TAG, "No words found.");
-//    }
-//    
-//    if (characters.size() > 0) {
-//      for (int i = 0; i < characters.size(); i++) {
-//        Rect r = characters.get(i);
-//        Log.d(TAG, "Characters Rect " + i + "\n" +
-//            "  left = " + r.left + "\n" +
-//            "  right = " + r.right + "\n" +
-//            "  top = " + r.top + "\n" +
-//            "  bottom = " + r.bottom);
-//      }
-//    } else {
-//      Log.d(TAG, "No characters found.");
-//    }
-//
-//    if (regions.size() > 0) {
-//      for (int i = 0; i < regions.size(); i++) {
-//        Rect r = regions.get(i);
-//        Log.e(TAG, "Regions Rect " + i + "\n" +
-//            "  left = " + r.left + "\n" +
-//            "  right = " + r.right + "\n" +
-//            "  top = " + r.top + "\n" +
-//            "  bottom = " + r.bottom);
-//      }
-//    } else {
-//      Log.e(TAG, "No regions found.");
-//    }
-    
-    if (textResult == null || textResult.equals("")) {
-      ocrResultFailure = new OcrResultFailure(end - start);
-      return false;
-    } else {  
 
-      //textResult = PseudoTranslator.translate(textResult);
+    //textResult = PseudoTranslator.translate(textResult);
 
-      ocrResult = new OcrResult(bitmap, textResult, wordConfidences, overallConf, characterBoxes, 
-          textlineBoxes, wordBoxes, (end - start));
-    }
-    
-    if (wordConfidences != null) {
-      for (int i = 0; i < wordConfidences.length; i++) {
-        //Log.d(TAG, "conf " + i + ": " + wordConfidences[i]);
-      }
-    }
-
-    if (overallConf < CaptureActivity.MINIMUM_MEAN_CONFIDENCE) {
-      //Log.d(TAG, "meanConfidence is " + overallConf + ", which is below the minimum score of " + CaptureActivity.MINIMUM_MEAN_CONFIDENCE);
-      return false;
-    }
-
+    ocrResult = new OcrResult(bitmap, textResult, wordConfidences, overallConf, characterBoxes, 
+        textlineBoxes, wordBoxes, (end - start));
     return true;
   }
-
+  
   @Override
-  protected synchronized void onPostExecute(Boolean result) {
+  protected void onPostExecute(Boolean result) {
     super.onPostExecute(result);
 
     if (!isContinuous) {
       // Send results for single-shot mode recognition.
       if (result) {
         //Log.i(TAG, "SUCCESS");
-        // Send the result to CaptureActivityHandler
         Message message = Message.obtain(activity.getHandler(), R.id.ocr_decode_succeeded, ocrResult);
-//        Bundle bundle = new Bundle();
-//        bundle.putParcelable(DecodeThread.OCR_BITMAP, bitmap);
-//        message.setData(bundle);
         message.sendToTarget();
       } else {
         //Log.i(TAG, "FAILURE");
+        bitmap.recycle();
         Message message = Message.obtain(activity.getHandler(), R.id.ocr_decode_failed, ocrResult);
         message.sendToTarget();
       }
@@ -184,32 +125,23 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
         try {
           // Send the result to CaptureActivityHandler
           Message message = Message.obtain(activity.getHandler(), R.id.ocr_continuous_decode_succeeded, ocrResult);
-//          Bundle bundle = new Bundle();
-//          bundle.putParcelable(DecodeThread.OCR_BITMAP, bitmap);
-//          message.setData(bundle);
           message.sendToTarget();
         } catch (NullPointerException e) {
-          //Log.d(TAG, "Caught NullPointerException sending continuous OCR result message [ocr succeed]. calling stopHandler()...");
-
           activity.stopHandler();
         }
       } else {
         //Log.i(TAG, "FAILURE");
-        
+        bitmap.recycle();
         try {
           Message message = Message.obtain(activity.getHandler(), R.id.ocr_continuous_decode_failed, ocrResultFailure);
           message.sendToTarget();
         } catch (NullPointerException e) {
-          //Log.d(TAG, "Caught NullPointerException sending continuous OCR result message [ocr fail]. calling stopHandler()...");
-          
           activity.stopHandler();
         }
       }
-      if (baseApi != null) {
-        //Log.d(TAG, "Clearing baseApi...");
-        baseApi.clear();
-      }
+    }
+    if (baseApi != null) {
+      baseApi.clear();
     }
   }
-
 }

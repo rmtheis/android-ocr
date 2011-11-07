@@ -99,13 +99,6 @@ public final class PlanarYUVLuminanceSource extends LuminanceSource {
     return matrix;
   }
 
-  @Override
-  public boolean isCropSupported() {
-    //return true;
-    
-    return false;
-  }
-
   public Bitmap renderCroppedGreyscaleBitmap() {
     int width = getWidth();
     int height = getHeight();
