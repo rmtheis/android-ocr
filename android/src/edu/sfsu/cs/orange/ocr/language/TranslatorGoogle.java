@@ -17,6 +17,7 @@ package edu.sfsu.cs.orange.ocr.language;
 
 import android.util.Log;
 
+import com.google.api.GoogleAPI;
 import com.google.api.translate.Language;
 import com.google.api.translate.Translate;
 
@@ -36,10 +37,10 @@ class TranslatorGoogle {
       sourceText = sourceText.substring(0, 4500);
     }
     
-    Translate.setKey(API_KEY);
-    Translate.setHttpReferrer("https://github.com/rmtheis/android-ocr");
+    GoogleAPI.setKey(API_KEY);
+    GoogleAPI.setHttpReferrer("https://github.com/rmtheis/android-ocr");
     try {
-      return Translate.execute(sourceText, Language.fromString(sourceLanguageCode), 
+      return Translate.DEFAULT.execute(sourceText, Language.fromString(sourceLanguageCode), 
           Language.fromString(targetLanguageCode));
     } catch (Exception e) {
       Log.e(TAG, "Caught exeption in translation request.");
