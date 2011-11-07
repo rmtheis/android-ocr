@@ -58,7 +58,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
     ".cube.lm", 
     ".cube.nn", 
     ".cube.params", 
-    //".cube.size",
+    //".cube.size", // This file is not available for Hindi
     ".cube.word-freq", 
     ".tesseract_cube.nn", 
     ".traineddata"

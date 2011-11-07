@@ -397,7 +397,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
     if (baseApi != null) {
       baseApi.setPageSegMode(pageSegmentationMode);
-//      baseApi.setVariable(TessBaseAPI.VAR_ACCURACYVSPEED, accuracyVsSpeedMode.toString());
       baseApi.setVariable(TessBaseAPI.VAR_CHAR_BLACKLIST, characterBlacklist);
       baseApi.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, characterWhitelist);
     }
@@ -701,7 +700,17 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     if (handler != null) {
       handler.quitSynchronously();     
     }
-  
+
+    // Disable continuous mode if we're using Cube. This will prevent bad states for devices 
+    // with low memory that crash when running OCR with Cube, and prevent unwanted delays.
+    // Retrieve from preferences, and set in this Activity, the capture mode preference
+    if (ocrEngineMode == TessBaseAPI.OEM_CUBE_ONLY || ocrEngineMode == TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED) {
+      Log.d(TAG, "Disabling continuous preview");
+      isContinuousModeActive = false;
+      SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+      prefs.edit().putBoolean(PreferencesActivity.KEY_CONTINUOUS_PREVIEW, false);
+    }
+    
     // Start AsyncTask to install language data and init OCR
     baseApi = new TessBaseAPI();
     new OcrInitAsyncTask(this, baseApi, dialog, indeterminateDialog, languageCode, languageName, ocrEngineMode)
