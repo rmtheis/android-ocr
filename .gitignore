@@ -2,6 +2,7 @@
 .svn
 local.properties
 orig-build.xml
+android/proguard
 android/res/drawable/torch_button.xml
 android/res/drawable-hdpi/torch.png
 android/res/drawable-hdpi/torch_pressed.png
