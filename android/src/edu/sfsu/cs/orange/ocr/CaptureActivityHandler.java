@@ -132,8 +132,8 @@ final class CaptureActivityHandler extends Handler {
         if (state == State.CONTINUOUS) {
           restartOcrPreviewAndDecode();
         } else if (state == State.CONTINUOUS_FOCUSING) {
-          
-
+          message = Message.obtain(activity.getHandler(), R.id.ocr_continuous_retry_after_autofocus, true);
+          message.sendToTarget();
         }
         break;
       case R.id.ocr_continuous_decode_succeeded:
@@ -153,15 +153,13 @@ final class CaptureActivityHandler extends Handler {
       case R.id.ocr_continuous_retry_after_autofocus:
         // Wait until autofocus is finished, then continue decoding 
         if (state == State.CONTINUOUS_FOCUSING) {
-          Log.e(TAG, "Autofocus cycle. Delaying decode request for 30 ms...");
           Handler handler = new Handler();
           handler.postDelayed(new Runnable() {
             public void run() {
-              Log.e(TAG, "requesting...");
               Message message = Message.obtain(activity.getHandler(), R.id.ocr_continuous_retry_after_autofocus, true);
               message.sendToTarget();
             }
-          }, 20);
+          }, 5);
         } else {
           restartOcrPreviewAndDecode();
         }
