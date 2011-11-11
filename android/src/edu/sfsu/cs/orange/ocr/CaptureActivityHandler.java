@@ -140,8 +140,7 @@ final class CaptureActivityHandler extends Handler {
         if (state == State.CONTINUOUS) {
           restartOcrPreviewAndDecode();
         } else if (state == State.CONTINUOUS_FOCUSING) {
-          message = Message.obtain(activity.getHandler(), R.id.ocr_continuous_retry_after_autofocus, true);
-          message.sendToTarget();
+          state = State.CONTINUOUS_WAITING_FOR_AUTOFOCUS_TO_FINISH;
         }
         break;
       case R.id.ocr_continuous_decode_succeeded:
