@@ -50,6 +50,7 @@ final class CaptureActivityHandler extends Handler {
     CONTINUOUS,
     CONTINUOUS_FOCUSING,
     CONTINUOUS_PAUSED,
+    CONTINUOUS_WAITING_FOR_AUTOFOCUS_TO_FINISH,
     SUCCESS,
     DONE
   }
@@ -74,7 +75,7 @@ final class CaptureActivityHandler extends Handler {
       
       // Display a "be patient" message while first recognition request is running
       activity.setStatusViewForContinuous();
-
+      
       CameraManager.get().requestAutoFocus(this, R.id.auto_focus);
       restartOcrPreviewAndDecode();
     } else {
@@ -106,6 +107,10 @@ final class CaptureActivityHandler extends Handler {
           requestDelayedAutofocus(CaptureActivity.PREVIEW_AUTOFOCUS_INTERVAL_MS, R.id.auto_focus);
         } else if (state == State.CONTINUOUS_FOCUSING) {
           requestDelayedAutofocus(CaptureActivity.CONTINUOUS_AUTOFOCUS_INTERVAL_MS, R.id.auto_focus);
+        } else if (state == State.CONTINUOUS_WAITING_FOR_AUTOFOCUS_TO_FINISH) {
+          state = State.CONTINUOUS;
+          requestDelayedAutofocus(CaptureActivity.CONTINUOUS_AUTOFOCUS_INTERVAL_MS, R.id.auto_focus);
+          restartOcrPreviewAndDecode();
         } else {
           isAutofocusLoopStarted = false;
         }
@@ -117,6 +122,9 @@ final class CaptureActivityHandler extends Handler {
           state = State.PREVIEW;
         } else if (state == State.CONTINUOUS_FOCUSING) {
           state = State.CONTINUOUS;
+        } else if (state == State.CONTINUOUS_WAITING_FOR_AUTOFOCUS_TO_FINISH) {
+          state = State.CONTINUOUS;
+          restartOcrPreviewAndDecode();
         }
         break;
       case R.id.restart_preview:
@@ -146,22 +154,7 @@ final class CaptureActivityHandler extends Handler {
         if (state == State.CONTINUOUS) {
           restartOcrPreviewAndDecode();
         } else if (state == State.CONTINUOUS_FOCUSING) {
-          message = Message.obtain(activity.getHandler(), R.id.ocr_continuous_retry_after_autofocus, true);
-          message.sendToTarget();
-        }
-        break;
-      case R.id.ocr_continuous_retry_after_autofocus:
-        // Wait until autofocus is finished, then continue decoding 
-        if (state == State.CONTINUOUS_FOCUSING) {
-          Handler handler = new Handler();
-          handler.postDelayed(new Runnable() {
-            public void run() {
-              Message message = Message.obtain(activity.getHandler(), R.id.ocr_continuous_retry_after_autofocus, true);
-              message.sendToTarget();
-            }
-          }, 5);
-        } else {
-          restartOcrPreviewAndDecode();
+          state = State.CONTINUOUS_WAITING_FOR_AUTOFOCUS_TO_FINISH;
         }
         break;
       case R.id.ocr_decode_succeeded:

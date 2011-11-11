@@ -26,7 +26,6 @@
   <item type="id" name="ocr_continuous_decode"/>
   <item type="id" name="ocr_continuous_decode_failed"/>
   <item type="id" name="ocr_continuous_decode_succeeded"/>
-  <item type="id" name="ocr_continuous_retry_after_autofocus"/>
   <item type="id" name="ocr_decode"/>
   <item type="id" name="ocr_decode_failed"/>
   <item type="id" name="ocr_decode_succeeded"/>
