@@ -25,6 +25,7 @@ import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.Message;
 
 final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
@@ -104,36 +105,32 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
   protected void onPostExecute(Boolean result) {
     super.onPostExecute(result);
 
-    if (!isContinuous) {
+    Handler handler = activity.getHandler();
+    if (!isContinuous && handler != null) {
       // Send results for single-shot mode recognition.
       if (result) {
-        //Log.i(TAG, "SUCCESS");
-        Message message = Message.obtain(activity.getHandler(), R.id.ocr_decode_succeeded, ocrResult);
+        Message message = Message.obtain(handler, R.id.ocr_decode_succeeded, ocrResult);
         message.sendToTarget();
       } else {
-        //Log.i(TAG, "FAILURE");
         bitmap.recycle();
-        Message message = Message.obtain(activity.getHandler(), R.id.ocr_decode_failed, ocrResult);
+        Message message = Message.obtain(handler, R.id.ocr_decode_failed, ocrResult);
         message.sendToTarget();
       }
       indeterminateDialog.dismiss();
-    } else {
+    } else  if (handler != null) {
       // Send results for continuous mode recognition.
       if (result) {
-        //Log.i(TAG, "SUCCESS");
-
         try {
           // Send the result to CaptureActivityHandler
-          Message message = Message.obtain(activity.getHandler(), R.id.ocr_continuous_decode_succeeded, ocrResult);
+          Message message = Message.obtain(handler, R.id.ocr_continuous_decode_succeeded, ocrResult);
           message.sendToTarget();
         } catch (NullPointerException e) {
           activity.stopHandler();
         }
       } else {
-        //Log.i(TAG, "FAILURE");
         bitmap.recycle();
         try {
-          Message message = Message.obtain(activity.getHandler(), R.id.ocr_continuous_decode_failed, ocrResultFailure);
+          Message message = Message.obtain(handler, R.id.ocr_continuous_decode_failed, ocrResultFailure);
           message.sendToTarget();
         } catch (NullPointerException e) {
           activity.stopHandler();
