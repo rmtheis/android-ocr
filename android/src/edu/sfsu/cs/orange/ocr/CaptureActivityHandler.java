@@ -43,6 +43,7 @@ final class CaptureActivityHandler extends Handler {
   private static State state;
   private final CameraManager cameraManager;
   private static boolean isAutofocusLoopStarted = false;
+  private long delay;
 
   private enum State {
     PREVIEW,
@@ -91,34 +92,37 @@ final class CaptureActivityHandler extends Handler {
   }
 
   @Override
-  public void handleMessage(Message message) { // Messages from the decode handler returning decode results
+  public void handleMessage(Message message) {
     
     switch (message.what) {
       case R.id.auto_focus:
-        // When one auto focus pass finishes, start another. This is the closest thing to
-        // continuous AF. It does seem to hunt a bit, but I'm not sure what else to do.
+        // If the last autofocus was successful, use a longer delay.
+        if (message.getData().getBoolean("success")) {
+          delay = CaptureActivity.AUTOFOCUS_SUCCESS_INTERVAL_MS;
+        } else {
+          delay = CaptureActivity.AUTOFOCUS_FAILURE_INTERVAL_MS;
+        }
         
         // Submit another delayed autofocus request.
         if (state == State.PREVIEW_FOCUSING || state == State.PREVIEW) {
           state = State.PREVIEW;
-          requestDelayedAutofocus(CaptureActivity.PREVIEW_AUTOFOCUS_INTERVAL_MS, R.id.auto_focus);
+          requestDelayedAutofocus(delay, R.id.auto_focus);
         } else if (state == State.CONTINUOUS_FOCUSING || state == State.CONTINUOUS) {
           state = State.CONTINUOUS;
-          requestDelayedAutofocus(CaptureActivity.CONTINUOUS_AUTOFOCUS_INTERVAL_MS, R.id.auto_focus);
+          requestDelayedAutofocus(delay, R.id.auto_focus);
         } else if (state == State.PREVIEW_FOCUSING) {
-          requestDelayedAutofocus(CaptureActivity.PREVIEW_AUTOFOCUS_INTERVAL_MS, R.id.auto_focus);
+          requestDelayedAutofocus(delay, R.id.auto_focus);
         } else if (state == State.CONTINUOUS_FOCUSING) {
-          requestDelayedAutofocus(CaptureActivity.CONTINUOUS_AUTOFOCUS_INTERVAL_MS, R.id.auto_focus);
+          requestDelayedAutofocus(delay, R.id.auto_focus);
         } else if (state == State.CONTINUOUS_WAITING_FOR_AUTOFOCUS_TO_FINISH) {
           state = State.CONTINUOUS;
-          requestDelayedAutofocus(CaptureActivity.CONTINUOUS_AUTOFOCUS_INTERVAL_MS, R.id.auto_focus);
+          requestDelayedAutofocus(delay, R.id.auto_focus);
           restartOcrPreviewAndDecode();
         } else {
           isAutofocusLoopStarted = false;
         }
-
         break;
-      case R.id.user_requested_auto_focus_done:
+      case R.id.user_requested_auto_focus:
         // Reset the state, but don't request more autofocusing.
         if (state == State.PREVIEW_FOCUSING) {
           state = State.PREVIEW;
@@ -286,9 +290,9 @@ final class CaptureActivityHandler extends Handler {
       // otherwise stop autofocusing until the next restartOcrPreview()
       if (state == State.PREVIEW_FOCUSING && message == R.id.auto_focus) { 
         //Log.d(TAG, "focusing now, so Requesting a new delayed autofocus");
-        requestDelayedAutofocus(CaptureActivity.PREVIEW_AUTOFOCUS_INTERVAL_MS, message);
+        requestDelayedAutofocus(CaptureActivity.AUTOFOCUS_FAILURE_INTERVAL_MS, message);
       } else if (state == State.CONTINUOUS_FOCUSING && message == R.id.auto_focus) {
-        requestDelayedAutofocus(CaptureActivity.CONTINUOUS_AUTOFOCUS_INTERVAL_MS, message);
+        requestDelayedAutofocus(CaptureActivity.AUTOFOCUS_FAILURE_INTERVAL_MS, message);
       } else if (message == R.id.auto_focus) {
         isAutofocusLoopStarted = false;
       }

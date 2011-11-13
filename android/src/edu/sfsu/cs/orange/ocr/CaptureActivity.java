@@ -115,8 +115,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   public static final int MINIMUM_MEAN_CONFIDENCE = 0; // 0 means don't reject any scored results
   
   // Length of time between subsequent autofocus requests. Used in CaptureActivityHandler.
-  static final long CONTINUOUS_AUTOFOCUS_INTERVAL_MS = 4000L; // originally 1500L
-  static final long PREVIEW_AUTOFOCUS_INTERVAL_MS = 6000L; // originally 1500L
+  static final long AUTOFOCUS_SUCCESS_INTERVAL_MS = 9000L;
+  static final long AUTOFOCUS_FAILURE_INTERVAL_MS = 1000L;
   
   // Context menu
   private static final int SETTINGS_ID = Menu.FIRST;
@@ -511,7 +511,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     } else if (keyCode == KeyEvent.KEYCODE_FOCUS) {      
       // Only perform autofocus if user is not holding down the button.
       if (event.getRepeatCount() == 0) {
-        handler.requestDelayedAutofocus(500L, R.id.user_requested_auto_focus_done);
+        handler.requestDelayedAutofocus(500L, R.id.user_requested_auto_focus);
       }
       return true;
     }
@@ -934,7 +934,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     // Wait 350 ms before focusing to avoid interfering with quick button presses when
     // the user just wants to take a picture without focusing.
     if (handler != null) {
-      handler.requestDelayedAutofocus(350L, R.id.user_requested_auto_focus_done);
+      handler.requestDelayedAutofocus(350L, R.id.user_requested_auto_focus);
     }
   }
   
