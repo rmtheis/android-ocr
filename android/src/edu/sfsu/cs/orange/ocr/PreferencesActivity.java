@@ -21,6 +21,7 @@ import edu.sfsu.cs.orange.ocr.language.LanguageCodeHelper;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
@@ -55,22 +56,23 @@ public class PreferencesActivity extends PreferenceActivity implements
   public static final String KEY_PLAY_BEEP = "preferences_play_beep";
   public static final String KEY_VIBRATE = "preferences_vibrate";
 
-  public static final String CAPTURE_MODE_CONTINUOUS = "Continuous";
-  public static final String CAPTURE_MODE_SINGLE_SHOT = "Single shot";
-
   public static final String TRANSLATOR_BING = "Bing Translator";
   public static final String TRANSLATOR_GOOGLE = "Google Translate";
-
   
-  private ListPreference listPreferenceTranslator;
+  //private CheckBoxPreference checkBoxPreferenceContinuousPreview;
   private ListPreference listPreferenceSourceLanguage;
-  private ListPreference listPreferenceTargetLanguage;
-  private ListPreference listPreferencePageSegmentationMode;
+  //private CheckBoxPreference checkBoxTranslate;
+  private ListPreference listPreferenceTargetLanguage;  
+  private ListPreference listPreferenceTranslator;
   private ListPreference listPreferenceOcrEngineMode;
+  //private CheckBoxPreference checkBoxBeep;
   private EditTextPreference editTextPreferenceCharacterBlacklist;
   private EditTextPreference editTextPreferenceCharacterWhitelist;
-  private SharedPreferences sharedPreferences;
-
+  private ListPreference listPreferencePageSegmentationMode;
+  //private CheckBoxPreference checkBoxReversedImage;
+  
+  private static SharedPreferences sharedPreferences;
+  
   /**
    * Set the default preference values.
    * 
@@ -82,19 +84,26 @@ public class PreferencesActivity extends PreferenceActivity implements
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     addPreferencesFromResource(R.xml.preferences);
+    
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-    listPreferenceTranslator = (ListPreference) getPreferenceScreen().findPreference(KEY_TRANSLATOR);
+    
+    //checkBoxPreferenceContinuousPreview = (CheckBoxPreference) getPreferenceScreen().findPreference(KEY_CONTINUOUS_PREVIEW);
     listPreferenceSourceLanguage = (ListPreference) getPreferenceScreen().findPreference(KEY_SOURCE_LANGUAGE_PREFERENCE);
+    //checkBoxTranslate = (CheckBoxPreference) getPreferenceScreen().findPreference(KEY_TOGGLE_TRANSLATION);
     listPreferenceTargetLanguage = (ListPreference) getPreferenceScreen().findPreference(KEY_TARGET_LANGUAGE_PREFERENCE);
-    listPreferencePageSegmentationMode = (ListPreference) getPreferenceScreen().findPreference(KEY_PAGE_SEGMENTATION_MODE);
+    listPreferenceTranslator = (ListPreference) getPreferenceScreen().findPreference(KEY_TRANSLATOR);    
     listPreferenceOcrEngineMode = (ListPreference) getPreferenceScreen().findPreference(KEY_OCR_ENGINE_MODE);
+    //checkBoxBeep = (CheckBoxPreference) getPreferenceScreen().findPreference(KEY_PLAY_BEEP);
     editTextPreferenceCharacterBlacklist = (EditTextPreference) getPreferenceScreen().findPreference(KEY_CHARACTER_BLACKLIST);
     editTextPreferenceCharacterWhitelist = (EditTextPreference) getPreferenceScreen().findPreference(KEY_CHARACTER_WHITELIST);
+    listPreferencePageSegmentationMode = (ListPreference) getPreferenceScreen().findPreference(KEY_PAGE_SEGMENTATION_MODE);
+    //checkBoxReversedImage = (CheckBoxPreference) getPreferenceScreen().findPreference(KEY_REVERSE_IMAGE);
     
     // Create the entries/entryvalues for the translation target language list.
     initTranslationTargetList();
+    
   }
-
+  
   /**
    * Interface definition for a callback to be invoked when a shared
    * preference is changed. Sets summary text for the app's preferences. Summary text values show the
@@ -113,17 +122,44 @@ public class PreferencesActivity extends PreferenceActivity implements
     if (key.equals(KEY_TRANSLATOR)) {
       listPreferenceTranslator.setSummary(sharedPreferences.getString(key, CaptureActivity.DEFAULT_TRANSLATOR));
     } else if(key.equals(KEY_SOURCE_LANGUAGE_PREFERENCE)) {
+      
+      // Set the summary text for the source language name
       listPreferenceSourceLanguage.setSummary(LanguageCodeHelper.getLanguageName(getBaseContext(), sharedPreferences.getString(key, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE)));
+      
+      // Retrieve the character blacklist/whitelist for the new language
+      sharedPreferences.edit().putString(KEY_CHARACTER_BLACKLIST, OcrCharacterHelper.getBlacklist(sharedPreferences, listPreferenceSourceLanguage.getValue())).commit();
+      sharedPreferences.edit().putString(KEY_CHARACTER_WHITELIST, OcrCharacterHelper.getWhitelist(sharedPreferences, listPreferenceSourceLanguage.getValue())).commit();
+      
+      // Set the blacklist/whitelist summary text
+      editTextPreferenceCharacterBlacklist.setSummary(sharedPreferences.getString(key, OcrCharacterHelper.getDefaultBlacklist(listPreferenceSourceLanguage.getValue())));
+      editTextPreferenceCharacterWhitelist.setSummary(sharedPreferences.getString(key, OcrCharacterHelper.getDefaultWhitelist(listPreferenceSourceLanguage.getValue())));
+      
     } else if (key.equals(KEY_TARGET_LANGUAGE_PREFERENCE)) {
       listPreferenceTargetLanguage.setSummary(LanguageCodeHelper.getTranslationLanguageName(this, sharedPreferences.getString(key, CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE)));
     } else if (key.equals(KEY_PAGE_SEGMENTATION_MODE)) {
       listPreferencePageSegmentationMode.setSummary(sharedPreferences.getString(key, CaptureActivity.DEFAULT_PAGE_SEGMENTATION_MODE));
     } else if (key.equals(KEY_OCR_ENGINE_MODE)) {
-      listPreferenceOcrEngineMode.setSummary(sharedPreferences.getString(key, CaptureActivity.DEFAULT_OCR_ENGINE_MODE_SUMMARY_TEXT));
-    } else if (key.equals(KEY_CHARACTER_BLACKLIST)) {
-      editTextPreferenceCharacterBlacklist.setSummary(sharedPreferences.getString(key, CaptureActivity.DEFAULT_CHARACTER_BLACKLIST));
+      listPreferenceOcrEngineMode.setSummary(sharedPreferences.getString(key, CaptureActivity.DEFAULT_OCR_ENGINE_MODE));
+    } else if (key.equals(KEY_CHARACTER_BLACKLIST)) {  
+      
+      // Save a separate, language-specific character blacklist for this language
+      OcrCharacterHelper.setBlacklist(sharedPreferences, 
+          listPreferenceSourceLanguage.getValue(), 
+          sharedPreferences.getString(key, OcrCharacterHelper.getDefaultBlacklist(listPreferenceSourceLanguage.getValue())));
+      
+      // Set the summary text
+      editTextPreferenceCharacterBlacklist.setSummary(sharedPreferences.getString(key, OcrCharacterHelper.getDefaultBlacklist(listPreferenceSourceLanguage.getValue())));
+      
     } else if (key.equals(KEY_CHARACTER_WHITELIST)) {
-      editTextPreferenceCharacterWhitelist.setSummary(sharedPreferences.getString(key, CaptureActivity.DEFAULT_CHARACTER_WHITELIST));
+      
+      // Save a separate, language-specific character blacklist for this language
+      OcrCharacterHelper.setWhitelist(sharedPreferences, 
+          listPreferenceSourceLanguage.getValue(), 
+          sharedPreferences.getString(key, OcrCharacterHelper.getDefaultWhitelist(listPreferenceSourceLanguage.getValue())));
+      
+      // Set the summary text
+      editTextPreferenceCharacterWhitelist.setSummary(sharedPreferences.getString(key, OcrCharacterHelper.getDefaultWhitelist(listPreferenceSourceLanguage.getValue())));
+      
     }
     
     // Update the languages available for translation based on the current translator selected.
@@ -139,10 +175,11 @@ public class PreferencesActivity extends PreferenceActivity implements
    */
   void initTranslationTargetList() {
     // Update the list of available languages for the currently-chosen translation API.
-    if (sharedPreferences.getString(KEY_TRANSLATOR, CaptureActivity.DEFAULT_TRANSLATOR).equals(TRANSLATOR_BING)) {
+    String[] translators = getResources().getStringArray(R.array.translators);
+    if (sharedPreferences.getString(KEY_TRANSLATOR, CaptureActivity.DEFAULT_TRANSLATOR).equals(translators[0])) {
       listPreferenceTargetLanguage.setEntries(R.array.translationtargetlanguagenames_microsoft);
       listPreferenceTargetLanguage.setEntryValues(R.array.translationtargetiso6391_microsoft);
-    } else if (sharedPreferences.getString(KEY_TRANSLATOR, CaptureActivity.DEFAULT_TRANSLATOR).equals(TRANSLATOR_GOOGLE)) {
+    } else if (sharedPreferences.getString(KEY_TRANSLATOR, CaptureActivity.DEFAULT_TRANSLATOR).equals(translators[1])) {
       listPreferenceTargetLanguage.setEntries(R.array.translationtargetlanguagenames_google);
       listPreferenceTargetLanguage.setEntryValues(R.array.translationtargetiso6391_google);
     }
@@ -207,9 +244,9 @@ public class PreferencesActivity extends PreferenceActivity implements
     listPreferenceSourceLanguage.setSummary(LanguageCodeHelper.getLanguageName(this, sharedPreferences.getString(KEY_SOURCE_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE)));
     listPreferenceTargetLanguage.setSummary(LanguageCodeHelper.getTranslationLanguageName(this, sharedPreferences.getString(KEY_TARGET_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE)));
     listPreferencePageSegmentationMode.setSummary(sharedPreferences.getString(KEY_PAGE_SEGMENTATION_MODE, CaptureActivity.DEFAULT_PAGE_SEGMENTATION_MODE));
-    listPreferenceOcrEngineMode.setSummary(sharedPreferences.getString(KEY_OCR_ENGINE_MODE, CaptureActivity.DEFAULT_OCR_ENGINE_MODE_SUMMARY_TEXT));
-    editTextPreferenceCharacterBlacklist.setSummary(sharedPreferences.getString(KEY_CHARACTER_BLACKLIST, CaptureActivity.DEFAULT_CHARACTER_BLACKLIST));
-    editTextPreferenceCharacterWhitelist.setSummary(sharedPreferences.getString(KEY_CHARACTER_WHITELIST, CaptureActivity.DEFAULT_CHARACTER_WHITELIST));
+    listPreferenceOcrEngineMode.setSummary(sharedPreferences.getString(KEY_OCR_ENGINE_MODE, CaptureActivity.DEFAULT_OCR_ENGINE_MODE));
+    editTextPreferenceCharacterBlacklist.setSummary(sharedPreferences.getString(KEY_CHARACTER_BLACKLIST, OcrCharacterHelper.getDefaultBlacklist(listPreferenceSourceLanguage.getValue())));
+    editTextPreferenceCharacterWhitelist.setSummary(sharedPreferences.getString(KEY_CHARACTER_WHITELIST, OcrCharacterHelper.getDefaultWhitelist(listPreferenceSourceLanguage.getValue())));
     
     // Set up a listener whenever a key changes
     getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);

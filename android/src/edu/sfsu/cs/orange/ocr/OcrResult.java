@@ -81,15 +81,15 @@ public final class OcrResult {
       canvas.drawRect(r, paint);
     }    
     
-    // Draw bounding boxes around each character
-    for (int i = 0; i < characterBoundingBoxes.size(); i++) {
-      paint.setAlpha(0xA0);
-      paint.setColor(0xFF00FF00);
-      paint.setStyle(Style.STROKE);
-      paint.setStrokeWidth(3);
-      Rect r = characterBoundingBoxes.get(i);
-      canvas.drawRect(r, paint);
-    }
+//    // Draw bounding boxes around each character
+//    for (int i = 0; i < characterBoundingBoxes.size(); i++) {
+//      paint.setAlpha(0xA0);
+//      paint.setColor(0xFF00FF00);
+//      paint.setStyle(Style.STROKE);
+//      paint.setStrokeWidth(3);
+//      Rect r = characterBoundingBoxes.get(i);
+//      canvas.drawRect(r, paint);
+//    }
     
     return bitmap;
   }

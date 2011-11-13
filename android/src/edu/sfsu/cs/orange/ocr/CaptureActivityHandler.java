@@ -41,6 +41,7 @@ final class CaptureActivityHandler extends Handler {
   private final CaptureActivity activity;
   private final DecodeThread decodeThread;
   private static State state;
+  private final CameraManager cameraManager;
   private static boolean isAutofocusLoopStarted = false;
 
   private enum State {
@@ -55,12 +56,13 @@ final class CaptureActivityHandler extends Handler {
     DONE
   }
 
-  CaptureActivityHandler(CaptureActivity activity, TessBaseAPI baseApi, 
+  CaptureActivityHandler(CaptureActivity activity, CameraManager cameraManager, TessBaseAPI baseApi, 
       boolean isContinuousModeActive) {
     this.activity = activity;
+    this.cameraManager = cameraManager;
 
     // Start ourselves capturing previews (and decoding if using continuous recognition mode).
-    CameraManager.get().startPreview();
+    cameraManager.startPreview();
     
     decodeThread = new DecodeThread(activity, 
         //new ViewfinderResultPointCallback(activity.getViewfinderView()), 
@@ -76,7 +78,7 @@ final class CaptureActivityHandler extends Handler {
       // Display a "be patient" message while first recognition request is running
       activity.setStatusViewForContinuous();
       
-      CameraManager.get().requestAutoFocus(this, R.id.auto_focus);
+      cameraManager.requestAutoFocus(this, R.id.auto_focus);
       restartOcrPreviewAndDecode();
     } else {
       state = State.SUCCESS;
@@ -198,9 +200,8 @@ final class CaptureActivityHandler extends Handler {
   
   void quitSynchronously() {    
     state = State.DONE;
-    CameraManager cameraManager = CameraManager.get();
     if (cameraManager != null) {
-      CameraManager.get().stopPreview();
+      cameraManager.stopPreview();
     }
     //Message quit = Message.obtain(decodeThread.getHandler(), R.id.quit);
     try {
@@ -247,16 +248,16 @@ final class CaptureActivityHandler extends Handler {
   // Send a decode request for continuous OCR mode
   private void restartOcrPreviewAndDecode() {
     // Continue capturing camera frames
-    CameraManager.get().startPreview();
+    cameraManager.startPreview();
     
     // Continue requesting decode of images
-    CameraManager.get().requestOcrDecode(decodeThread.getHandler(), R.id.ocr_continuous_decode);
+    cameraManager.requestOcrDecode(decodeThread.getHandler(), R.id.ocr_continuous_decode);
     activity.drawViewfinder();    
   }
 
   private void ocrDecode() {
     state = State.PREVIEW_PAUSED;
-    CameraManager.get().requestOcrDecode(decodeThread.getHandler(), R.id.ocr_decode);
+    cameraManager.requestOcrDecode(decodeThread.getHandler(), R.id.ocr_decode);
   }
 
   void hardwareShutterButtonClick() {
@@ -279,7 +280,7 @@ final class CaptureActivityHandler extends Handler {
       } else if (state == State.CONTINUOUS){
         state = State.CONTINUOUS_FOCUSING;
       }
-      CameraManager.get().requestAutoFocus(this, message);
+      cameraManager.requestAutoFocus(this, message);
     } else {
       // If we're bumping up against a user-requested focus, enqueue another focus request,
       // otherwise stop autofocusing until the next restartOcrPreview()

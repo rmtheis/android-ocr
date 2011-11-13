@@ -21,34 +21,30 @@
 
 		<CheckBoxPreference android:key="preference_capture_continuous"
 			android:title="Continuous preview"
-			android:defaultValue="false"
 			android:entries="@array/capturemodes" />
 
 		<ListPreference android:title="Recognize"
 			android:key="sourceLanguageCodeOcrPref"
-			android:defaultValue="eng" 
 			android:entries="@array/languagenames"
 			android:entryValues="@array/iso6393" />
+			
 	</PreferenceCategory>
 
 	<!-- TRANSLATION SETTINGS -->
 	<PreferenceCategory android:title="@string/preferences_settings_for_translation">
 
 		<CheckBoxPreference android:key="preference_translation_toggle_translation"
-			android:title="@string/preference_translation_toggle_translation"
-			android:defaultValue="true" />
+			android:title="@string/preference_translation_toggle_translation"/>
 
 		<ListPreference android:key="targetLanguageCodeTranslationPref"  
 			android:title="Translate to"
 			android:dependency="preference_translation_toggle_translation"
-			android:defaultValue="es"
 			android:entries="@array/translationtargetlanguagenames_google" 
 			android:entryValues="@array/translationtargetiso6391_google" />
 			
 		<ListPreference android:key="preference_translator" 
 			android:title="Translator"
 		    android:dependency="preference_translation_toggle_translation"
-			android:defaultValue="Bing Translator"
 			android:entries="@array/translators" 
 			android:entryValues="@array/translators" />
 						
@@ -59,34 +55,28 @@
 
 	    <ListPreference android:key="preference_ocr_engine_mode"
 	        android:title="OCR engine"
-	        android:defaultValue="Tesseract"
 	        android:entries="@array/ocrenginemodes"
-	        android:entryValues="@array/ocrenginemodes" />
+	        android:entryValues="@array/ocrenginemodes"/>
 	    
 	    <CheckBoxPreference
             android:key="preferences_play_beep"
-            android:defaultValue="true"
             android:title="Beep"/>
 	    	    
         <EditTextPreference android:key="preference_character_blacklist"
-            android:title="Character blacklist"
-            android:defaultValue="" />
+            android:title="Character blacklist"/>
                 
         <EditTextPreference android:key="preference_character_whitelist"
-            android:title="Character whitelist"
-            android:defaultValue="" />
+            android:title="Character whitelist"/>
 
 	    <ListPreference android:key="preference_page_segmentation_mode"
 			android:title="Page segmentation"
-			android:defaultValue="Single block"
 			android:entries="@array/pagesegmentationmodes"
 			android:entryValues="@array/pagesegmentationmodes" />
 
 	    <CheckBoxPreference
             android:key="preferences_reverse_image"
-            android:defaultValue="false"
             android:title="Reversed camera image"
-            android:summary="For devices with only a front camera"/>
+            android:summary="(For devices with only a front camera)"/>
 	    
 	</PreferenceCategory>
 	

@@ -85,15 +85,19 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   private static final String TAG = CaptureActivity.class.getSimpleName();
   
-  // Note these values will be overridden by the ones in preferences.xml
+  // Note these values will be overridden by any default values defined in preferences.xml.
+  // These values should match 
   public static final String DEFAULT_SOURCE_LANGUAGE_CODE = "eng";
   public static final String DEFAULT_TARGET_LANGUAGE_CODE = "es";
   public static final boolean DEFAULT_TOGGLE_CONTINUOUS = false;
-  public static final String DEFAULT_OCR_ENGINE_MODE_SUMMARY_TEXT = "Tesseract only";
+  public static final boolean DEFAULT_TOGGLE_BEEP = true;
+  public static final boolean DEFAULT_TOGGLE_TRANSLATION = true;
+  public static final String DEFAULT_OCR_ENGINE_MODE = "Tesseract";
   public static final String DEFAULT_CHARACTER_BLACKLIST = "";
-  public static final String DEFAULT_CHARACTER_WHITELIST = "";
+  //public static final String DEFAULT_CHARACTER_WHITELIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^()_-+=/:;'\"";
   public static final String DEFAULT_PAGE_SEGMENTATION_MODE = "Single block";
-  public static final String DEFAULT_TRANSLATOR = PreferencesActivity.TRANSLATOR_BING;
+  public static final String DEFAULT_TRANSLATOR = "Bing Translator";
+  public static final boolean DEFAULT_TOGGLE_REVERSED_IMAGE = false;
 
   /** Languages for which Cube data is available. */
   static final String[] CUBE_SUPPORTED_LANGUAGES = { 
@@ -122,6 +126,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private static final int OPTIONS_COPY_RECOGNIZED_TEXT_ID = Menu.FIRST;
   private static final int OPTIONS_COPY_TRANSLATED_TEXT_ID = Menu.FIRST + 1;
 
+  private CameraManager cameraManager;
   private CaptureActivityHandler handler;
   private ViewfinderView viewfinderView;
   private SurfaceView surfaceView;
@@ -157,23 +162,30 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private ProgressDialog indeterminateDialog; // also for initOcr - init OCR engine
   private boolean isEngineReady;
   private boolean isPaused;
+  private static boolean isFirstLaunch;
 
   Handler getHandler() {
     return handler;
   }
 
+  CameraManager getCameraManager() {
+    return cameraManager;
+  }
+  
   @Override
   public void onCreate(Bundle icicle) {
     super.onCreate(icicle);
-
-    showHelpOnFirstLaunch();
+    
+    checkFirstLaunch();
+    
+    if (isFirstLaunch) {
+      setDefaultPreferences();
+    }
     
     Window window = getWindow();
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
     setContentView(R.layout.capture); // TODO update layout-ldpi/capture.xml to add shutter button, etc. 
-
-    CameraManager.init(this);
     viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
     cameraButtonView = findViewById(R.id.camera_button_view);
     resultView = findViewById(R.id.result_view);
@@ -210,6 +222,15 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     progressView = (View) findViewById(R.id.indeterminate_progress_indicator_view);
 
     isEngineReady = false;
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();   
+    resetStatusView();
+    
+    cameraManager = new CameraManager(getApplication());
+    viewfinderView.setCameraManager(cameraManager);
     
     // Set listener to change the size of the viewfinder rectangle.
     viewfinderView.setOnTouchListener(new View.OnTouchListener() {
@@ -228,7 +249,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
           int currentY = (int) event.getY();
 
           try {
-            Rect rect = CameraManager.get().getFramingRect();
+            Rect rect = cameraManager.getFramingRect();
 
             final int BUFFER = 50;
             final int BIG_BUFFER = 60;
@@ -237,42 +258,42 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
               if (((currentX >= rect.left - BIG_BUFFER && currentX <= rect.left + BIG_BUFFER) || (lastX >= rect.left - BIG_BUFFER && lastX <= rect.left + BIG_BUFFER))
                   && ((currentY <= rect.top + BIG_BUFFER && currentY >= rect.top - BIG_BUFFER) || (lastY <= rect.top + BIG_BUFFER && lastY >= rect.top - BIG_BUFFER))) {
                 // Top left corner: adjust both top and left sides
-                CameraManager.get().adjustFramingRect( 2 * (lastX - currentX), 2 * (lastY - currentY));
+                cameraManager.adjustFramingRect( 2 * (lastX - currentX), 2 * (lastY - currentY));
                 viewfinderView.removeResultText();
               } else if (((currentX >= rect.right - BIG_BUFFER && currentX <= rect.right + BIG_BUFFER) || (lastX >= rect.right - BIG_BUFFER && lastX <= rect.right + BIG_BUFFER)) 
                   && ((currentY <= rect.top + BIG_BUFFER && currentY >= rect.top - BIG_BUFFER) || (lastY <= rect.top + BIG_BUFFER && lastY >= rect.top - BIG_BUFFER))) {
                 // Top right corner: adjust both top and right sides
-                CameraManager.get().adjustFramingRect( 2 * (currentX - lastX), 2 * (lastY - currentY));
+                cameraManager.adjustFramingRect( 2 * (currentX - lastX), 2 * (lastY - currentY));
                 viewfinderView.removeResultText();
               } else if (((currentX >= rect.left - BIG_BUFFER && currentX <= rect.left + BIG_BUFFER) || (lastX >= rect.left - BIG_BUFFER && lastX <= rect.left + BIG_BUFFER))
                   && ((currentY <= rect.bottom + BIG_BUFFER && currentY >= rect.bottom - BIG_BUFFER) || (lastY <= rect.bottom + BIG_BUFFER && lastY >= rect.bottom - BIG_BUFFER))) {
                 // Bottom left corner: adjust both bottom and left sides
-                CameraManager.get().adjustFramingRect(2 * (lastX - currentX), 2 * (currentY - lastY));
+                cameraManager.adjustFramingRect(2 * (lastX - currentX), 2 * (currentY - lastY));
                 viewfinderView.removeResultText();
               } else if (((currentX >= rect.right - BIG_BUFFER && currentX <= rect.right + BIG_BUFFER) || (lastX >= rect.right - BIG_BUFFER && lastX <= rect.right + BIG_BUFFER)) 
                   && ((currentY <= rect.bottom + BIG_BUFFER && currentY >= rect.bottom - BIG_BUFFER) || (lastY <= rect.bottom + BIG_BUFFER && lastY >= rect.bottom - BIG_BUFFER))) {
                 // Bottom right corner: adjust both bottom and right sides
-                CameraManager.get().adjustFramingRect(2 * (currentX - lastX), 2 * (currentY - lastY));
+                cameraManager.adjustFramingRect(2 * (currentX - lastX), 2 * (currentY - lastY));
                 viewfinderView.removeResultText();
               } else if (((currentX >= rect.left - BUFFER && currentX <= rect.left + BUFFER) || (lastX >= rect.left - BUFFER && lastX <= rect.left + BUFFER))
                   && ((currentY <= rect.bottom && currentY >= rect.top) || (lastY <= rect.bottom && lastY >= rect.top))) {
                 // Adjusting left side: event falls within BUFFER pixels of left side, and between top and bottom side limits
-                CameraManager.get().adjustFramingRect(2 * (lastX - currentX), 0);
+                cameraManager.adjustFramingRect(2 * (lastX - currentX), 0);
                 viewfinderView.removeResultText();
               } else if (((currentX >= rect.right - BUFFER && currentX <= rect.right + BUFFER) || (lastX >= rect.right - BUFFER && lastX <= rect.right + BUFFER))
                   && ((currentY <= rect.bottom && currentY >= rect.top) || (lastY <= rect.bottom && lastY >= rect.top))) {
                 // Adjusting right side: event falls within BUFFER pixels of right side, and between top and bottom side limits
-                CameraManager.get().adjustFramingRect(2 * (currentX - lastX), 0);
+                cameraManager.adjustFramingRect(2 * (currentX - lastX), 0);
                 viewfinderView.removeResultText();
               } else if (((currentY <= rect.top + BUFFER && currentY >= rect.top - BUFFER) || (lastY <= rect.top + BUFFER && lastY >= rect.top - BUFFER))
                   && ((currentX <= rect.right && currentX >= rect.left) || (lastX <= rect.right && lastX >= rect.left))) {
                 // Adjusting top side: event falls within BUFFER pixels of top side, and between left and right side limits
-                CameraManager.get().adjustFramingRect(0, 2 * (lastY - currentY));
+                cameraManager.adjustFramingRect(0, 2 * (lastY - currentY));
                 viewfinderView.removeResultText();
               } else if (((currentY <= rect.bottom + BUFFER && currentY >= rect.bottom - BUFFER) || (lastY <= rect.bottom + BUFFER && lastY >= rect.bottom - BUFFER))
                   && ((currentX <= rect.right && currentX >= rect.left) || (lastX <= rect.right && lastX >= rect.left))) {
                 // Adjusting bottom side: event falls within BUFFER pixels of bottom side, and between left and right side limits
-                CameraManager.get().adjustFramingRect(0, 2 * (currentY - lastY));
+                cameraManager.adjustFramingRect(0, 2 * (currentY - lastY));
                 viewfinderView.removeResultText();
               }     
             }
@@ -291,69 +312,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         return false;
       }
     });
-  }
-
-//  public boolean getTorchButtonState() {
-//    return torchButton.isChecked();
-//  }
-//  
-//  public void setTorchButtonState(boolean enabled) {
-//    torchButton.setChecked(enabled);
-//  }
-  
-  /**
-   * Called when the shutter button is pressed in continuous mode.
-   */
-  void onShutterButtonPressContinuous() {
-    isPaused = true;
-    handler.stop();  
-    beepManager.playBeepSoundAndVibrate();
-    statusViewBottom.setText("");
-    statusViewBottom.setTextSize(14);
-    statusViewBottom.setTextColor(getResources().getColor(R.color.status_text));
-//    torchButton.setVisibility(View.GONE);
-    shutterButton.setVisibility(View.GONE);
-    boolean nullText = false;
-    if (isTranslationActive) {
-      try {
-        // Check if our last OCR request failed
-        lastResult.getText();
-      } catch (NullPointerException e) {
-        Toast toast = Toast.makeText(this, "OCR failed. Please try again.", Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.TOP, 0, 0);
-        toast.show();
-        nullText = true;
-        resumeContinuousDecoding();
-      }
-    }
-    if (!nullText) {
-      handleOcrDecode(lastResult);
-    }
-  }
-
-  /**
-   * Called to resume recognition after translation in continuous mode.
-   */
-  void resumeContinuousDecoding() {
-    isPaused = false;
-    resetStatusView();
-    setStatusViewForContinuous();
-    handler.resetState();
-//    torchButton.setVisibility(View.VISIBLE);
-    shutterButton.setVisibility(View.VISIBLE);
-  }
-  
-  @Override
-  protected void onResume() {
-    super.onResume();
-    
-    resetStatusView();
     
     String previousSourceLanguageCodeOcr = sourceLanguageCodeOcr;
     int previousOcrEngineMode = ocrEngineMode;
     
     retrievePreferences();
-    beepManager.updatePrefs();
     
     // Set up the camera preview surface.
     surfaceView = (SurfaceView) findViewById(R.id.preview_view);
@@ -404,6 +367,56 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       initCamera(surfaceHolder);
     }
   }
+  
+//  public boolean getTorchButtonState() {
+//    return torchButton.isChecked();
+//  }
+//  
+//  public void setTorchButtonState(boolean enabled) {
+//    torchButton.setChecked(enabled);
+//  }
+  
+  /**
+   * Called when the shutter button is pressed in continuous mode.
+   */
+  void onShutterButtonPressContinuous() {
+    isPaused = true;
+    handler.stop();  
+    beepManager.playBeepSoundAndVibrate();
+    statusViewBottom.setText("");
+    statusViewBottom.setTextSize(14);
+    statusViewBottom.setTextColor(getResources().getColor(R.color.status_text));
+//    torchButton.setVisibility(View.GONE);
+    shutterButton.setVisibility(View.GONE);
+    boolean nullText = false;
+    if (isTranslationActive) {
+      try {
+        // Check if our last OCR request failed
+        lastResult.getText();
+      } catch (NullPointerException e) {
+        Toast toast = Toast.makeText(this, "OCR failed. Please try again.", Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.TOP, 0, 0);
+        toast.show();
+        nullText = true;
+        resumeContinuousDecoding();
+      }
+    }
+    if (!nullText) {
+      handleOcrDecode(lastResult);
+    }
+  }
+
+  /**
+   * Called to resume recognition after translation in continuous mode.
+   */
+  void resumeContinuousDecoding() {
+    isPaused = false;
+    resetStatusView();
+    setStatusViewForContinuous();
+    handler.resetState();
+//    torchButton.setVisibility(View.VISIBLE);
+    shutterButton.setVisibility(View.VISIBLE);
+  }
 
   public void surfaceCreated(SurfaceHolder holder) {
     Log.d(TAG, "surfaceCreated()");
@@ -425,10 +438,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     try {
 
       // Open and initialize the camera
-      CameraManager.get().openDriver(surfaceHolder);
+      cameraManager.openDriver(surfaceHolder);
       
       // Creating the handler starts the preview, which can also throw a RuntimeException.
-      handler = new CaptureActivityHandler(this, baseApi, isContinuousModeActive);
+      handler = new CaptureActivityHandler(this, cameraManager, baseApi, isContinuousModeActive);
       
     } catch (IOException ioe) {
       showErrorMessage("Error", "Could not initialize camera. Please try restarting device.");
@@ -447,7 +460,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
     
     // Stop using the camera, to avoid conflicting with other camera-based apps
-    CameraManager.get().closeDriver();
+    cameraManager.closeDriver();
   }
 
   void stopHandler() {
@@ -539,59 +552,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   }
 
   public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-  }
-  
-  private void retrievePreferences() {
-      prefs = PreferenceManager.getDefaultSharedPreferences(this);
-      
-      // Retrieve from preferences, and set in this Activity, the language preferences
-      PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-      setSourceLanguage(prefs.getString(PreferencesActivity.KEY_SOURCE_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE));
-      setTargetLanguage(prefs.getString(PreferencesActivity.KEY_TARGET_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE));
-      isTranslationActive = prefs.getBoolean(PreferencesActivity.KEY_TOGGLE_TRANSLATION, false);
-      
-      // Retrieve from preferences, and set in this Activity, the capture mode preference
-      if (prefs.getBoolean(PreferencesActivity.KEY_CONTINUOUS_PREVIEW, CaptureActivity.DEFAULT_TOGGLE_CONTINUOUS)) {
-        isContinuousModeActive = true;
-      } else {
-        isContinuousModeActive = false;
-      }
-
-      // Retrieve from preferences, and set in this Activity, the page segmentation mode preference
-      String[] pageSegmentationModes = getResources().getStringArray(R.array.pagesegmentationmodes);
-      String pageSegmentationModeName = prefs.getString(PreferencesActivity.KEY_PAGE_SEGMENTATION_MODE, pageSegmentationModes[0]);
-      if (pageSegmentationModeName.equals(pageSegmentationModes[0])) {
-        pageSegmentationMode = TessBaseAPI.PSM_AUTO;
-      } else if (pageSegmentationModeName.equals(pageSegmentationModes[1])) {
-        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_BLOCK;
-      } else if (pageSegmentationModeName.equals(pageSegmentationModes[2])) {
-        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_CHAR;
-      } else if (pageSegmentationModeName.equals(pageSegmentationModes[3])) {
-        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_COLUMN;
-      } else if (pageSegmentationModeName.equals(pageSegmentationModes[4])) {
-        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_LINE;
-      } else if (pageSegmentationModeName.equals(pageSegmentationModes[5])) {
-        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_WORD;
-      } else if (pageSegmentationModeName.equals(pageSegmentationModes[6])) {
-        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_BLOCK_VERT_TEXT;
-      }
-      
-      // Retrieve from preferences, and set in this Activity, the OCR engine mode
-      String[] ocrEngineModes = getResources().getStringArray(R.array.ocrenginemodes);
-      String ocrEngineModeName = prefs.getString(PreferencesActivity.KEY_OCR_ENGINE_MODE, ocrEngineModes[0]);
-      if (ocrEngineModeName.equals(ocrEngineModes[0])) {
-        ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
-      } else if (ocrEngineModeName.equals(ocrEngineModes[1])) {
-        ocrEngineMode = TessBaseAPI.OEM_CUBE_ONLY;
-      } else if (ocrEngineModeName.equals(ocrEngineModes[2])) {
-        ocrEngineMode = TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED;
-      }
-      
-      // Retrieve from preferences, and set in this Activity, the character blacklist and whitelist
-      characterBlacklist = prefs.getString(PreferencesActivity.KEY_CHARACTER_BLACKLIST, CaptureActivity.DEFAULT_CHARACTER_BLACKLIST);
-      characterWhitelist = prefs.getString(PreferencesActivity.KEY_CHARACTER_WHITELIST, CaptureActivity.DEFAULT_CHARACTER_WHITELIST);
-      
-      prefs.registerOnSharedPreferenceChangeListener(listener);    
   }
 
   private boolean setSourceLanguage(String languageCode) {
@@ -806,13 +766,13 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
                                                    ocrResult.getTextlineBoundingBoxes()));
     
     // Display the recognized text on the screen
-    statusViewTop.setText(ocrResult.getText());
-    int scaledSize = Math.max(22, 32 - ocrResult.getText().length() / 4);
-    statusViewTop.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
-    statusViewTop.setTextColor(Color.BLACK);
-    statusViewTop.setBackgroundResource(R.color.white);
+//    statusViewTop.setText(ocrResult.getText());
+//    int scaledSize = Math.max(22, 32 - ocrResult.getText().length() / 4);
+//    statusViewTop.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
+//    statusViewTop.setTextColor(Color.BLACK);
+//    statusViewTop.setBackgroundResource(R.color.white);
     Integer meanConfidence = ocrResult.getMeanConfidence();
-    statusViewTop.getBackground().setAlpha(meanConfidence * (255 / 100));
+//    statusViewTop.getBackground().setAlpha(meanConfidence * (255 / 100));
     
     // Display recognition-related metadata at the bottom of the screen
     long recognitionTimeRequired = ocrResult.getRecognitionTimeRequired();
@@ -934,10 +894,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   }
   
   void setButtonVisibility(boolean visible) {
-    if (visible == true) {
+    if (shutterButton != null && visible == true) {
       shutterButton.setVisibility(View.VISIBLE);
 //      torchButton.setVisibility(View.VISIBLE);
-    } else {
+    } else if (shutterButton != null) {
       shutterButton.setVisibility(View.GONE);
 //      torchButton.setVisibility(View.GONE);
     }
@@ -978,17 +938,26 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
   }
   
+  static boolean getFirstLaunch() {
+    return isFirstLaunch;
+  }
+  
   /**
    * We want the help screen to be shown automatically the first time a new version of the app is
    * run. The easiest way to do this is to check android:versionCode from the manifest, and compare
    * it to a value stored as a preference.
    */
-  private boolean showHelpOnFirstLaunch() {
+  private boolean checkFirstLaunch() {
     try {
       PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
       int currentVersion = info.versionCode;
       SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
       int lastVersion = prefs.getInt(PreferencesActivity.KEY_HELP_VERSION_SHOWN, 0);
+      if (lastVersion == 0) {
+        isFirstLaunch = true;
+      } else {
+        isFirstLaunch = false;
+      }
       if (currentVersion > lastVersion) {
         
         // Record the last version for which we last displayed the What's New (Help) page
@@ -1006,6 +975,102 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       Log.w(TAG, e);
     }
     return false;
+  }
+  
+  private void retrievePreferences() {
+      prefs = PreferenceManager.getDefaultSharedPreferences(this);
+      
+      // Retrieve from preferences, and set in this Activity, the language preferences
+      PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+      setSourceLanguage(prefs.getString(PreferencesActivity.KEY_SOURCE_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE));
+      setTargetLanguage(prefs.getString(PreferencesActivity.KEY_TARGET_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE));
+      isTranslationActive = prefs.getBoolean(PreferencesActivity.KEY_TOGGLE_TRANSLATION, false);
+      
+      // Retrieve from preferences, and set in this Activity, the capture mode preference
+      if (prefs.getBoolean(PreferencesActivity.KEY_CONTINUOUS_PREVIEW, CaptureActivity.DEFAULT_TOGGLE_CONTINUOUS)) {
+        isContinuousModeActive = true;
+      } else {
+        isContinuousModeActive = false;
+      }
+
+      // Retrieve from preferences, and set in this Activity, the page segmentation mode preference
+      String[] pageSegmentationModes = getResources().getStringArray(R.array.pagesegmentationmodes);
+      String pageSegmentationModeName = prefs.getString(PreferencesActivity.KEY_PAGE_SEGMENTATION_MODE, pageSegmentationModes[0]);
+      if (pageSegmentationModeName.equals(pageSegmentationModes[0])) {
+        pageSegmentationMode = TessBaseAPI.PSM_AUTO;
+      } else if (pageSegmentationModeName.equals(pageSegmentationModes[1])) {
+        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_BLOCK;
+      } else if (pageSegmentationModeName.equals(pageSegmentationModes[2])) {
+        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_CHAR;
+      } else if (pageSegmentationModeName.equals(pageSegmentationModes[3])) {
+        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_COLUMN;
+      } else if (pageSegmentationModeName.equals(pageSegmentationModes[4])) {
+        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_LINE;
+      } else if (pageSegmentationModeName.equals(pageSegmentationModes[5])) {
+        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_WORD;
+      } else if (pageSegmentationModeName.equals(pageSegmentationModes[6])) {
+        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_BLOCK_VERT_TEXT;
+      }
+      
+      // Retrieve from preferences, and set in this Activity, the OCR engine mode
+      String[] ocrEngineModes = getResources().getStringArray(R.array.ocrenginemodes);
+      String ocrEngineModeName = prefs.getString(PreferencesActivity.KEY_OCR_ENGINE_MODE, ocrEngineModes[0]);
+      if (ocrEngineModeName.equals(ocrEngineModes[0])) {
+        ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
+      } else if (ocrEngineModeName.equals(ocrEngineModes[1])) {
+        ocrEngineMode = TessBaseAPI.OEM_CUBE_ONLY;
+      } else if (ocrEngineModeName.equals(ocrEngineModes[2])) {
+        ocrEngineMode = TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED;
+      }
+      
+      // Retrieve from preferences, and set in this Activity, the character blacklist and whitelist
+      //characterBlacklist = prefs.getString(PreferencesActivity.KEY_CHARACTER_BLACKLIST, CaptureActivity.DEFAULT_CHARACTER_BLACKLIST);
+      //characterWhitelist = prefs.getString(PreferencesActivity.KEY_CHARACTER_WHITELIST, CaptureActivity.DEFAULT_CHARACTER_WHITELIST);
+      characterBlacklist = OcrCharacterHelper.getBlacklist(prefs, sourceLanguageCodeOcr);
+      characterWhitelist = OcrCharacterHelper.getWhitelist(prefs, sourceLanguageCodeOcr);
+      
+      prefs.registerOnSharedPreferenceChangeListener(listener);
+      
+      beepManager.updatePrefs();
+  }
+  
+  private void setDefaultPreferences() {
+    prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+    // Continuous preview
+    prefs.edit().putBoolean(PreferencesActivity.KEY_CONTINUOUS_PREVIEW, CaptureActivity.DEFAULT_TOGGLE_CONTINUOUS).commit();
+
+    // Recognition language
+    prefs.edit().putString(PreferencesActivity.KEY_SOURCE_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE).commit();
+
+    // Translation
+    prefs.edit().putBoolean(PreferencesActivity.KEY_TOGGLE_TRANSLATION, CaptureActivity.DEFAULT_TOGGLE_TRANSLATION).commit();
+
+    // Translation target language
+    prefs.edit().putString(PreferencesActivity.KEY_TARGET_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE).commit();
+
+    // Translator
+    prefs.edit().putString(PreferencesActivity.KEY_TRANSLATOR, CaptureActivity.DEFAULT_TRANSLATOR).commit();
+
+    // OCR Engine
+    prefs.edit().putString(PreferencesActivity.KEY_OCR_ENGINE_MODE, CaptureActivity.DEFAULT_OCR_ENGINE_MODE).commit();
+
+    // Beep
+    prefs.edit().putBoolean(PreferencesActivity.KEY_PLAY_BEEP, CaptureActivity.DEFAULT_TOGGLE_BEEP).commit();
+
+    // Character blacklist
+    prefs.edit().putString(PreferencesActivity.KEY_CHARACTER_BLACKLIST, 
+        OcrCharacterHelper.getDefaultBlacklist(CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE)).commit();
+
+    // Character whitelist
+    prefs.edit().putString(PreferencesActivity.KEY_CHARACTER_WHITELIST, 
+        OcrCharacterHelper.getDefaultWhitelist(CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE)).commit();
+
+    // Page segmentation mode
+    prefs.edit().putString(PreferencesActivity.KEY_PAGE_SEGMENTATION_MODE, CaptureActivity.DEFAULT_PAGE_SEGMENTATION_MODE).commit();
+
+    // Reversed camera image
+    prefs.edit().putBoolean(PreferencesActivity.KEY_REVERSE_IMAGE, CaptureActivity.DEFAULT_TOGGLE_REVERSED_IMAGE).commit();
   }
   
   void showErrorMessage(String title, String message) {

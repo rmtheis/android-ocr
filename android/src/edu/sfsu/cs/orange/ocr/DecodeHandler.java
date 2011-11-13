@@ -103,7 +103,7 @@ final class DecodeHandler extends Handler {
     indeterminateDialog.show();
     
     // Asyncrhonously launch the OCR process
-    PlanarYUVLuminanceSource source = CameraManager.get().buildLuminanceSource(data, width, height);
+    PlanarYUVLuminanceSource source = activity.getCameraManager().buildLuminanceSource(data, width, height);
     new OcrRecognizeAsyncTask(activity, baseApi, indeterminateDialog, source.renderCroppedGreyscaleBitmap()).execute();
 
   }
@@ -111,7 +111,7 @@ final class DecodeHandler extends Handler {
   // Perform an OCR decode for continuous recognition mode.
   private void ocrContinuousDecode(byte[] data, int width, int height) {
     // Asyncrhonously launch the OCR process
-    PlanarYUVLuminanceSource source = CameraManager.get().buildLuminanceSource(data, width, height);
+    PlanarYUVLuminanceSource source = activity.getCameraManager().buildLuminanceSource(data, width, height);
     new OcrRecognizeAsyncTask(activity, baseApi, source.renderCroppedGreyscaleBitmap()).execute();
   }
 }

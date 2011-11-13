@@ -45,8 +45,6 @@ public final class CameraManager {
   private static final int MIN_FRAME_HEIGHT = 20; // originally 240
   private static final int MAX_FRAME_WIDTH = 800; // originally 480
   private static final int MAX_FRAME_HEIGHT = 600; // originally 360
-
-  private static CameraManager cameraManager;
   
   private final Context context;
   private final CameraConfigurationManager configManager;
@@ -56,7 +54,8 @@ public final class CameraManager {
   private boolean initialized;
   private boolean previewing;
   private boolean reverseImage;
-
+  private int requestedFramingRectWidth;
+  private int requestedFramingRectHeight;
   /**
    * Preview frames are delivered here, which we pass on to the registered handler. Make sure to
    * clear the handler so it will only receive one message.
@@ -66,40 +65,11 @@ public final class CameraManager {
   /** Autofocus callbacks arrive here, and are dispatched to the Handler which requested them. */
   private final AutoFocusCallback autoFocusCallback;
 
-  /**
-   * Initializes this static object with the Context of the calling Activity.
-   *
-   * @param context The Activity which wants to use the camera.
-   */
-  public static void init(CaptureActivity activity) {
-    if (cameraManager == null) {
-      cameraManager = new CameraManager(activity);
-    }
-  }
-  
-  /**
-   * Deletes all state. We don't want to keep global variables around from one launch to another.
-   */
-  public static void destroy() {
-    cameraManager = null;
-  }
-  
-  /**
-   * Gets the CameraManager singleton instance.
-   *
-   * @return A reference to the CameraManager singleton.
-   */
-  public static CameraManager get() {
-    return cameraManager;
-  }
-
-  private CameraManager(CaptureActivity activity) {
-
-    this.context = activity.getBaseContext();
+  public CameraManager(Context context) {
+    this.context = context;
     this.configManager = new CameraConfigurationManager(context);
     previewCallback = new PreviewCallback(configManager);
     autoFocusCallback = new AutoFocusCallback();
-
   }
 
   /**
@@ -109,18 +79,25 @@ public final class CameraManager {
    * @throws IOException Indicates the camera driver failed to open.
    */
   public void openDriver(SurfaceHolder holder) throws IOException {
-    if (camera == null) {
-      camera = Camera.open();
-      if (camera == null) {
+    Camera theCamera = camera;
+    if (theCamera == null) {
+      theCamera = Camera.open();
+      if (theCamera == null) {
         throw new IOException();
       }
+      camera = theCamera;
     }
     camera.setPreviewDisplay(holder);
     if (!initialized) {
       initialized = true;
-      configManager.initFromCameraParameters(camera);
+      configManager.initFromCameraParameters(theCamera);
+      if (requestedFramingRectWidth > 0 && requestedFramingRectHeight > 0) {
+        adjustFramingRect(requestedFramingRectWidth, requestedFramingRectHeight);
+        requestedFramingRectWidth = 0;
+        requestedFramingRectHeight = 0;
+      }
     }
-    configManager.setDesiredCameraParameters(camera);
+    configManager.setDesiredCameraParameters(theCamera);
     
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
     reverseImage = prefs.getBoolean(PreferencesActivity.KEY_REVERSE_IMAGE, false);
@@ -227,8 +204,9 @@ public final class CameraManager {
    * Asks the camera hardware to begin drawing preview frames to the screen.
    */
   public void startPreview() {
-    if (camera != null && !previewing) {
-      camera.startPreview();
+    Camera theCamera = camera;
+    if (theCamera != null && !previewing) {
+      theCamera.startPreview();
       previewing = true;
     }
   }
@@ -255,9 +233,10 @@ public final class CameraManager {
    * @param message The what field of the message to be sent.
    */
   public void requestOcrDecode(Handler handler, int message) {
-    if (camera != null && previewing) {
+    Camera theCamera = camera;
+    if (theCamera != null && previewing) {
       previewCallback.setHandler(handler, message);
-      camera.setOneShotPreviewCallback(previewCallback);
+      theCamera.setOneShotPreviewCallback(previewCallback);
     }
   }
   
@@ -325,22 +304,27 @@ public final class CameraManager {
   }
 
   public void adjustFramingRect(int deltaWidth, int deltaHeight) {
-    Point screenResolution = configManager.getScreenResolution();
-    
-    // Set maximum and minimum sizes
-    if ((framingRect.width() + deltaWidth > screenResolution.x - 4) || (framingRect.width() + deltaWidth < 50)) {
-      deltaWidth = 0;
+    if (initialized) {
+      Point screenResolution = configManager.getScreenResolution();
+
+      // Set maximum and minimum sizes
+      if ((framingRect.width() + deltaWidth > screenResolution.x - 4) || (framingRect.width() + deltaWidth < 50)) {
+        deltaWidth = 0;
+      }
+      if ((framingRect.height() + deltaHeight > screenResolution.y - 4) || (framingRect.height() + deltaHeight < 50)) {
+        deltaHeight = 0;
+      }
+
+      int newWidth = framingRect.width() + deltaWidth;
+      int newHeight = framingRect.height() + deltaHeight;
+      int leftOffset = (screenResolution.x - newWidth) / 2;
+      int topOffset = (screenResolution.y - newHeight) / 2;
+      framingRect = new Rect(leftOffset, topOffset, leftOffset + newWidth, topOffset + newHeight);
+      framingRectInPreview = null;
+    } else {
+      requestedFramingRectWidth = deltaWidth;
+      requestedFramingRectHeight = deltaHeight;
     }
-    if ((framingRect.height() + deltaHeight > screenResolution.y - 4) || (framingRect.height() + deltaHeight < 50)) {
-      deltaHeight = 0;
-    }
-    
-    int newWidth = framingRect.width() + deltaWidth;
-    int newHeight = framingRect.height() + deltaHeight;
-    int leftOffset = (screenResolution.x - newWidth) / 2;
-    int topOffset = (screenResolution.y - newHeight) / 2;
-    framingRect = new Rect(leftOffset, topOffset, leftOffset + newWidth, topOffset + newHeight);
-    framingRectInPreview = null;
   }
 
   /**
@@ -354,6 +338,9 @@ public final class CameraManager {
    */
   public PlanarYUVLuminanceSource buildLuminanceSource(byte[] data, int width, int height) {
     Rect rect = getFramingRectInPreview();
+    if (rect == null) {
+      throw new IllegalStateException();
+    }
     int previewFormat = configManager.getPreviewFormat();
     String previewFormatString = configManager.getPreviewFormatString();
 
