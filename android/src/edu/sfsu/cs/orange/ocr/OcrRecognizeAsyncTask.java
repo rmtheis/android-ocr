@@ -93,11 +93,12 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
     List<Rect> wordBoxes = baseApi.getWords().getBoxRects();
     List<Rect> characterBoxes = baseApi.getCharacters().getBoxRects();
     List<Rect> textlineBoxes = baseApi.getTextlines().getBoxRects();
+    List<Rect> regionBoxes = baseApi.getRegions().getBoxRects();
 
     //textResult = PseudoTranslator.translate(textResult);
 
     ocrResult = new OcrResult(bitmap, textResult, wordConfidences, overallConf, characterBoxes, 
-        textlineBoxes, wordBoxes, (end - start));
+        textlineBoxes, wordBoxes, regionBoxes, (end - start));
     return true;
   }
   

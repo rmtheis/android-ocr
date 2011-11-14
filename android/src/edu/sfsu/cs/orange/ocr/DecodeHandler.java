@@ -21,17 +21,12 @@ package edu.sfsu.cs.orange.ocr;
 //import com.google.zxing.MultiFormatReader;
 //import com.google.zxing.ReaderException;
 //import com.google.zxing.Result;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import edu.sfsu.cs.orange.ocr.BeepManager;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import edu.sfsu.cs.orange.ocr.CaptureActivity;
 import edu.sfsu.cs.orange.ocr.OcrRecognizeAsyncTask;
 import edu.sfsu.cs.orange.ocr.R;
-import edu.sfsu.cs.orange.ocr.camera.CameraManager;
 
 import android.app.ProgressDialog;
 import android.os.Handler;

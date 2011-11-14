@@ -49,8 +49,6 @@ import android.util.Log;
 final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
   private static final String TAG = OcrInitAsyncTask.class.getSimpleName();
 
-  private static final String DOWNLOAD_BASE = "http://tesseract-ocr.googlecode.com/files/";
-
   /** Suffixes of required data files for Cube. */
   private static final String[] CUBE_DATA_FILES = {
     ".cube.bigrams",
@@ -70,7 +68,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
   private ProgressDialog dialog;
   private ProgressDialog indeterminateDialog;
   private final String languageCode;
-  private final String languageName;
+  private String languageName;
   private int ocrEngineMode;
 
   /**
@@ -108,7 +106,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
   protected void onPreExecute() {
     super.onPreExecute();
     dialog.setTitle("Please wait");
-    dialog.setMessage("Checking for language data installation...");
+    dialog.setMessage("Checking for data installation...");
     dialog.setIndeterminate(false);
     dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
     dialog.setCancelable(false);
@@ -234,12 +232,67 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
       installSuccess = true;
     }
 
+    // If OSD data file is not present, download it
+    File osdFile = new File(tessdataDir, CaptureActivity.OSD_FILENAME_BASE);
+    boolean osdInstallSuccess = false;
+    if (!osdFile.exists()) {
+      // Check assets for language data to install. If not present, download from Internet
+      languageName = "orientation and script detection";
+      try {
+        // Check for, and delete, partially-downloaded OSD files
+        String[] badFiles = { CaptureActivity.OSD_FILENAME + ".gz.download", 
+            CaptureActivity.OSD_FILENAME + ".gz", CaptureActivity.OSD_FILENAME };
+        for (String filename : badFiles) {
+          File file = new File(tessdataDir, filename);
+          if (file.exists()) {
+            file.delete();
+          }
+        }
+        
+        Log.d(TAG, "Checking for OSD data (" + CaptureActivity.OSD_FILENAME_BASE
+            + ".zip) in application assets...");
+        // Check for "osd.traineddata.zip"
+        osdInstallSuccess = installFromAssets(CaptureActivity.OSD_FILENAME_BASE + ".zip", 
+            tessdataDir, new File(CaptureActivity.OSD_FILENAME));
+      } catch (IOException e) {
+        Log.e(TAG, "IOException", e);
+      } catch (Exception e) {
+        Log.e(TAG, "Got exception", e);
+      }
+
+      if (!osdInstallSuccess) {
+        // File was not packaged in assets, so download it
+        Log.d(TAG, "Downloading " + CaptureActivity.OSD_FILENAME + ".gz...");
+        try {
+          osdInstallSuccess = downloadFile(CaptureActivity.OSD_FILENAME, new File(tessdataDir, 
+              CaptureActivity.OSD_FILENAME));
+          if (!osdInstallSuccess) {
+            Log.e(TAG, "Download failed");
+            return false;
+          }
+        } catch (IOException e) {
+          Log.e(TAG, "IOException received in doInBackground. Is a network connection available?");
+          return false;
+        }
+      }
+
+      // Unzip the OSD tar file
+      try {
+        untar(new File(tessdataDir.toString() + File.separator + CaptureActivity.OSD_FILENAME), 
+            tessdataDir);
+      } catch (IOException e) {
+        Log.e(TAG, "Untar failed");
+        return false;
+      }
+
+    }
+    
     // Dismiss the progress dialog box, revealing the indeterminate dialog box behind it
     dialog.dismiss();
 
     // Initialize the OCR engine
     if (baseApi.init(destinationDirBase + File.separator, languageCode, ocrEngineMode)) {
-      return installSuccess;
+      return installSuccess && osdInstallSuccess;
     }
     return false;
   }
@@ -281,7 +334,8 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
   private boolean downloadFile(String sourceFilenameBase, File destinationFile)
       throws IOException {
     try {
-      return downloadGzippedFileHttp(new URL(DOWNLOAD_BASE + sourceFilenameBase + ".gz"), 
+      return downloadGzippedFileHttp(new URL(CaptureActivity.DOWNLOAD_BASE + sourceFilenameBase + 
+          ".gz"), 
           destinationFile);
     } catch (MalformedURLException e) {
       throw new IllegalArgumentException("Bad URL string.");
@@ -303,7 +357,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
       throws IOException {
     // Send an HTTP GET request for the file
     Log.d(TAG, "Sending GET request to " + url + "...");
-    publishProgress("Downloading language data for " + languageName + "...", "0");
+    publishProgress("Downloading data for " + languageName + "...", "0");
     HttpURLConnection urlConnection = null;
     urlConnection = (HttpURLConnection) url.openConnection();
     urlConnection.setAllowUserInteraction(false);
@@ -339,7 +393,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
       percentComplete = (int) ((downloaded / (float) fileSize) * 100);
       if (percentComplete > percentCompleteLast) {
         publishProgress(
-            "Downloading language data for " + languageName + "...",
+            "Downloading data for " + languageName + "...",
             percentComplete.toString());
         percentCompleteLast = percentComplete;
       }
@@ -380,7 +434,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
     int unzippedBytes = 0;
     final Integer progressMin = 0;
     int progressMax = 100 - progressMin;
-    publishProgress("Uncompressing language data for " + languageName + "...",
+    publishProgress("Uncompressing data for " + languageName + "...",
         progressMin.toString());
 
     // If the file is a tar file, just show progress to 50%
@@ -405,7 +459,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
           + progressMin;
 
       if (percentComplete > percentCompleteLast) {
-        publishProgress("Uncompressing language data for " + languageName
+        publishProgress("Uncompressing data for " + languageName
             + "...", percentComplete.toString());
         percentCompleteLast = percentComplete;
       }
@@ -458,7 +512,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
     int unzippedBytes = 0;
     final Integer progressMin = 50;
     final int progressMax = 100 - progressMin;
-    publishProgress("Uncompressing language data for " + languageName + "...",
+    publishProgress("Uncompressing data for " + languageName + "...",
         progressMin.toString());
 
     // Extract all the files
@@ -481,7 +535,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
         percentComplete = (int) ((unzippedBytes / (float) uncompressedSize) * progressMax)
             + progressMin;
         if (percentComplete > percentCompleteLast) {
-          publishProgress("Uncompressing language data for " + languageName + "...", 
+          publishProgress("Uncompressing data for " + languageName + "...", 
               percentComplete.toString());
           percentCompleteLast = percentComplete;
         }
@@ -564,7 +618,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
       File destinationDir, File destinationFile) throws IOException,
       FileNotFoundException {
     // Attempt to open the zip archive
-    publishProgress("Uncompressing language data for " + languageName + "...", "0");
+    publishProgress("Uncompressing data for " + languageName + "...", "0");
     ZipInputStream inputStream = new ZipInputStream(context.getAssets().open(sourceFilename));
 
     // Loop through all the files and folders in the zip archive (but there should just be one)
@@ -596,7 +650,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
           unzippedSize += count;
           percentComplete = (int) ((unzippedSize / (long) zippedFileSize) * 100);
           if (percentComplete > percentCompleteLast) {
-            publishProgress("Uncompressing language data for " + languageName + "...", 
+            publishProgress("Uncompressing data for " + languageName + "...", 
                 percentComplete.toString(), "0");
             percentCompleteLast = percentComplete;
           }

@@ -21,6 +21,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.graphics.Point;
 import android.graphics.Rect;
 
 public final class OcrResult {
@@ -33,6 +34,7 @@ public final class OcrResult {
   private final List<Rect> wordBoundingBoxes;
   private final List<Rect> characterBoundingBoxes;
   private final List<Rect> textlineBoundingBoxes;
+  private final List<Rect> regionBoundingBoxes;
   
   private final long timestamp;
   private final long recognitionTimeRequired;
@@ -46,6 +48,7 @@ public final class OcrResult {
                    List<Rect> characterBoundingBoxes,
                    List<Rect> textlineBoundingBoxes,
                    List<Rect> wordBoundingBoxes,
+                   List<Rect> regionBoxes, 
                    long recognitionTimeRequired) {
     this.bitmap = bitmap;
     this.text = text;
@@ -54,6 +57,7 @@ public final class OcrResult {
     this.characterBoundingBoxes = characterBoundingBoxes;
     this.textlineBoundingBoxes = textlineBoundingBoxes;
     this.wordBoundingBoxes = wordBoundingBoxes;
+    this.regionBoundingBoxes = regionBoxes;
     this.recognitionTimeRequired = recognitionTimeRequired;
     this.timestamp = System.currentTimeMillis();
     
@@ -109,6 +113,10 @@ public final class OcrResult {
   public long getRecognitionTimeRequired() {
     return recognitionTimeRequired;
   }
+
+  public Point getBitmapDimensions() {
+    return new Point(bitmap.getWidth(), bitmap.getHeight()); 
+  }
   
   public List<Rect> getCharacterBoundingBoxes() {
     return characterBoundingBoxes;
@@ -120,6 +128,10 @@ public final class OcrResult {
   
   public List<Rect> getWordBoundingBoxes() {
     return wordBoundingBoxes;
+  }
+  
+  public List<Rect> getRegionBoundingBoxes() {
+    return regionBoundingBoxes;
   }
   
   public long getTimestamp() {

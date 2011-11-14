@@ -17,8 +17,6 @@
 
 package edu.sfsu.cs.orange.ocr;
 
-//import com.google.zxing.ResultMetadataType;
-//import com.google.zxing.ResultPoint;
 import edu.sfsu.cs.orange.ocr.BeepManager;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
@@ -42,7 +40,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -86,18 +83,15 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private static final String TAG = CaptureActivity.class.getSimpleName();
   
   // Note these values will be overridden by any default values defined in preferences.xml.
-  // These values should match 
   public static final String DEFAULT_SOURCE_LANGUAGE_CODE = "eng";
   public static final String DEFAULT_TARGET_LANGUAGE_CODE = "es";
-  public static final boolean DEFAULT_TOGGLE_CONTINUOUS = false;
-  public static final boolean DEFAULT_TOGGLE_BEEP = true;
-  public static final boolean DEFAULT_TOGGLE_TRANSLATION = true;
-  public static final String DEFAULT_OCR_ENGINE_MODE = "Tesseract";
-  public static final String DEFAULT_CHARACTER_BLACKLIST = "";
-  //public static final String DEFAULT_CHARACTER_WHITELIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^()_-+=/:;'\"";
-  public static final String DEFAULT_PAGE_SEGMENTATION_MODE = "Single block";
   public static final String DEFAULT_TRANSLATOR = "Bing Translator";
+  public static final String DEFAULT_OCR_ENGINE_MODE = "Tesseract";
+  public static final String DEFAULT_PAGE_SEGMENTATION_MODE = "Auto";
+  public static final boolean DEFAULT_TOGGLE_BEEP = true;
+  public static final boolean DEFAULT_TOGGLE_CONTINUOUS = false;
   public static final boolean DEFAULT_TOGGLE_REVERSED_IMAGE = false;
+  public static final boolean DEFAULT_TOGGLE_TRANSLATION = true;
 
   /** Languages for which Cube data is available. */
   static final String[] CUBE_SUPPORTED_LANGUAGES = { 
@@ -111,11 +105,20 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     "ara" // Arabic
   };
   
+  /** Resource to use for data file downloads. */
+  static final String DOWNLOAD_BASE = "http://tesseract-ocr.googlecode.com/files/";
+  
+  /** Download filename for orientation and script detection (OSD) data. */
+  static final String OSD_FILENAME = "tesseract-ocr-3.01.osd.tar";
+  
+  /** Destination filename for orientation and script detection (OSD) data. */
+  static final String OSD_FILENAME_BASE = "osd.traineddata";
+  
   // Minimum mean confidence score necessary to not reject single-shot OCR result
-  public static final int MINIMUM_MEAN_CONFIDENCE = 0; // 0 means don't reject any scored results
+  static final int MINIMUM_MEAN_CONFIDENCE = 0; // 0 means don't reject any scored results
   
   // Length of time between subsequent autofocus requests. Used in CaptureActivityHandler.
-  static final long AUTOFOCUS_SUCCESS_INTERVAL_MS = 9000L;
+  static final long AUTOFOCUS_SUCCESS_INTERVAL_MS = 8000L;
   static final long AUTOFOCUS_FAILURE_INTERVAL_MS = 1000L;
   
   // Context menu
@@ -185,7 +188,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     Window window = getWindow();
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-    setContentView(R.layout.capture); // TODO update layout-ldpi/capture.xml to add shutter button, etc. 
+    setContentView(R.layout.capture);
     viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
     cameraButtonView = findViewById(R.id.camera_button_view);
     resultView = findViewById(R.id.result_view);
@@ -221,14 +224,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     
     progressView = (View) findViewById(R.id.indeterminate_progress_indicator_view);
 
-    isEngineReady = false;
-  }
-
-  @Override
-  protected void onResume() {
-    super.onResume();   
-    resetStatusView();
-    
     cameraManager = new CameraManager(getApplication());
     viewfinderView.setCameraManager(cameraManager);
     
@@ -312,6 +307,14 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         return false;
       }
     });
+    
+    isEngineReady = false;
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();   
+    resetStatusView();
     
     String previousSourceLanguageCodeOcr = sourceLanguageCodeOcr;
     int previousOcrEngineMode = ocrEngineMode;
@@ -668,19 +671,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     new OcrInitAsyncTask(this, baseApi, dialog, indeterminateDialog, languageCode, languageName, ocrEngineMode)
       .execute(storageRoot.toString());
   }
-
-  String getOcrEngineModeName() {
-    String ocrEngineModeName = "";
-    String[] ocrEngineModes = getResources().getStringArray(R.array.ocrenginemodes);
-    if (ocrEngineMode == TessBaseAPI.OEM_TESSERACT_ONLY) {
-      ocrEngineModeName = ocrEngineModes[0];
-    } else if (ocrEngineMode == TessBaseAPI.OEM_CUBE_ONLY) {
-      ocrEngineModeName = ocrEngineModes[1];
-    } else if (ocrEngineMode == TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED) {
-      ocrEngineModeName = ocrEngineModes[2];
-    }
-    return ocrEngineModeName;
-  }
   
   boolean handleOcrDecode(OcrResult ocrResult) {
     lastResult = ocrResult;
@@ -761,9 +751,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     viewfinderView.addResultText(new OcrResultText(ocrResult.getText(), 
                                                    ocrResult.getWordConfidences(),
                                                    ocrResult.getMeanConfidence(),
+                                                   ocrResult.getBitmapDimensions(),
                                                    ocrResult.getCharacterBoundingBoxes(),
                                                    ocrResult.getWordBoundingBoxes(),
-                                                   ocrResult.getTextlineBoundingBoxes()));
+                                                   ocrResult.getTextlineBoundingBoxes(),
+                                                   ocrResult.getRegionBoundingBoxes()));
     
     // Display the recognized text on the screen
 //    statusViewTop.setText(ocrResult.getText());
@@ -977,6 +969,19 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     return false;
   }
   
+  String getOcrEngineModeName() {
+    String ocrEngineModeName = "";
+    String[] ocrEngineModes = getResources().getStringArray(R.array.ocrenginemodes);
+    if (ocrEngineMode == TessBaseAPI.OEM_TESSERACT_ONLY) {
+      ocrEngineModeName = ocrEngineModes[0];
+    } else if (ocrEngineMode == TessBaseAPI.OEM_CUBE_ONLY) {
+      ocrEngineModeName = ocrEngineModes[1];
+    } else if (ocrEngineMode == TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED) {
+      ocrEngineModeName = ocrEngineModes[2];
+    }
+    return ocrEngineModeName;
+  }
+  
   private void retrievePreferences() {
       prefs = PreferenceManager.getDefaultSharedPreferences(this);
       
@@ -997,18 +1002,20 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       String[] pageSegmentationModes = getResources().getStringArray(R.array.pagesegmentationmodes);
       String pageSegmentationModeName = prefs.getString(PreferencesActivity.KEY_PAGE_SEGMENTATION_MODE, pageSegmentationModes[0]);
       if (pageSegmentationModeName.equals(pageSegmentationModes[0])) {
-        pageSegmentationMode = TessBaseAPI.PSM_AUTO;
+        pageSegmentationMode = TessBaseAPI.PSM_AUTO_OSD;
       } else if (pageSegmentationModeName.equals(pageSegmentationModes[1])) {
-        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_BLOCK;
+        pageSegmentationMode = TessBaseAPI.PSM_AUTO;
       } else if (pageSegmentationModeName.equals(pageSegmentationModes[2])) {
-        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_CHAR;
+        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_BLOCK;
       } else if (pageSegmentationModeName.equals(pageSegmentationModes[3])) {
-        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_COLUMN;
+        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_CHAR;
       } else if (pageSegmentationModeName.equals(pageSegmentationModes[4])) {
-        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_LINE;
+        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_COLUMN;
       } else if (pageSegmentationModeName.equals(pageSegmentationModes[5])) {
-        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_WORD;
+        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_LINE;
       } else if (pageSegmentationModeName.equals(pageSegmentationModes[6])) {
+        pageSegmentationMode = TessBaseAPI.PSM_SINGLE_WORD;
+      } else if (pageSegmentationModeName.equals(pageSegmentationModes[7])) {
         pageSegmentationMode = TessBaseAPI.PSM_SINGLE_BLOCK_VERT_TEXT;
       }
       
@@ -1024,8 +1031,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       }
       
       // Retrieve from preferences, and set in this Activity, the character blacklist and whitelist
-      //characterBlacklist = prefs.getString(PreferencesActivity.KEY_CHARACTER_BLACKLIST, CaptureActivity.DEFAULT_CHARACTER_BLACKLIST);
-      //characterWhitelist = prefs.getString(PreferencesActivity.KEY_CHARACTER_WHITELIST, CaptureActivity.DEFAULT_CHARACTER_WHITELIST);
       characterBlacklist = OcrCharacterHelper.getBlacklist(prefs, sourceLanguageCodeOcr);
       characterWhitelist = OcrCharacterHelper.getWhitelist(prefs, sourceLanguageCodeOcr);
       
