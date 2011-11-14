@@ -19,8 +19,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="edu.sfsu.cs.orange.ocr"
           android:installLocation="preferExternal" 
-          android:versionName="0.5.8" 
-          android:versionCode="23"
+          android:versionName="0.5.9" 
+          android:versionCode="26"
           >
   <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="11"/>
   <supports-screens android:xlargeScreens="true"
@@ -28,7 +28,6 @@
                     android:normalScreens="true"
                     android:smallScreens="true" />
   <uses-feature android:name="android.hardware.camera.autofocus" />
-  <uses-feature android:name="android.hardware.camera.flash" />
   <uses-feature android:name="android.hardware.camera"/>
   
   <application android:icon="@drawable/launcher_icon"
