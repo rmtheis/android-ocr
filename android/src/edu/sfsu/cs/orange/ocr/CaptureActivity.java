@@ -40,6 +40,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -93,6 +94,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   public static final boolean DEFAULT_TOGGLE_REVERSED_IMAGE = false;
   public static final boolean DEFAULT_TOGGLE_TRANSLATION = true;
 
+  private static final boolean CONTINUOUS_DISPLAY_RECOGNIZED_TEXT = true;
+  private static final boolean CONTINUOUS_DISPLAY_METADATA = true;
+  
   /** Languages for which Cube data is available. */
   static final String[] CUBE_SUPPORTED_LANGUAGES = { 
     "ara", // Arabic
@@ -756,21 +760,27 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
                                                    ocrResult.getWordBoundingBoxes(),
                                                    ocrResult.getTextlineBoundingBoxes(),
                                                    ocrResult.getRegionBoundingBoxes()));
-    
-    // Display the recognized text on the screen
-//    statusViewTop.setText(ocrResult.getText());
-//    int scaledSize = Math.max(22, 32 - ocrResult.getText().length() / 4);
-//    statusViewTop.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
-//    statusViewTop.setTextColor(Color.BLACK);
-//    statusViewTop.setBackgroundResource(R.color.white);
+
     Integer meanConfidence = ocrResult.getMeanConfidence();
-//    statusViewTop.getBackground().setAlpha(meanConfidence * (255 / 100));
     
-    // Display recognition-related metadata at the bottom of the screen
-    long recognitionTimeRequired = ocrResult.getRecognitionTimeRequired();
-    statusViewBottom.setTextSize(14);
-    statusViewBottom.setText("OCR: " + sourceLanguageReadable + " - Mean confidence: " + 
-        meanConfidence.toString() + " - Time required: " + recognitionTimeRequired + " ms");
+    if (CONTINUOUS_DISPLAY_RECOGNIZED_TEXT) {
+      // Display the recognized text on the screen
+      statusViewTop.setText(ocrResult.getText());
+      int scaledSize = Math.max(22, 32 - ocrResult.getText().length() / 4);
+      statusViewTop.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
+      statusViewTop.setTextColor(Color.BLACK);
+      statusViewTop.setBackgroundResource(R.color.white);
+
+      statusViewTop.getBackground().setAlpha(meanConfidence * (255 / 100));
+    }
+
+    if (CONTINUOUS_DISPLAY_METADATA) {
+      // Display recognition-related metadata at the bottom of the screen
+      long recognitionTimeRequired = ocrResult.getRecognitionTimeRequired();
+      statusViewBottom.setTextSize(14);
+      statusViewBottom.setText("OCR: " + sourceLanguageReadable + " - Mean confidence: " + 
+          meanConfidence.toString() + " - Time required: " + recognitionTimeRequired + " ms");
+    }
   }
   
   /**

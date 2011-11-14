@@ -19,7 +19,7 @@ import java.util.List;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
-import edu.sfsu.cs.orange.ocr.language.PseudoTranslator;
+//import edu.sfsu.cs.orange.ocr.language.PseudoTranslator;
 
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;

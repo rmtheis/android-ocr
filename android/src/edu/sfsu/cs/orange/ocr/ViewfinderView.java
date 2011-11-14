@@ -48,7 +48,7 @@ public final class ViewfinderView extends View {
   private static final boolean DRAW_WORD_BOXES = true;
   private static final boolean DRAW_CHARACTER_BOXES = false;
 
-  private static final boolean DRAW_WORD_TEXT = true;
+  private static final boolean DRAW_WORD_TEXT = false;
   private static final boolean DRAW_CHARACTER_TEXT = false;
 
   private CameraManager cameraManager;
@@ -133,11 +133,11 @@ public final class ViewfinderView extends View {
         if (DRAW_TEXTLINE_BOXES) {
           // Draw each textline
           textlineBoundingBoxes = resultText.getTextlineBoundingBoxes();
+          paint.setAlpha(0xA0);
+          paint.setColor(Color.RED);
+          paint.setStyle(Style.STROKE);
+          paint.setStrokeWidth(1);
           for (int i = 0; i < textlineBoundingBoxes.size(); i++) {
-            paint.setAlpha(0xA0);
-            paint.setColor(Color.RED);
-            paint.setStyle(Style.STROKE);
-            paint.setStrokeWidth(1);
             rect = textlineBoundingBoxes.get(i);
             canvas.drawRect(frame.left + rect.left * scaleX,
                 frame.top + rect.top * scaleY, 
@@ -163,19 +163,19 @@ public final class ViewfinderView extends View {
             rect = wordBoundingBoxes.get(i);
             int[] wordConfidences = resultText.getWordConfidences();
             paint.setColor(Color.WHITE);
-            paint.setAlpha(wordConfidences[i] * 255 / 100); // Higher confidence = more opaque, less transparent background
             paint.setStyle(Style.FILL);
+            paint.setAlpha(wordConfidences[i] * 255 / 100); // Higher confidence = more opaque, less transparent background
             canvas.drawRect(frame.left + rect.left * scaleX,
                 frame.top + rect.top * scaleY, 
                 frame.left + rect.right * scaleX, 
                 frame.top + rect.bottom * scaleY, paint);
 
             // Draw the word in black text
+            paint.setColor(Color.BLACK);
+            paint.setAlpha(0xFF);
+            paint.setAntiAlias(true);
+            paint.setTextAlign(Align.LEFT);
             try {
-              paint.setColor(Color.BLACK);
-              paint.setAlpha(0xFF);
-              paint.setAntiAlias(true);
-              paint.setTextAlign(Align.LEFT);
               // Adjust text size to fill rect
               paint.setTextSize(100);
               paint.setTextScaleX(1.0f);
@@ -212,16 +212,19 @@ public final class ViewfinderView extends View {
         }
 
         if (DRAW_WORD_BOXES) {
-          // Draw a bounding box around the word
           paint.setAlpha(0xA0);
           paint.setColor(0xFF00CCFF);
           paint.setStyle(Style.STROKE);
           paint.setStrokeWidth(1);
-          canvas.drawRect(
-              frame.left + rect.left * scaleX,
-              frame.top + rect.top * scaleY, 
-              frame.left + rect.right * scaleX, 
-              frame.top + rect.bottom * scaleY, paint);
+          for (int i = 0; i < wordBoundingBoxes.size(); i++) {
+            // Draw a bounding box around the word
+            rect = wordBoundingBoxes.get(i);
+            canvas.drawRect(
+                frame.left + rect.left * scaleX,
+                frame.top + rect.top * scaleY, 
+                frame.left + rect.right * scaleX, 
+                frame.top + rect.bottom * scaleY, paint);
+          }
         }    
 
         if (DRAW_CHARACTER_BOXES || DRAW_CHARACTER_TEXT) {
@@ -230,11 +233,11 @@ public final class ViewfinderView extends View {
 
         if (DRAW_CHARACTER_BOXES) {
           // Draw bounding boxes around each character
+          paint.setAlpha(0xA0);
+          paint.setColor(0xFF00FF00);
+          paint.setStyle(Style.STROKE);
+          paint.setStrokeWidth(1);
           for (int c = 0; c < characterBoundingBoxes.size(); c++) {
-            paint.setAlpha(0xA0);
-            paint.setColor(0xFF00FF00);
-            paint.setStyle(Style.STROKE);
-            paint.setStrokeWidth(1);
             Rect characterRect = characterBoundingBoxes.get(c);
             canvas.drawRect(frame.left + characterRect.left * scaleX,
                 frame.top + characterRect.top * scaleY, 

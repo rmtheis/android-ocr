@@ -220,6 +220,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
         try {
           untar(new File(tessdataDir.toString() + File.separator + destinationFilenameBase), 
               tessdataDir);
+          installSuccess = true;
         } catch (IOException e) {
           Log.e(TAG, "Untar failed");
           return false;
@@ -276,7 +277,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
         }
       }
 
-      // Unzip the OSD tar file
+      // Untar the OSD tar file
       try {
         untar(new File(tessdataDir.toString() + File.separator + CaptureActivity.OSD_FILENAME), 
             tessdataDir);
@@ -285,6 +286,9 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
         return false;
       }
 
+    } else {
+      Log.d(TAG, "OSD file already present in " + tessdataDir.toString());
+      osdInstallSuccess = true;
     }
     
     // Dismiss the progress dialog box, revealing the indeterminate dialog box behind it
