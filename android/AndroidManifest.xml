@@ -28,6 +28,7 @@
                     android:normalScreens="true"
                     android:smallScreens="true" />
   <uses-feature android:name="android.hardware.camera.autofocus" />
+  <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
   <uses-feature android:name="android.hardware.camera"/>
   
   <application android:icon="@drawable/launcher_icon"
