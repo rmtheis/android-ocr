@@ -15,6 +15,7 @@ PseudoTranslator.java
 TranslatorBing.java
 TranslatorGoogle.java
 actionscript/
+release/
 android-integration/
 androidtest/
 core/

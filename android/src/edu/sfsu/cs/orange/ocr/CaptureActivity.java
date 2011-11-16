@@ -586,10 +586,18 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
     
     if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+
       // We can read and write the media
       //    	if (Integer.valueOf(android.os.Build.VERSION.SDK_INT) > 7) {
       // For Android 2.2 and above
-      return getExternalFilesDir(Environment.MEDIA_MOUNTED);
+      
+      try {
+        return getExternalFilesDir(Environment.MEDIA_MOUNTED);
+      } catch (NullPointerException e) {
+        Log.e(TAG, "External storage is unavailable");
+        showErrorMessage("Error", "Required external storage (such as an SD card) is unavailable.");
+      }
+      
       //        } else {
       //          // For Android 2.1 and below, explicitly give the path as, for example,
       //          // "/mnt/sdcard/Android/data/edu.sfsu.cs.orange.ocr/files/"
@@ -597,6 +605,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       //                  "Android" + File.separator + "data" + File.separator + getPackageName() + 
       //                  File.separator + "files" + File.separator);
       //        }
+    
     } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
     	// We can only read the media
     	Log.e(TAG, "External storage is read-only");
