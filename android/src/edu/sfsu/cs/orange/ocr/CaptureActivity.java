@@ -390,26 +390,13 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     isPaused = true;
     handler.stop();  
     beepManager.playBeepSoundAndVibrate();
-    statusViewBottom.setText("");
-    statusViewBottom.setTextSize(14);
-    statusViewBottom.setTextColor(getResources().getColor(R.color.status_text));
-//    torchButton.setVisibility(View.GONE);
-    shutterButton.setVisibility(View.GONE);
-    boolean nullText = false;
-    if (isTranslationActive) {
-      try {
-        // Check if our last OCR request failed
-        lastResult.getText();
-      } catch (NullPointerException e) {
-        Toast toast = Toast.makeText(this, "OCR failed. Please try again.", Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.TOP, 0, 0);
-        toast.show();
-        nullText = true;
-        resumeContinuousDecoding();
-      }
-    }
-    if (!nullText) {
+    if (lastResult != null) {
       handleOcrDecode(lastResult);
+    } else {
+      Toast toast = Toast.makeText(this, "OCR failed. Please try again.", Toast.LENGTH_SHORT);
+      toast.setGravity(Gravity.TOP, 0, 0);
+      toast.show();
+      resumeContinuousDecoding();
     }
   }
 
