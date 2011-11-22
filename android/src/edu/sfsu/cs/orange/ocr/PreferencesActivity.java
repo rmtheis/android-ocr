@@ -46,7 +46,7 @@ public class PreferencesActivity extends PreferenceActivity implements
   public static final String KEY_OCR_ENGINE_MODE = "preference_ocr_engine_mode";
   public static final String KEY_CHARACTER_BLACKLIST = "preference_character_blacklist";
   public static final String KEY_CHARACTER_WHITELIST = "preference_character_whitelist";
-  //public static final String KEY_TOGGLE_LIGHT = "preference_toggle_light";
+  public static final String KEY_TOGGLE_LIGHT = "preference_toggle_light";
   public static final String KEY_TRANSLATOR = "preference_translator";
   
   // Preference keys carried over from ZXing project
@@ -127,13 +127,17 @@ public class PreferencesActivity extends PreferenceActivity implements
       listPreferenceSourceLanguage.setSummary(LanguageCodeHelper.getLanguageName(getBaseContext(), sharedPreferences.getString(key, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE)));
       
       // Retrieve the character blacklist/whitelist for the new language
-      sharedPreferences.edit().putString(KEY_CHARACTER_BLACKLIST, OcrCharacterHelper.getBlacklist(sharedPreferences, listPreferenceSourceLanguage.getValue())).commit();
-      sharedPreferences.edit().putString(KEY_CHARACTER_WHITELIST, OcrCharacterHelper.getWhitelist(sharedPreferences, listPreferenceSourceLanguage.getValue())).commit();
+      String blacklist = OcrCharacterHelper.getBlacklist(sharedPreferences, listPreferenceSourceLanguage.getValue());
+      String whitelist = OcrCharacterHelper.getWhitelist(sharedPreferences, listPreferenceSourceLanguage.getValue());
+      
+      // Save the character blacklist/whitelist to preferences
+      sharedPreferences.edit().putString(KEY_CHARACTER_BLACKLIST, blacklist).commit();
+      sharedPreferences.edit().putString(KEY_CHARACTER_WHITELIST, whitelist).commit();
       
       // Set the blacklist/whitelist summary text
-      editTextPreferenceCharacterBlacklist.setSummary(sharedPreferences.getString(key, OcrCharacterHelper.getDefaultBlacklist(listPreferenceSourceLanguage.getValue())));
-      editTextPreferenceCharacterWhitelist.setSummary(sharedPreferences.getString(key, OcrCharacterHelper.getDefaultWhitelist(listPreferenceSourceLanguage.getValue())));
-      
+      editTextPreferenceCharacterBlacklist.setSummary(blacklist);
+      editTextPreferenceCharacterWhitelist.setSummary(whitelist);
+
     } else if (key.equals(KEY_TARGET_LANGUAGE_PREFERENCE)) {
       listPreferenceTargetLanguage.setSummary(LanguageCodeHelper.getTranslationLanguageName(this, sharedPreferences.getString(key, CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE)));
     } else if (key.equals(KEY_PAGE_SEGMENTATION_MODE)) {
