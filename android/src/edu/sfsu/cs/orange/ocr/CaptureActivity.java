@@ -93,6 +93,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   public static final boolean DEFAULT_TOGGLE_CONTINUOUS = false;
   public static final boolean DEFAULT_TOGGLE_REVERSED_IMAGE = false;
   public static final boolean DEFAULT_TOGGLE_TRANSLATION = true;
+  public static final boolean DEFAULT_TOGGLE_LIGHT = false;
 
   private static final boolean CONTINUOUS_DISPLAY_RECOGNIZED_TEXT = true;
   private static final boolean CONTINUOUS_DISPLAY_METADATA = true;
@@ -210,17 +211,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     // Camera shutter button
     shutterButton = (ShutterButton) findViewById(R.id.shutter_button);
     shutterButton.setOnShutterButtonListener(this);
-    
-//    // Camera light toggle button
-//    torchButton = (ToggleButton) findViewById(R.id.torch_button);
-//    torchButton.setOnClickListener(new OnClickListener() {
-//      public void onClick(View v) {
-//        if (!isPaused) {
-//          CameraManager.get().toggleLight();
-//        }
-//      }
-//    });
-    
+   
     ocrResultView = (TextView) findViewById(R.id.ocr_result_text_view);
     registerForContextMenu(ocrResultView);
     translationView = (TextView) findViewById(R.id.translation_text_view);
@@ -375,14 +366,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
   }
   
-//  public boolean getTorchButtonState() {
-//    return torchButton.isChecked();
-//  }
-//  
-//  public void setTorchButtonState(boolean enabled) {
-//    torchButton.setChecked(enabled);
-//  }
-  
   /**
    * Called when the shutter button is pressed in continuous mode.
    */
@@ -408,7 +391,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     resetStatusView();
     setStatusViewForContinuous();
     handler.resetState();
-//    torchButton.setVisibility(View.VISIBLE);
     shutterButton.setVisibility(View.VISIBLE);
   }
 
@@ -699,9 +681,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     cameraButtonView.setVisibility(View.GONE);
     viewfinderView.setVisibility(View.GONE);
     resultView.setVisibility(View.VISIBLE);
-    
-//    // Disable light
-//    CameraManager.get().disableLight();
 
     ImageView bitmapImageView = (ImageView) findViewById(R.id.image_view);
     lastBitmap = ocrResult.getBitmap();
@@ -881,7 +860,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     viewfinderView.setVisibility(View.VISIBLE);
     cameraButtonView.setVisibility(View.VISIBLE);
     shutterButton.setVisibility(View.VISIBLE);
-//    torchButton.setVisibility(View.VISIBLE);
     lastResult = null;
     viewfinderView.removeResultText();
   }
@@ -900,10 +878,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   void setButtonVisibility(boolean visible) {
     if (shutterButton != null && visible == true) {
       shutterButton.setVisibility(View.VISIBLE);
-//      torchButton.setVisibility(View.VISIBLE);
     } else if (shutterButton != null) {
       shutterButton.setVisibility(View.GONE);
-//      torchButton.setVisibility(View.GONE);
     }
   }
   
@@ -1088,6 +1064,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     // Reversed camera image
     prefs.edit().putBoolean(PreferencesActivity.KEY_REVERSE_IMAGE, CaptureActivity.DEFAULT_TOGGLE_REVERSED_IMAGE).commit();
+    
+    // Light
+    prefs.edit().putBoolean(PreferencesActivity.KEY_TOGGLE_LIGHT, CaptureActivity.DEFAULT_TOGGLE_LIGHT).commit();
   }
   
   void showErrorMessage(String title, String message) {

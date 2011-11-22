@@ -68,6 +68,12 @@
         <EditTextPreference android:key="preference_character_whitelist"
             android:title="Character whitelist"/>
 
+<!-- 
+		<CheckBoxPreference
+		    android:key="preference_toggle_light"
+		    android:title="Light"/>
+-->
+
 	    <ListPreference android:key="preference_page_segmentation_mode"
 			android:title="Page segmentation"
 			android:entries="@array/pagesegmentationmodes"

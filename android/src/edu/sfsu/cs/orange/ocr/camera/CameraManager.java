@@ -101,11 +101,6 @@ public final class CameraManager {
     
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
     reverseImage = prefs.getBoolean(PreferencesActivity.KEY_REVERSE_IMAGE, false);
-    //    if (prefs.getBoolean(PreferencesActivity.KEY_FRONT_LIGHT, false)) {
-    //      FlashlightManager.enableFlashlight();
-    //    }
-    
-    //enableLight();
   }
 
   /**
@@ -113,9 +108,6 @@ public final class CameraManager {
    */
   public void closeDriver() {
     if (camera != null) {
-      //FlashlightManager.disableFlashlight();
-//      disableLight();
-      
       camera.release();
       camera = null;
 
@@ -126,80 +118,6 @@ public final class CameraManager {
     }
   }
 
-//  public void toggleLight() {
-//    Camera.Parameters parameters = camera.getParameters();
-//    if (parameters.getFlashMode().equals(Camera.Parameters.FLASH_MODE_OFF)) {
-//      parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-//      camera.setParameters(parameters);
-//      
-//      // If necessary, turn on the button to match the state of the light
-//      if (!activity.getTorchButtonState()) {
-//        activity.setTorchButtonState(true);
-//      }
-//      
-////      // Save the flash state to SharedPreferences
-////      SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-////      prefs.edit().putBoolean(PreferencesActivity.KEY_TOGGLE_LIGHT, true).commit();
-//      
-//    } else if (parameters.getFlashMode().equals(Camera.Parameters.FLASH_MODE_TORCH)) {
-//      parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-//      camera.setParameters(parameters);
-//      
-//      // If necessary, turn off the button to match the state of the light
-//      if (activity.getTorchButtonState()) {
-//        activity.setTorchButtonState(false);
-//      }
-//      
-////      // Save the flash state to SharedPreferences
-////      SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-////      prefs.edit().putBoolean(PreferencesActivity.KEY_TOGGLE_LIGHT, false).commit(); // TODO Change to use .apply() instead for API 9 and up, for everywhere we use .commit()
-////      
-//    }
-//  }
-  
-//  /**
-//   * Turn the light off.
-//   */
-//  public void disableLight() {
-//    activity.setTorchButtonState(false);
-//    
-//    if (camera != null) {
-//      Camera.Parameters parameters = camera.getParameters();
-//      parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-//      camera.setParameters(parameters);
-//    }
-//  }
-  
-//  /**
-//   * Turn the light on, if it was turned on the last time we used the camera.
-//   */
-//  public void enableLight() {
-//    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-//    boolean enabled = prefs.getBoolean(PreferencesActivity.KEY_TOGGLE_LIGHT, false);
-//    if (enabled) {
-//      Camera.Parameters parameters = camera.getParameters();
-//      parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-//      camera.setParameters(parameters);
-//      
-//      // If necessary, turn on the button to match the state of the light
-//      if (!activity.getTorchButtonState()) {
-//        activity.setTorchButtonState(true);
-//      }
-//         
-//      Log.d(TAG, "setting state of ToggleButton to match light");
-//    } else {
-//      // Be sure the light is off // TODO do we need this block?
-//      Camera.Parameters parameters = camera.getParameters();
-//      parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-//      camera.setParameters(parameters);
-//      
-//      // If necessary, turn off the button to match the state of the light
-//      if (activity.getTorchButtonState()) {
-//        activity.setTorchButtonState(false);
-//      }
-//    }
-//  }
-  
   /**
    * Asks the camera hardware to begin drawing preview frames to the screen.
    */
@@ -216,7 +134,6 @@ public final class CameraManager {
    */
   public void stopPreview() {
     if (camera != null && previewing) {
-//      disableLight();
       camera.stopPreview();
       previewCallback.setHandler(null, 0);
       autoFocusCallback.setHandler(null, 0);
@@ -341,28 +258,9 @@ public final class CameraManager {
     if (rect == null) {
       return null;
     }
-    int previewFormat = configManager.getPreviewFormat();
-    String previewFormatString = configManager.getPreviewFormatString();
-
-    switch (previewFormat) {
-      // This is the standard Android format which all devices are REQUIRED to support.
-      // In theory, it's the only one we should ever care about.
-      case PixelFormat.YCbCr_420_SP:
-      // This format has never been seen in the wild, but is compatible as we only care
-      // about the Y channel, so allow it.
-      case PixelFormat.YCbCr_422_SP:
-        return new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top,
-            rect.width(), rect.height(), reverseImage);
-      default:
-        // The Samsung Moment incorrectly uses this variant instead of the 'sp' version.
-        // Fortunately, it too has all the Y data up front, so we can read it.
-        if ("yuv420p".equals(previewFormatString)) {
-          return new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top,
-              rect.width(), rect.height(), reverseImage);
-        }
-    }
-    throw new IllegalArgumentException("Unsupported picture format: " +
-        previewFormat + '/' + previewFormatString);
+    // Go ahead and assume it's YUV rather than die.
+    return new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top,
+                                        rect.width(), rect.height(), reverseImage);
   }
 
 }
