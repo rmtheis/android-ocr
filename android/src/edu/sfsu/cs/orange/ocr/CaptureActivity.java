@@ -569,8 +569,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       try {
         return getExternalFilesDir(Environment.MEDIA_MOUNTED);
       } catch (NullPointerException e) {
+        // We get an error here if the SD card is visible, but full
         Log.e(TAG, "External storage is unavailable");
-        showErrorMessage("Error", "Required external storage (such as an SD card) is unavailable.");
+        showErrorMessage("Error", "Required external storage (such as an SD card) is full or unavailable.");
       }
       
       //        } else {
