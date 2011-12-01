@@ -44,11 +44,11 @@ public final class ViewfinderView extends View {
   //private static final long ANIMATION_DELAY = 80L;
 
   private static final boolean DRAW_REGION_BOXES = false;
-  private static final boolean DRAW_TEXTLINE_BOXES = true;
-  private static final boolean DRAW_WORD_BOXES = true;
+  private static final boolean DRAW_TEXTLINE_BOXES = false;
+  private static final boolean DRAW_WORD_BOXES = false;
   private static final boolean DRAW_CHARACTER_BOXES = false;
 
-  private static final boolean DRAW_WORD_TEXT = false;
+  private static final boolean DRAW_WORD_TEXT = true;
   private static final boolean DRAW_CHARACTER_TEXT = false;
 
   private CameraManager cameraManager;
@@ -122,7 +122,7 @@ public final class ViewfinderView extends View {
             paint.setColor(Color.MAGENTA);
             paint.setStyle(Style.STROKE);
             paint.setStrokeWidth(1);
-            rect = textlineBoundingBoxes.get(i);
+            rect = regionBoundingBoxes.get(i);
             canvas.drawRect(frame.left + rect.left * scaleX,
                 frame.top + rect.top * scaleY, 
                 frame.left + rect.right * scaleX, 
@@ -148,7 +148,6 @@ public final class ViewfinderView extends View {
 
         if (DRAW_WORD_BOXES || DRAW_WORD_TEXT) {
           // Split the text into words
-          words = resultText.getText().replace("\n"," ").split(" ");
           wordBoundingBoxes = resultText.getWordBoundingBoxes();
           //      for (String w : words) {
           //        Log.e("ViewfinderView", "word: " + w);
@@ -158,10 +157,11 @@ public final class ViewfinderView extends View {
         }
 
         if (DRAW_WORD_TEXT) { 
+          words = resultText.getText().replace("\n"," ").split(" ");
+          int[] wordConfidences = resultText.getWordConfidences();          
           for (int i = 0; i < wordBoundingBoxes.size(); i++) {
             // Draw a white background around each word
             rect = wordBoundingBoxes.get(i);
-            int[] wordConfidences = resultText.getWordConfidences();
             paint.setColor(Color.WHITE);
             paint.setStyle(Style.FILL);
             paint.setAlpha(wordConfidences[i] * 255 / 100); // Higher confidence = more opaque, less transparent background

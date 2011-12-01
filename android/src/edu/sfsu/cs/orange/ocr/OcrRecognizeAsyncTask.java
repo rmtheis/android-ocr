@@ -19,7 +19,7 @@ import java.util.List;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
-//import edu.sfsu.cs.orange.ocr.language.PseudoTranslator;
+import edu.sfsu.cs.orange.ocr.language.PseudoTranslator;
 
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
@@ -30,6 +30,8 @@ import android.os.Message;
 
 final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
 
+  private static final boolean PERFORM_PSEUDOTRANSLATION = true;
+  
   private CaptureActivity activity;
   private TessBaseAPI baseApi;
   private Bitmap bitmap;
@@ -95,8 +97,10 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
     List<Rect> textlineBoxes = baseApi.getTextlines().getBoxRects();
     List<Rect> regionBoxes = baseApi.getRegions().getBoxRects();
 
-    //textResult = PseudoTranslator.translate(textResult);
-
+    if (PERFORM_PSEUDOTRANSLATION) {
+      textResult = PseudoTranslator.translate(textResult);
+    }
+      
     ocrResult = new OcrResult(bitmap, textResult, wordConfidences, overallConf, characterBoxes, 
         textlineBoxes, wordBoxes, regionBoxes, (end - start));
     return true;
