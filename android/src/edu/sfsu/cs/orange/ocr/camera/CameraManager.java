@@ -37,7 +37,7 @@ import java.io.IOException;
  * implementation encapsulates the steps needed to take preview-sized images, which are used for
  * both preview and decoding.
  *
- * @author dswitkin@google.com (Daniel Switkin)
+ * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing
  */
 public final class CameraManager {
 
@@ -220,6 +220,12 @@ public final class CameraManager {
     return framingRectInPreview;
   }
 
+  /**
+   * Changes the size of the framing rect.
+   * 
+   * @param deltaWidth Number of pixels to adjust the width
+   * @param deltaHeight Number of pixels to adjust the height
+   */
   public void adjustFramingRect(int deltaWidth, int deltaHeight) {
     if (initialized) {
       Point screenResolution = configManager.getScreenResolution();

@@ -29,6 +29,8 @@ import java.io.IOException;
 
 /**
  * Manages beeps and vibrations for {@link CaptureActivity}.
+ * 
+ * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing/
  */
 public final class BeepManager {
 

@@ -31,6 +31,11 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 
+/**
+ * Activity to display informational pages to the user in a WebView.
+ * 
+ * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing
+ */
 public final class HelpActivity extends Activity {
 
   private static final String TAG = HelpActivity.class.getSimpleName();
@@ -79,7 +84,6 @@ public final class HelpActivity extends Activity {
     // Froyo has a bug with calling onCreate() twice in a row, which causes the What's New page
     // that's auto-loaded on first run to appear blank. As a workaround we only call restoreState()
     // if a valid URL was loaded at the time the previous activity was torn down.
-    // Note: copied from ZXing project http://code.google.com/p/zxing/
     if (icicle != null && icicle.getBoolean(WEBVIEW_STATE_PRESENT, false)) {
       webView.restoreState(icicle);
     } else if (intent != null && page != null && page.length() > 0) {

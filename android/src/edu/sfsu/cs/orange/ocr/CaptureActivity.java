@@ -73,30 +73,58 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * This activity opens the camera and does the actual scanning on a background thread.
- *
- * @author dswitkin@google.com (Daniel Switkin)
- * @author Sean Owen
+ * This activity opens the camera and does the actual scanning on a background thread. It draws a
+ * viewfinder to help the user place the barcode correctly, shows feedback as the image processing
+ * is happening, and then overlays the results when a scan is successful.
+ * 
+ * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing/
  */
 public final class CaptureActivity extends Activity implements SurfaceHolder.Callback, 
   ShutterButton.OnShutterButtonListener {
 
   private static final String TAG = CaptureActivity.class.getSimpleName();
   
-  // Note these values will be overridden by any default values defined in preferences.xml.
+  // Note: These constants will be overridden by any default values defined in preferences.xml.
+  
+  /** ISO 639-3 language code indicating the default recognition language. */
   public static final String DEFAULT_SOURCE_LANGUAGE_CODE = "eng";
+  
+  /** ISO 639-1 language code indicating the default target language for translation. */
   public static final String DEFAULT_TARGET_LANGUAGE_CODE = "es";
+  
+  /** The default online machine translation service to use. */
   public static final String DEFAULT_TRANSLATOR = "Bing Translator";
+  
+  /** The default OCR engine to use. */
   public static final String DEFAULT_OCR_ENGINE_MODE = "Tesseract";
+  
+  /** The default page segmentation mode to use. */
   public static final String DEFAULT_PAGE_SEGMENTATION_MODE = "Auto";
+  
+  /** Whether to beep by default when the shutter button is pressed. */
   public static final boolean DEFAULT_TOGGLE_BEEP = true;
+  
+  /** Whether to initially show a looping, real-time OCR display. */
   public static final boolean DEFAULT_TOGGLE_CONTINUOUS = false;
+  
+  /** Whether to initially reverse the image returned by the camera. */
   public static final boolean DEFAULT_TOGGLE_REVERSED_IMAGE = false;
+  
+  /** Whether to enable the use of online translation services be default. */
   public static final boolean DEFAULT_TOGGLE_TRANSLATION = true;
+  
+  /** Whether the light should be initially activated by default. */
   public static final boolean DEFAULT_TOGGLE_LIGHT = false;
 
-  private static final boolean CONTINUOUS_DISPLAY_RECOGNIZED_TEXT = true;
-  private static final boolean CONTINUOUS_DISPLAY_METADATA = true;
+  
+  /** Flag to display the real-time recognition results at the top of the scanning screen. */
+  private static final boolean CONTINUOUS_DISPLAY_RECOGNIZED_TEXT = false;
+  
+  /** Flag to display recognition-related statistics on the scanning screen. */
+  private static final boolean CONTINUOUS_DISPLAY_METADATA = false;
+  
+  /** Flag to enable display of the on-screen shutter button. */
+  private static final boolean DISPLAY_SHUTTER_BUTTON = false;
   
   /** Languages for which Cube data is available. */
   static final String[] CUBE_SUPPORTED_LANGUAGES = { 
@@ -119,11 +147,13 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   /** Destination filename for orientation and script detection (OSD) data. */
   static final String OSD_FILENAME_BASE = "osd.traineddata";
   
-  // Minimum mean confidence score necessary to not reject single-shot OCR result
+  /** Minimum mean confidence score necessary to not reject single-shot OCR result. Currently unused. */
   static final int MINIMUM_MEAN_CONFIDENCE = 0; // 0 means don't reject any scored results
   
-  // Length of time between subsequent autofocus requests. Used in CaptureActivityHandler.
+  /** Length of time before the next autofocus request, if the last one was successful. Used in CaptureActivityHandler. */
   static final long AUTOFOCUS_SUCCESS_INTERVAL_MS = 8000L;
+  
+  /** Length of time before the next autofocus request, if the last request failed. Used in CaptureActivityHandler. */
   static final long AUTOFOCUS_FAILURE_INTERVAL_MS = 1000L;
   
   // Context menu
@@ -170,7 +200,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private ProgressDialog indeterminateDialog; // also for initOcr - init OCR engine
   private boolean isEngineReady;
   private boolean isPaused;
-  private static boolean isFirstLaunch;
+  private static boolean isFirstLaunch; // True if this is the first time the app is being run
 
   Handler getHandler() {
     return handler;
@@ -209,8 +239,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     beepManager = new BeepManager(this);
     
     // Camera shutter button
-    shutterButton = (ShutterButton) findViewById(R.id.shutter_button);
-    shutterButton.setOnShutterButtonListener(this);
+    if (DISPLAY_SHUTTER_BUTTON) {
+      shutterButton = (ShutterButton) findViewById(R.id.shutter_button);
+      shutterButton.setOnShutterButtonListener(this);
+    }
    
     ocrResultView = (TextView) findViewById(R.id.ocr_result_text_view);
     registerForContextMenu(ocrResultView);
@@ -341,10 +373,15 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
   }
   
+  /** 
+   * Method to start or restart recognition after the OCR engine has been initialized,
+   * or after the app regains focus. Sets state related settings and OCR engine parameters,
+   * and requests camera initialization.
+   */
   void resumeOCR() {
     Log.d(TAG, "resumeOCR()");
     
-    // This method is called when Tesseract has already been successfully initiliazed, so set 
+    // This method is called when Tesseract has already been successfully initialized, so set 
     // isEngineReady = true here.
     isEngineReady = true;
     
@@ -366,9 +403,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
   }
   
-  /**
-   * Called when the shutter button is pressed in continuous mode.
-   */
+  /** Called when the shutter button is pressed in continuous mode. */
   void onShutterButtonPressContinuous() {
     isPaused = true;
     handler.stop();  
@@ -383,17 +418,19 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
   }
 
-  /**
-   * Called to resume recognition after translation in continuous mode.
-   */
+  /** Called to resume recognition after translation in continuous mode. */
+  @SuppressWarnings("unused")
   void resumeContinuousDecoding() {
     isPaused = false;
     resetStatusView();
     setStatusViewForContinuous();
     handler.resetState();
-    shutterButton.setVisibility(View.VISIBLE);
+    if (shutterButton != null && DISPLAY_SHUTTER_BUTTON) {
+      shutterButton.setVisibility(View.VISIBLE);
+    }
   }
 
+  @Override
   public void surfaceCreated(SurfaceHolder holder) {
     Log.d(TAG, "surfaceCreated()");
     
@@ -409,6 +446,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     hasSurface = true;
   }
   
+  /** Initializes the camera and starts the handler to begin previewing. */
   private void initCamera(SurfaceHolder surfaceHolder) {
     Log.d(TAG, "initCamera()");
     try {
@@ -536,6 +574,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
   }
 
+  /** Sets the necessary language code values for the given OCR language. */
   private boolean setSourceLanguage(String languageCode) {
     sourceLanguageCodeOcr = languageCode;
     sourceLanguageCodeTranslation = LanguageCodeHelper.mapLanguageCode(languageCode);
@@ -543,12 +582,14 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     return true;
   }
 
+  /** Sets the necessary language code values for the translation target language. */
   private boolean setTargetLanguage(String languageCode) {
     targetLanguageCodeTranslation = languageCode;
     targetLanguageReadable = LanguageCodeHelper.getTranslationLanguageName(this, languageCode);
     return true;
   }
 
+  /** Finds the proper location on the SD card where we can save files. */
   private File getStorageDirectory() {
     //Log.d(TAG, "getStorageDirectory(): API level is " + Integer.valueOf(android.os.Build.VERSION.SDK_INT));
     
@@ -595,6 +636,13 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     return null;
   }
 
+  /**
+   * Requests initialization of the OCR engine with the given parameters.
+   * 
+   * @param storageRoot Path to location of the tessdata directory to use
+   * @param languageCode Three-letter ISO 639-3 language code for OCR 
+   * @param languageName Name of the language for OCR, for example, "English"
+   */
   private void initOcrEngine(File storageRoot, String languageCode, String languageName) {    
     isEngineReady = false;
     
@@ -661,6 +709,12 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       .execute(storageRoot.toString());
   }
   
+  /**
+   * Displays information relating to the result of OCR, and requests a translation if necessary.
+   * 
+   * @param ocrResult Object representing successful OCR results
+   * @return True if a non-null result was received for OCR
+   */
   boolean handleOcrDecode(OcrResult ocrResult) {
     lastResult = ocrResult;
     
@@ -729,6 +783,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     return true;
   }
   
+  /**
+   * Displays information relating to the results of a successful real-time OCR request.
+   * 
+   * @param ocrResult Object representing successful OCR results
+   */
   void handleOcrContinuousDecode(OcrResult ocrResult) {
    
     lastResult = ocrResult;
@@ -766,7 +825,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   }
   
   /**
-   * Version of handleOcrContinuousDecode for failed OCR requests
+   * Version of handleOcrContinuousDecode for failed OCR requests. Displays a failure message.
+   * 
+   * @param obj Metadata for the failed OCR request.
    */
   void handleOcrContinuousDecode(OcrResultFailure obj) {
     lastResult = null;
@@ -774,12 +835,14 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     
     // Reset the text in the recognized text box.
     statusViewTop.setText("");
-    
-    // Color text delimited by '-' as red.
-    statusViewBottom.setTextSize(14);
-    CharSequence cs = setSpanBetweenTokens("OCR: " + sourceLanguageReadable + " - OCR failed - Time required: " 
-        + obj.getTimeRequired() + " ms", "-", new ForegroundColorSpan(0xFFFF0000));
-    statusViewBottom.setText(cs);
+
+    if (CONTINUOUS_DISPLAY_METADATA) {
+      // Color text delimited by '-' as red.
+      statusViewBottom.setTextSize(14);
+      CharSequence cs = setSpanBetweenTokens("OCR: " + sourceLanguageReadable + " - OCR failed - Time required: " 
+          + obj.getTimeRequired() + " ms", "-", new ForegroundColorSpan(0xFFFF0000));
+      statusViewBottom.setText(cs);
+    }
   }
   
   /**
@@ -849,45 +912,68 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
   }
 
+  /**
+   * Resets view elements.
+   */
   private void resetStatusView() {
     resultView.setVisibility(View.GONE);
-    statusViewBottom.setText("");
-    statusViewBottom.setTextSize(14);
-    statusViewBottom.setTextColor(getResources().getColor(R.color.status_text));
-    statusViewBottom.setVisibility(View.VISIBLE);
-    statusViewTop.setText("");
-    statusViewTop.setTextSize(14);
-    statusViewTop.setVisibility(View.VISIBLE);
+    if (CONTINUOUS_DISPLAY_METADATA) {
+      statusViewBottom.setText("");
+      statusViewBottom.setTextSize(14);
+      statusViewBottom.setTextColor(getResources().getColor(R.color.status_text));
+      statusViewBottom.setVisibility(View.VISIBLE);
+    }
+    if (CONTINUOUS_DISPLAY_RECOGNIZED_TEXT) {
+      statusViewTop.setText("");
+      statusViewTop.setTextSize(14);
+      statusViewTop.setVisibility(View.VISIBLE);
+    }
     viewfinderView.setVisibility(View.VISIBLE);
     cameraButtonView.setVisibility(View.VISIBLE);
-    shutterButton.setVisibility(View.VISIBLE);
+    if (DISPLAY_SHUTTER_BUTTON) {
+      shutterButton.setVisibility(View.VISIBLE);
+    }
     lastResult = null;
     viewfinderView.removeResultText();
   }
   
+  /** Displays a pop-up message showing the name of the current OCR source language. */
   void showLanguageName() {   
     Toast toast = Toast.makeText(this, "OCR: " + sourceLanguageReadable, Toast.LENGTH_LONG);
     toast.setGravity(Gravity.TOP, 0, 0);
     toast.show();
   }
   
+  /**
+   * Displays an initial message to the user while waiting for the first OCR request to be
+   * completed after starting realtime OCR.
+   */
   void setStatusViewForContinuous() {
     viewfinderView.removeResultText();
-    statusViewBottom.setText("OCR: " + sourceLanguageReadable + " - waiting for OCR...");
+    if (CONTINUOUS_DISPLAY_METADATA) {
+      statusViewBottom.setText("OCR: " + sourceLanguageReadable + " - waiting for OCR...");
+    }
   }
   
+  @SuppressWarnings("unused")
   void setButtonVisibility(boolean visible) {
-    if (shutterButton != null && visible == true) {
+    if (shutterButton != null && visible == true && DISPLAY_SHUTTER_BUTTON) {
       shutterButton.setVisibility(View.VISIBLE);
     } else if (shutterButton != null) {
       shutterButton.setVisibility(View.GONE);
     }
   }
   
+  /**
+   * Enables/disables the shutter button to prevent double-clicks on the button.
+   * 
+   * @param clickable True if the button should accept a click
+   */
   void setShutterButtonClickable(boolean clickable) {
     shutterButton.setClickable(clickable);
   }
 
+  /** Request the viewfinder to be invalidated. */
   void drawViewfinder() {
     viewfinderView.drawViewfinder();
   }
@@ -911,6 +997,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     requestDelayedAutofocus();
   }
   
+  /**
+   * Requests autofocus after a 350 ms delay. This delay prevents requesting focus when the user 
+   * just wants to click the shutter button without focusing. Quick button press/release will 
+   * trigger onShutterButtonClick() before the focus kicks in.
+   */
   private void requestDelayedAutofocus() {
     // Wait 350 ms before focusing to avoid interfering with quick button presses when
     // the user just wants to take a picture without focusing.
@@ -958,6 +1049,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     return false;
   }
   
+  /**
+   * Returns a string that represents which OCR engine(s) are currently set to be run.
+   * 
+   * @return OCR engine mode
+   */
   String getOcrEngineModeName() {
     String ocrEngineModeName = "";
     String[] ocrEngineModes = getResources().getStringArray(R.array.ocrenginemodes);
@@ -971,6 +1067,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     return ocrEngineModeName;
   }
   
+  /**
+   * Gets values from shared preferences and sets the corresponding data members in this activity.
+   */
   private void retrievePreferences() {
       prefs = PreferenceManager.getDefaultSharedPreferences(this);
       
@@ -1028,6 +1127,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       beepManager.updatePrefs();
   }
   
+  /**
+   * Sets default values for preferences. To be called the first time this app is run.
+   */
   private void setDefaultPreferences() {
     prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -1070,6 +1172,12 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     prefs.edit().putBoolean(PreferencesActivity.KEY_TOGGLE_LIGHT, CaptureActivity.DEFAULT_TOGGLE_LIGHT).commit();
   }
   
+  /**
+   * Displays an error message dialog box to the user on the UI thread.
+   * 
+   * @param title The title for the dialog box
+   * @param message The error message to be displayed
+   */
   void showErrorMessage(String title, String message) {
 	  new AlertDialog.Builder(this)
 	    .setTitle(title)

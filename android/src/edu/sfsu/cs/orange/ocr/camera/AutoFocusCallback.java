@@ -22,6 +22,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+/**
+ * Callback that's received when the autofocus cycle finishes.
+ * 
+ * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing
+ */
 final class AutoFocusCallback implements Camera.AutoFocusCallback {
   private static final String TAG = AutoFocusCallback.class.getSimpleName();
 

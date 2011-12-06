@@ -22,14 +22,9 @@ import android.util.Log;
 import edu.sfsu.cs.orange.ocr.PreferencesActivity;
 import edu.sfsu.cs.orange.ocr.R;
 
-// TODO See about re-doing this using enum as in:
-//   https://github.com/rmtheis/multi-translator/blob/master/src/com/robtheis/translator/TranslatorGoogle.java
-
 /**
  * Class for handling functions relating to converting between standard language
  * codes, and converting language codes to language names.
- * 
- * @author Jingjing
  */
 public class LanguageCodeHelper {
 	public static final String TAG = "LanguageCodeHelper";

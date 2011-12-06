@@ -24,6 +24,9 @@ import android.graphics.Paint.Style;
 import android.graphics.Point;
 import android.graphics.Rect;
 
+/**
+ * Encapsulates the result of OCR.
+ */
 public final class OcrResult {
   private final Bitmap bitmap;
   private final String text;

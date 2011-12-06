@@ -23,7 +23,7 @@ import android.content.DialogInterface;
 /**
  * Simple listener used to exit the app in a few cases.
  *
- * @author Sean Owen
+ * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing
  */
 final class FinishListener
     implements DialogInterface.OnClickListener, DialogInterface.OnCancelListener, Runnable {

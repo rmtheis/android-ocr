@@ -23,6 +23,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+/**
+ * Called when the next preview frame is received.
+ * 
+ * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing
+ */
 final class PreviewCallback implements Camera.PreviewCallback {
 
   private static final String TAG = PreviewCallback.class.getSimpleName();
@@ -40,6 +45,8 @@ final class PreviewCallback implements Camera.PreviewCallback {
     this.previewMessage = previewMessage;
   }
 
+  // Since we're not calling setPreviewFormat(int), the data arrives here in the YCbCr_420_SP 
+  // (NV21) format.
   @Override
   public void onPreviewFrame(byte[] data, Camera camera) {
     Point cameraResolution = configManager.getCameraResolution();

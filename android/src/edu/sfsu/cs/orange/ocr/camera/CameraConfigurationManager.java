@@ -34,6 +34,8 @@ import java.util.Collection;
 /**
  * A class which deals with reading, parsing, and setting the camera parameters which are used to
  * configure the camera hardware.
+ * 
+ * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing
  */
 final class CameraConfigurationManager {
 

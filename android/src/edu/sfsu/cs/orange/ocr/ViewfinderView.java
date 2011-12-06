@@ -20,6 +20,7 @@ import java.util.List;
 
 import edu.sfsu.cs.orange.ocr.R;
 import edu.sfsu.cs.orange.ocr.camera.CameraManager;
+import edu.sfsu.cs.orange.ocr.language.PseudoTranslator;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -38,17 +39,30 @@ import android.view.View;
  * This view is overlaid on top of the camera preview. It adds the viewfinder rectangle and partial
  * transparency outside it, as well as the result text.
  *
- * @author dswitkin@google.com (Daniel Switkin)
+ * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing
  */
 public final class ViewfinderView extends View {
   //private static final long ANIMATION_DELAY = 80L;
 
+  /** Flag to draw boxes representing the results from TessBaseAPI::GetRegions(). */
   private static final boolean DRAW_REGION_BOXES = false;
+
+  /** Flag to draw boxes representing the results from TessBaseAPI::GetTextlines(). */
   private static final boolean DRAW_TEXTLINE_BOXES = false;
+
+  /** Flag to draw boxes representing the results from TessBaseAPI::GetWords(). */
   private static final boolean DRAW_WORD_BOXES = false;
+
+  /** Flag to draw word text with a background varying from transparent to opaque. */
+  private static final boolean DRAW_TRANSPARENT_WORD_BACKGROUNDS = false;
+
+  /** Flag to draw boxes representing the results from TessBaseAPI::GetCharacters(). */
   private static final boolean DRAW_CHARACTER_BOXES = false;
 
+  /** Flag to draw the text of words within their respective boxes from TessBaseAPI::GetWords(). */
   private static final boolean DRAW_WORD_TEXT = true;
+
+  /** Flag to draw each character in its respective box from TessBaseAPI::GetCharacters(). */
   private static final boolean DRAW_CHARACTER_TEXT = false;
 
   private CameraManager cameraManager;
@@ -160,22 +174,38 @@ public final class ViewfinderView extends View {
           words = resultText.getText().replace("\n"," ").split(" ");
           int[] wordConfidences = resultText.getWordConfidences();          
           for (int i = 0; i < wordBoundingBoxes.size(); i++) {
-            // Draw a white background around each word
-            rect = wordBoundingBoxes.get(i);
-            paint.setColor(Color.WHITE);
-            paint.setStyle(Style.FILL);
-            paint.setAlpha(wordConfidences[i] * 255 / 100); // Higher confidence = more opaque, less transparent background
-            canvas.drawRect(frame.left + rect.left * scaleX,
-                frame.top + rect.top * scaleY, 
-                frame.left + rect.right * scaleX, 
-                frame.top + rect.bottom * scaleY, paint);
-
-            // Draw the word in black text
-            paint.setColor(Color.BLACK);
-            paint.setAlpha(0xFF);
-            paint.setAntiAlias(true);
-            paint.setTextAlign(Align.LEFT);
+            boolean isWordBlank = true;
             try {
+              if (!words[i].equals("") && !words[i].equalsIgnoreCase(PseudoTranslator.UNKNOWN_WORD)) {
+                isWordBlank = false;
+              }
+            } catch (ArrayIndexOutOfBoundsException e) {
+              e.printStackTrace();
+            }
+
+            // Only draw if word has characters
+            if (!isWordBlank) {
+              // Draw a white background around each word
+              rect = wordBoundingBoxes.get(i);
+              paint.setColor(Color.WHITE);
+              paint.setStyle(Style.FILL);
+              if (DRAW_TRANSPARENT_WORD_BACKGROUNDS) {
+                // Higher confidence = more opaque, less transparent background
+                paint.setAlpha(wordConfidences[i] * 255 / 100);
+              } else {
+                paint.setAlpha(255);
+              }
+              canvas.drawRect(frame.left + rect.left * scaleX,
+                  frame.top + rect.top * scaleY, 
+                  frame.left + rect.right * scaleX, 
+                  frame.top + rect.bottom * scaleY, paint);
+
+              // Draw the word in black text
+              paint.setColor(Color.BLACK);
+              paint.setAlpha(0xFF);
+              paint.setAntiAlias(true);
+              paint.setTextAlign(Align.LEFT);
+
               // Adjust text size to fill rect
               paint.setTextSize(100);
               paint.setTextScaleX(1.0f);
@@ -203,11 +233,8 @@ public final class ViewfinderView extends View {
               // set the scale for the text paint
               paint.setTextScaleX(xscale);
               canvas.drawText(words[i], frame.left + rect.left * scaleX, frame.top + rect.bottom * scaleY - baseline, paint);
-            } catch (ArrayIndexOutOfBoundsException e) {
-              e.printStackTrace();
-            } catch (Exception e) {
-              e.printStackTrace();
             }
+
           }
         }
 
@@ -333,10 +360,18 @@ public final class ViewfinderView extends View {
     invalidate();
   }
 
+  /**
+   * Adds the given OCR results for drawing to the view.
+   * 
+   * @param text Object containing OCR-derived text and corresponding data.
+   */
   public void addResultText(OcrResultText text) {
     resultText = text; 
   }
 
+  /**
+   * Nullifies OCR text to remove it at the next onDraw() drawing.
+   */
   public void removeResultText() {
     resultText = null;
   }

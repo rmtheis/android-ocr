@@ -27,7 +27,7 @@ import java.util.concurrent.CountDownLatch;
 /**
  * This thread does all the heavy lifting of decoding the images.
  *
- * @author dswitkin@google.com (Daniel Switkin)
+ * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing
  */
 final class DecodeThread extends Thread {
 

@@ -33,6 +33,8 @@ import android.util.Log;
  * a hierarchy of preferences to the user, organized into sections. These
  * preferences are displayed in the options menu that is shown when the user
  * presses the MENU button.
+ * 
+ * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing
  */
 public class PreferencesActivity extends PreferenceActivity implements
   OnSharedPreferenceChangeListener {

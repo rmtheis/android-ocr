@@ -25,6 +25,9 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.TextView;
 
+/**
+ * Class to perform translations in the background.
+ */
 public final class TranslateAsyncTask extends AsyncTask<String, String, Boolean> {
 
   private static final String TAG = TranslateAsyncTask.class.getSimpleName();

@@ -25,6 +25,8 @@ import android.widget.ImageView;
  * A button designed to be used for the on-screen shutter button.
  * It's currently an {@code ImageView} that can call a delegate when the
  * pressed state changes.
+ * 
+ * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing
  */
 public class ShutterButton extends ImageView {
 	/**

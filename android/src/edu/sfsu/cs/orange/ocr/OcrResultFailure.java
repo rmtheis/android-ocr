@@ -15,6 +15,9 @@
  */
 package edu.sfsu.cs.orange.ocr;
 
+/**
+ * Class to hold metadata for failed OCR results.
+ */
 public final class OcrResultFailure {
   private final long timeRequired;
   private final long timestamp;

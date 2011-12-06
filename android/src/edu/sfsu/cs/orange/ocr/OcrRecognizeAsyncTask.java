@@ -28,6 +28,10 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 
+/**
+ * Class to send OCR requests to the OCR engine in a separate thread and appropriately send a
+ * success/failure message.
+ */
 final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
 
   private static final boolean PERFORM_PSEUDOTRANSLATION = true;

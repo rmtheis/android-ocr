@@ -34,6 +34,11 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+/**
+ * Class to send bitmap data for OCR.
+ * 
+ * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing/
+ */
 final class DecodeHandler extends Handler {
 
   private final CaptureActivity activity;
@@ -78,7 +83,13 @@ final class DecodeHandler extends Handler {
     isDecodePending = false;
   }
   
-  // Perform an OCR decode for single-shot mode.
+  /**
+   *  Perform an OCR decode for single-shot mode.
+   *  
+   * @param data Image data
+   * @param width Image width
+   * @param height Image height
+   */
   private void ocrDecode(byte[] data, int width, int height) {
     //Log.d(TAG, "ocrDecode: Got R.id.ocr_decode message.");
     //Log.d(TAG, "width: " + width + ", height: " + height);
@@ -103,7 +114,13 @@ final class DecodeHandler extends Handler {
 
   }
   
-  // Perform an OCR decode for continuous recognition mode.
+  /**
+   *  Perform an OCR decode for realtime recognition mode.
+   *  
+   * @param data Image data
+   * @param width Image width
+   * @param height Image height
+   */
   private void ocrContinuousDecode(byte[] data, int width, int height) {
     // Asyncrhonously launch the OCR process
     PlanarYUVLuminanceSource source = activity.getCameraManager().buildLuminanceSource(data, width, height);

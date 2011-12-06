@@ -22,6 +22,9 @@ import android.preference.PreferenceManager;
 import edu.sfsu.cs.orange.ocr.CaptureActivity;
 import edu.sfsu.cs.orange.ocr.PreferencesActivity;
 
+/**
+ * Delegates translation requests to the appropriate translation service.
+ */
 public class Translator {
 
   public static final String BAD_TRANSLATION_MSG = "[Translation unavailable]";

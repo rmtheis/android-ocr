@@ -23,7 +23,7 @@ package edu.sfsu.cs.orange.ocr;
  * that one Reader does not modify the original luminance source and leave it in an unknown state
  * for other Readers in the chain.
  *
- * @author dswitkin@google.com (Daniel Switkin)
+ * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing
  */
 public abstract class LuminanceSource {
 

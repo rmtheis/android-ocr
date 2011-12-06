@@ -32,7 +32,7 @@ import android.widget.Toast;
 /**
  * This class handles all the messaging which comprises the state machine for capture.
  *
- * @author dswitkin@google.com (Daniel Switkin)
+ * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing/
  */
 final class CaptureActivityHandler extends Handler {
 
@@ -230,7 +230,9 @@ final class CaptureActivityHandler extends Handler {
 
   }
 
-  // Start the preview, but don't try to OCR anything until the user presses the shutter button.
+  /**
+   *  Start the preview, but don't try to OCR anything until the user presses the shutter button.
+   */
   private void restartOcrPreview() {    
     // Display the shutter and torch buttons
     activity.setButtonVisibility(true);
@@ -249,7 +251,9 @@ final class CaptureActivityHandler extends Handler {
     }
   }
   
-  // Send a decode request for continuous OCR mode
+  /**
+   *  Send a decode request for realtime OCR mode
+   */
   private void restartOcrPreviewAndDecode() {
     // Continue capturing camera frames
     cameraManager.startPreview();
@@ -259,11 +263,17 @@ final class CaptureActivityHandler extends Handler {
     activity.drawViewfinder();    
   }
 
+  /**
+   * Request OCR on the current preview frame. 
+   */
   private void ocrDecode() {
     state = State.PREVIEW_PAUSED;
     cameraManager.requestOcrDecode(decodeThread.getHandler(), R.id.ocr_decode);
   }
 
+  /**
+   * Request OCR when the hardware shutter button is clicked.
+   */
   void hardwareShutterButtonClick() {
     // Ensure that we're not in continuous recognition mode
     if (state == State.PREVIEW || state == State.PREVIEW_FOCUSING) {
@@ -271,12 +281,20 @@ final class CaptureActivityHandler extends Handler {
     }
   }
   
+  /**
+   * Request OCR when the on-screen shutter button is clicked.
+   */
   void shutterButtonClick() {
     // Disable further clicks on this button until OCR request is finished
     activity.setShutterButtonClickable(false);
     ocrDecode();
   }
   
+  /**
+   * Request autofocus from the CameraManager if we're in an appropriate state.
+   * 
+   * @param message The message to deliver
+   */
   private void requestAutofocus(int message) {
     if (state == State.PREVIEW || state == State.CONTINUOUS){
       if (state == State.PREVIEW) {
@@ -299,6 +317,12 @@ final class CaptureActivityHandler extends Handler {
     }
   }
   
+  /**
+   * Request autofocus after the given delay.
+   * 
+   * @param delay The delay, in milliseconds, until autofocus will be requested
+   * @param message The message to deliver
+   */
   void requestDelayedAutofocus(final long delay, final int message) {
     Handler autofocusHandler = new Handler(); 
     autofocusHandler.postDelayed(new Runnable() {
