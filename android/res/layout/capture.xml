@@ -173,7 +173,6 @@
               android:autoLink="web"
               android:clickable="true" />
  
- 	<!-- had android:src="@drawable/camera" -->
     <edu.sfsu.cs.orange.ocr.camera.ShutterButton
               android:id="@+id/shutter_button"
               android:layout_width="wrap_content"
@@ -185,7 +184,8 @@
               android:gravity="center_vertical"
               android:layout_marginRight="8dip"
               android:layout_marginTop="8dip"
-              android:scaleType="center" /> <!-- TODO change this to use state_window_focused instead of java code hiding and revealing this button during ocrinit? -->
+              android:scaleType="center"
+              android:visibility="gone" /> 
      
     <TextView android:id="@+id/status_view_bottom"
               android:layout_width="wrap_content"

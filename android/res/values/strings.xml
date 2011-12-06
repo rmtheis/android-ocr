@@ -19,7 +19,7 @@
   <string name="app_name">OCR Test</string>
   <string name="button_done">Done</string>
   <string name="msg_unmount_usb">Sorry, the SD card is not accessible.</string>
-  <string name="ocr_msg_capture_status_bottom">Resize viewfinder rectangle to place text inside, and press camera button.</string>
+  <string name="ocr_msg_capture_status_bottom"></string>
   <string name="ocr_msg_capture_status_top"></string>
   <string name="preferences_title">Preferences</string>
   <string name="preferences_settings_for_text_recognition">Text recognition settings</string>
