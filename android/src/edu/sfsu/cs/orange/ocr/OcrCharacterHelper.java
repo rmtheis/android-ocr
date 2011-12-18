@@ -100,6 +100,8 @@ public class OcrCharacterHelper {
   private OcrCharacterHelper() {} // Private constructor to enforce noninstantiability
   
   public static String getDefaultBlacklist(String languageCode) {
+    final String DEFAULT_BLACKLIST = "`~|";
+    
     if (languageCode.equals("ara")) { return ""; } // Arabic
     else if (languageCode.equals("bul")) { return ""; } // Bulgarian
     else if (languageCode.equals("cat")) { return ""; } // Catalan
@@ -151,7 +153,7 @@ public class OcrCharacterHelper {
     else if (languageCode.equals("ces")) { return ""; } // Czech
     else if (languageCode.equals("dan")) { return ""; } // Danish
     else if (languageCode.equals("nld")) { return ""; } // Dutch
-    else if (languageCode.equals("eng")) { return "!@#$%()<>_-+=/.,:;'\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; } // English
+    else if (languageCode.equals("eng")) { return "!?@#$%()<>_-+=/.,:;'\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; } // English
     else if (languageCode.equals("fin")) { return ""; } // Finnish
     else if (languageCode.equals("fra")) { return ""; } // French
     else if (languageCode.equals("deu")) { return ""; } // German
