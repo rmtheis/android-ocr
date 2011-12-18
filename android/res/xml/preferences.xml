@@ -31,10 +31,10 @@
 	</PreferenceCategory>
 
 	<!-- TRANSLATION SETTINGS -->
-	<PreferenceCategory android:title="@string/preferences_settings_for_translation">
+	<PreferenceCategory android:title="Translation settings">
 
 		<CheckBoxPreference android:key="preference_translation_toggle_translation"
-			android:title="@string/preference_translation_toggle_translation"/>
+			android:title="Translate"/>
 
 		<ListPreference android:key="targetLanguageCodeTranslationPref"  
 			android:title="Translate to"

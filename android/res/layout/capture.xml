@@ -192,7 +192,7 @@
               android:layout_height="wrap_content"
               android:layout_alignParentBottom="true"
               android:background="#0000"
-              android:text="@string/ocr_msg_capture_status_bottom"
+              android:text=""
               android:textColor="@color/status_text"
               android:textSize="14sp"
               android:autoLink="web"   
@@ -215,6 +215,5 @@
      -->
      
   </RelativeLayout>
-
 
 </FrameLayout>

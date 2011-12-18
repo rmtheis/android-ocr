@@ -741,7 +741,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     lastBitmap = ocrResult.getBitmap();
     if (lastBitmap == null) {
       bitmapImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(),
-          R.drawable.launcher_icon));
+          R.drawable.ic_launcher));
     } else {
       bitmapImageView.setImageBitmap(lastBitmap);
     }
@@ -810,7 +810,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       int scaledSize = Math.max(22, 32 - ocrResult.getText().length() / 4);
       statusViewTop.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
       statusViewTop.setTextColor(Color.BLACK);
-      statusViewTop.setBackgroundResource(R.color.white);
+      statusViewTop.setBackgroundResource(R.color.status_top_text_background);
 
       statusViewTop.getBackground().setAlpha(meanConfidence * (255 / 100));
     }

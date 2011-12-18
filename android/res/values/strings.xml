@@ -16,19 +16,5 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">OCR Test</string>
-  <string name="button_done">Done</string>
-  <string name="msg_unmount_usb">Sorry, the SD card is not accessible.</string>
-  <string name="ocr_msg_capture_status_bottom"></string>
-  <string name="ocr_msg_capture_status_top"></string>
-  <string name="preferences_title">Preferences</string>
-  <string name="preferences_settings_for_text_recognition">Text recognition settings</string>
-  <string name="preferences_settings_for_translation">Translation settings</string>
-  <string name="preference_text_recognition_language">Select language</string>
-  <string name="preference_text_recognition_language_summary">Chinese (Simplified)</string>
-  <string name="preference_text_recognition_language_dialogtitle">Select language</string>
-  <string name="preference_translation_target_language">Translate to</string>
-  <string name="preference_translation_target_language_summary">English</string>
-  <string name="preference_translation_target_language_dialogtitle">Select language</string>
-  <string name="preference_translation_toggle_translation">Translate</string>
+    <string name="app_name">OCR Test</string>
 </resources>

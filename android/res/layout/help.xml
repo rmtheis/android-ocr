@@ -38,18 +38,11 @@
       android:weightSum="1"
       android:background="@color/help_button_view">
 
-<!-- 
-    <Button android:id="@+id/back_button"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="@string/button_back"/>
--->
     <Button android:id="@+id/done_button"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:text="@string/button_done"/>
+            android:text="Done"/>
 
   </LinearLayout>
 
