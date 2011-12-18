@@ -100,7 +100,7 @@ public class OcrCharacterHelper {
   private OcrCharacterHelper() {} // Private constructor to enforce noninstantiability
   
   public static String getDefaultBlacklist(String languageCode) {
-    final String DEFAULT_BLACKLIST = "`~|";
+    //final String DEFAULT_BLACKLIST = "`~|";
     
     if (languageCode.equals("ara")) { return ""; } // Arabic
     else if (languageCode.equals("bul")) { return ""; } // Bulgarian

@@ -19,14 +19,12 @@ package edu.sfsu.cs.orange.ocr.camera;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.SurfaceHolder;
-import edu.sfsu.cs.orange.ocr.CaptureActivity;
 import edu.sfsu.cs.orange.ocr.PlanarYUVLuminanceSource;
 import edu.sfsu.cs.orange.ocr.PreferencesActivity;
 

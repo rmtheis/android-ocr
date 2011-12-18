@@ -17,10 +17,6 @@
 
 package edu.sfsu.cs.orange.ocr;
 
-//import com.google.zxing.BinaryBitmap;
-//import com.google.zxing.MultiFormatReader;
-//import com.google.zxing.ReaderException;
-//import com.google.zxing.Result;
 import edu.sfsu.cs.orange.ocr.BeepManager;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
@@ -32,7 +28,6 @@ import android.app.ProgressDialog;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
 /**
  * Class to send bitmap data for OCR.
