@@ -34,7 +34,7 @@ import android.os.Message;
  */
 final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
 
-  private static final boolean PERFORM_PSEUDOTRANSLATION = true;
+  private static final boolean PERFORM_PSEUDOTRANSLATION = false;
   
   private CaptureActivity activity;
   private TessBaseAPI baseApi;

@@ -118,13 +118,13 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   
   /** Flag to display the real-time recognition results at the top of the scanning screen. */
-  private static final boolean CONTINUOUS_DISPLAY_RECOGNIZED_TEXT = false;
+  private static final boolean CONTINUOUS_DISPLAY_RECOGNIZED_TEXT = true;
   
   /** Flag to display recognition-related statistics on the scanning screen. */
-  private static final boolean CONTINUOUS_DISPLAY_METADATA = false;
+  private static final boolean CONTINUOUS_DISPLAY_METADATA = true;
   
   /** Flag to enable display of the on-screen shutter button. */
-  private static final boolean DISPLAY_SHUTTER_BUTTON = false;
+  private static final boolean DISPLAY_SHUTTER_BUTTON = true;
   
   /** Languages for which Cube data is available. */
   static final String[] CUBE_SUPPORTED_LANGUAGES = { 
