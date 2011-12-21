@@ -367,10 +367,11 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
     urlConnection.setAllowUserInteraction(false);
     urlConnection.setInstanceFollowRedirects(true);
     urlConnection.setRequestMethod("GET");
-    urlConnection.setDoOutput(true);
     urlConnection.connect();
     if (urlConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
       Log.e(TAG, "Did not get HTTP_OK response.");
+      Log.e(TAG, "Response code: " + urlConnection.getResponseCode());
+      Log.e(TAG, "Response message: " + urlConnection.getResponseMessage().toString());
       return false;
     }
     int fileSize = urlConnection.getContentLength();
