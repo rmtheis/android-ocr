@@ -39,14 +39,20 @@ public class Translator {
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
     String api = prefs.getString(PreferencesActivity.KEY_TRANSLATOR, CaptureActivity.DEFAULT_TRANSLATOR);
     
-    if (sourceLanguageCode.equals(targetLanguageCode)) {
-      sourceLanguageCode = "";
-    }
-    
     // Delegate the translation based on the user's preference.
     if (api.equals(PreferencesActivity.TRANSLATOR_BING)) {
+      
+      // Get the correct code for the source language for this translation service.
+      sourceLanguageCode = TranslatorBing.toLanguage(
+          LanguageCodeHelper.getTranslationLanguageName(activity.getBaseContext(), sourceLanguageCode));
+      
       return TranslatorBing.translate(sourceLanguageCode, targetLanguageCode, sourceText);
     } else if (api.equals(PreferencesActivity.TRANSLATOR_GOOGLE)) {
+      
+      // Get the correct code for the source language for this translation service.
+      sourceLanguageCode = TranslatorGoogle.toLanguage(
+          LanguageCodeHelper.getTranslationLanguageName(activity.getBaseContext(), sourceLanguageCode));      
+      
       return TranslatorGoogle.translate(sourceLanguageCode, targetLanguageCode, sourceText);
     }
     return BAD_TRANSLATION_MSG;

@@ -404,7 +404,9 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
       }
     }
     fileOutputStream.close();
-    urlConnection.disconnect();
+    if (urlConnection != null) {
+      urlConnection.disconnect();
+    }
 
     // Uncompress the downloaded temporary file into place, and remove the temporary file
     try {

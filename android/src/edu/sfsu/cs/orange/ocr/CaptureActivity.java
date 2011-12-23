@@ -151,7 +151,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   static final int MINIMUM_MEAN_CONFIDENCE = 0; // 0 means don't reject any scored results
   
   /** Length of time before the next autofocus request, if the last one was successful. Used in CaptureActivityHandler. */
-  static final long AUTOFOCUS_SUCCESS_INTERVAL_MS = 8000L;
+  static final long AUTOFOCUS_SUCCESS_INTERVAL_MS = 3000L;
   
   /** Length of time before the next autofocus request, if the last request failed. Used in CaptureActivityHandler. */
   static final long AUTOFOCUS_FAILURE_INTERVAL_MS = 1000L;
@@ -578,7 +578,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private boolean setSourceLanguage(String languageCode) {
     sourceLanguageCodeOcr = languageCode;
     sourceLanguageCodeTranslation = LanguageCodeHelper.mapLanguageCode(languageCode);
-    sourceLanguageReadable = LanguageCodeHelper.getLanguageName(this, languageCode);
+    sourceLanguageReadable = LanguageCodeHelper.getOcrLanguageName(this, languageCode);
     return true;
   }
 

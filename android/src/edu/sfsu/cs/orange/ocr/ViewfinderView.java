@@ -47,10 +47,10 @@ public final class ViewfinderView extends View {
   private static final boolean DRAW_REGION_BOXES = false;
 
   /** Flag to draw boxes representing the results from TessBaseAPI::GetTextlines(). */
-  private static final boolean DRAW_TEXTLINE_BOXES = false;
+  private static final boolean DRAW_TEXTLINE_BOXES = true;
 
   /** Flag to draw boxes representing the results from TessBaseAPI::GetWords(). */
-  private static final boolean DRAW_WORD_BOXES = false;
+  private static final boolean DRAW_WORD_BOXES = true;
 
   /** Flag to draw word text with a background varying from transparent to opaque. */
   private static final boolean DRAW_TRANSPARENT_WORD_BACKGROUNDS = false;
@@ -59,7 +59,7 @@ public final class ViewfinderView extends View {
   private static final boolean DRAW_CHARACTER_BOXES = false;
 
   /** Flag to draw the text of words within their respective boxes from TessBaseAPI::GetWords(). */
-  private static final boolean DRAW_WORD_TEXT = true;
+  private static final boolean DRAW_WORD_TEXT = false;
 
   /** Flag to draw each character in its respective box from TessBaseAPI::GetCharacters(). */
   private static final boolean DRAW_CHARACTER_TEXT = false;

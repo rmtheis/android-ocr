@@ -17,6 +17,8 @@
 package edu.sfsu.cs.orange.ocr;
 
 import edu.sfsu.cs.orange.ocr.language.LanguageCodeHelper;
+import edu.sfsu.cs.orange.ocr.language.TranslatorBing;
+import edu.sfsu.cs.orange.ocr.language.TranslatorGoogle;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -84,6 +86,7 @@ public class PreferencesActivity extends PreferenceActivity implements
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    Log.e("PreferencesActivity", "onCreate()");
     addPreferencesFromResource(R.xml.preferences);
     
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -119,13 +122,15 @@ public class PreferencesActivity extends PreferenceActivity implements
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
       String key) {
     
+    Log.e("PreferencesActivity", "onSharedPreferenceChanged()");
+    
     // Update preference summary values to show current preferences
     if (key.equals(KEY_TRANSLATOR)) {
       listPreferenceTranslator.setSummary(sharedPreferences.getString(key, CaptureActivity.DEFAULT_TRANSLATOR));
     } else if(key.equals(KEY_SOURCE_LANGUAGE_PREFERENCE)) {
       
       // Set the summary text for the source language name
-      listPreferenceSourceLanguage.setSummary(LanguageCodeHelper.getLanguageName(getBaseContext(), sharedPreferences.getString(key, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE)));
+      listPreferenceSourceLanguage.setSummary(LanguageCodeHelper.getOcrLanguageName(getBaseContext(), sharedPreferences.getString(key, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE)));
       
       // Retrieve the character blacklist/whitelist for the new language
       String blacklist = OcrCharacterHelper.getBlacklist(sharedPreferences, listPreferenceSourceLanguage.getValue());
@@ -179,61 +184,40 @@ public class PreferencesActivity extends PreferenceActivity implements
    * when the key for the current translator is changed.
    */
   void initTranslationTargetList() {
-    // Update the list of available languages for the currently-chosen translation API.
-    String[] translators = getResources().getStringArray(R.array.translators);
-    if (sharedPreferences.getString(KEY_TRANSLATOR, CaptureActivity.DEFAULT_TRANSLATOR).equals(translators[0])) {
-      listPreferenceTargetLanguage.setEntries(R.array.translationtargetlanguagenames_microsoft);
-      listPreferenceTargetLanguage.setEntryValues(R.array.translationtargetiso6391_microsoft);
-    } else if (sharedPreferences.getString(KEY_TRANSLATOR, CaptureActivity.DEFAULT_TRANSLATOR).equals(translators[1])) {
-      listPreferenceTargetLanguage.setEntries(R.array.translationtargetlanguagenames_google);
-      listPreferenceTargetLanguage.setEntryValues(R.array.translationtargetiso6391_google);
-    }
-    
-    // Set the prference for the equivalent language for switching from Google to Bing, or Bing to Google.
-    // If that language is not supported by that translator, switch it to English.
+    // Set the preference for the target language code, in case we've just switched from Google
+    // to Bing, or Bing to Google.
     String currentLanguageCode = sharedPreferences.getString(KEY_TARGET_LANGUAGE_PREFERENCE, 
         CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE);
-    boolean supported = LanguageCodeHelper.isSupported(getBaseContext(), 
-        sharedPreferences.getString(KEY_TRANSLATOR, CaptureActivity.DEFAULT_TRANSLATOR), 
+
+    // Get the name of our language
+    String currentLanguage = LanguageCodeHelper.getTranslationLanguageName(getBaseContext(), 
         currentLanguageCode);
-    
-    Log.d("PreferencesActivity", "Checking if language code " + sharedPreferences.getString(KEY_TARGET_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE)
-        + " is supported");
-    
-    // If the language was not found on the list, set an appropriate new value.
+    String[] translators = getResources().getStringArray(R.array.translators);
+    String translator = sharedPreferences.getString(KEY_TRANSLATOR, CaptureActivity.DEFAULT_TRANSLATOR);
     String newLanguageCode = "";
-    if (!supported) {
-      // Default to English
-      newLanguageCode = LanguageCodeHelper.mapLanguageCode(CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE);
+    if (translator.equals(translators[0])) { // Bing
+      // Update the list of available languages for the currently-chosen translation API.
+      listPreferenceTargetLanguage.setEntries(R.array.translationtargetlanguagenames_microsoft);
+      listPreferenceTargetLanguage.setEntryValues(R.array.translationtargetiso6391_microsoft);
       
-      // Hack to check for Chinese codes that do not match between Google and Bing
-      if (currentLanguageCode.equals("zh-CHS")) {
-        newLanguageCode = "zh-CN";
-      } else if (currentLanguageCode.equals("zh-CHT")) {
-        newLanguageCode = "zh-TW";
-      } else if (currentLanguageCode.equals("zh-CN")) {
-        newLanguageCode = "zh-CHS";
-      } else if (currentLanguageCode.equals("zh-TW")) {
-        newLanguageCode = "zh-CHT";
-      } else if (currentLanguageCode.equals("zh")) {
-        newLanguageCode = "zh-CHS";
-      }
+      // Get the corresponding code for our language name
+      newLanguageCode = TranslatorBing.toLanguage(currentLanguage);
+    } else if (translator.equals(translators[1])) { // Google
+      // Update the list of available languages for the currently-chosen translation API.
+      listPreferenceTargetLanguage.setEntries(R.array.translationtargetlanguagenames_google);
+      listPreferenceTargetLanguage.setEntryValues(R.array.translationtargetiso6391_google);
       
-      // Hack to accomodate different codes for Hebrew--Google uses 'iw' but Bing uses 'he'
-      if (currentLanguageCode.equals("he")) {
-        newLanguageCode = "iw";
-      } else if (currentLanguageCode.equals("iw")) {
-        newLanguageCode = "he";
-      }
-      
-      // Set the target language preference
-      sharedPreferences.edit().putString(PreferencesActivity.KEY_TARGET_LANGUAGE_PREFERENCE, 
-          newLanguageCode).commit();
-      
-      // Also set the selected radio button in the target language list
-      listPreferenceTargetLanguage.setValue(LanguageCodeHelper.getLanguageName(getBaseContext(),
-          newLanguageCode));
+      // Get the corresponding code for our language name      
+      newLanguageCode = TranslatorGoogle.toLanguage(currentLanguage);
     }
+
+    // Store the code as the target language preference
+    String newLanguageName = LanguageCodeHelper.getTranslationLanguageName(getBaseContext(),
+        newLanguageCode);
+    listPreferenceTargetLanguage.setValue(newLanguageName); // Set the radio button in the list
+    sharedPreferences.edit().putString(PreferencesActivity.KEY_TARGET_LANGUAGE_PREFERENCE, 
+        newLanguageCode).commit();
+    listPreferenceTargetLanguage.setSummary(newLanguageName);
   }
   
   /**
@@ -243,11 +227,19 @@ public class PreferencesActivity extends PreferenceActivity implements
   @Override
   protected void onResume() {
     super.onResume();
-
+//    Log.e("PreferencesActivity", "onResume()");
+//    
+//    // what's going on?
+//    Log.w("PreferencesActivity", "the stored value for KEY_TARGET_LANGUAGE_PREFERENCE is now: " + sharedPreferences.getString(KEY_TARGET_LANGUAGE_PREFERENCE, "default..."));
+//    
+//    // Refresh the sharedPreferences
+//    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+//    Log.e("PreferencesActivity", "onResume(): KEY_TARGET_LANGUAGE_PREFERENCE is " + sharedPreferences.getString(KEY_TARGET_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE));
+//    
     // Set up the initial summary values
     listPreferenceTranslator.setSummary(sharedPreferences.getString(KEY_TRANSLATOR, CaptureActivity.DEFAULT_TRANSLATOR));
-    listPreferenceSourceLanguage.setSummary(LanguageCodeHelper.getLanguageName(this, sharedPreferences.getString(KEY_SOURCE_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE)));
-    listPreferenceTargetLanguage.setSummary(LanguageCodeHelper.getTranslationLanguageName(this, sharedPreferences.getString(KEY_TARGET_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE)));
+    listPreferenceSourceLanguage.setSummary(LanguageCodeHelper.getOcrLanguageName(getBaseContext(), sharedPreferences.getString(KEY_SOURCE_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE)));
+    listPreferenceTargetLanguage.setSummary(LanguageCodeHelper.getTranslationLanguageName(getBaseContext(), sharedPreferences.getString(KEY_TARGET_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE)));
     listPreferencePageSegmentationMode.setSummary(sharedPreferences.getString(KEY_PAGE_SEGMENTATION_MODE, CaptureActivity.DEFAULT_PAGE_SEGMENTATION_MODE));
     listPreferenceOcrEngineMode.setSummary(sharedPreferences.getString(KEY_OCR_ENGINE_MODE, CaptureActivity.DEFAULT_OCR_ENGINE_MODE));
     editTextPreferenceCharacterBlacklist.setSummary(sharedPreferences.getString(KEY_CHARACTER_BLACKLIST, OcrCharacterHelper.getDefaultBlacklist(listPreferenceSourceLanguage.getValue())));

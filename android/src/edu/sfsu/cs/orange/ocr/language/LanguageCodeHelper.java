@@ -116,7 +116,7 @@ public class LanguageCodeHelper {
       return "th";
     } else if (languageCode.equals("tur")) { // Turkish
       return "tr";
-    } else if (languageCode.equals("ukr")) { // Ukranian
+    } else if (languageCode.equals("ukr")) { // Ukrainian
       return "uk";
     } else if (languageCode.equals("vie")) { // Vietnamese
       return "vi";
@@ -136,7 +136,7 @@ public class LanguageCodeHelper {
 	 *            ISO 639-3 language code
 	 * @return language name
 	 */
-	public static String getLanguageName(Context context, String languageCode) {
+	public static String getOcrLanguageName(Context context, String languageCode) {
 		Resources res = context.getResources();
 		String[] language6393 = res.getStringArray(R.array.iso6393);
 		String[] languageNames = res.getStringArray(R.array.languagenames);
@@ -146,7 +146,7 @@ public class LanguageCodeHelper {
 		// from the languagenames array.
 		for (len = 0; len < language6393.length; len++) {
 			if (language6393[len].equals(languageCode)) {
-				Log.d(TAG, "languageCode: " + languageCode + "->"
+				Log.d(TAG, "getOcrLanguageName: " + languageCode + "->"
 						+ languageNames[len]);
 				return languageNames[len];
 			}
@@ -175,7 +175,7 @@ public class LanguageCodeHelper {
     // with the same index from the translationtargetlanguagenames array.
     for (len = 0; len < language6391.length; len++) {
       if (language6391[len].equals(languageCode)) {
-        Log.d(TAG, "languageCode: " + languageCode + "->" + languageNames[len]);
+        Log.d(TAG, "getTranslationLanguageName: " + languageCode + "->" + languageNames[len]);
         return languageNames[len];
       }
     }
@@ -191,38 +191,9 @@ public class LanguageCodeHelper {
       }
     }    
     
-    Log.d(TAG, "languageCode: Could not find language name for ISO 693-1: " + languageCode);
+    Log.d(TAG, "getTranslationLanguageName: Could not find language name for ISO 693-1: " + 
+            languageCode);
     return "";
 	}
-	
-	/**
-	 * Checks if the given language code is supported by the given translation provider, and returns
-	 * true if it is supported.
-	 */
-	public static boolean isSupported(Context context, String translator, String languageCode) {
-	  Resources res = context.getResources();
-	  String[] supportedCodes;
-	  int len;
-	  
-	  // Note: Need to separately check for Chinese because Google and Bing use different codes for
-	  // representing Chinese/Simplified Chinese/Traditional Chinese.
-	  
-	  if (translator.equals(PreferencesActivity.TRANSLATOR_BING)) {
-	    supportedCodes = res.getStringArray(R.array.translationtargetiso6391_microsoft);
-	    for (len = 0; len < supportedCodes.length; len++) {
-	      if (supportedCodes[len].equals(languageCode)) {
-	        return true;
-	      }
-	    }
-	  } else if (translator.equals(PreferencesActivity.TRANSLATOR_GOOGLE)) {
-      supportedCodes = res.getStringArray(R.array.translationtargetiso6391_google);
-      for (len = 0; len < supportedCodes.length; len++) {
-        if (supportedCodes[len].equals(languageCode)) {
-          return true;
-        }
-      }	    
-	  }
-	  
-	  return false;
-	}
+
 }
