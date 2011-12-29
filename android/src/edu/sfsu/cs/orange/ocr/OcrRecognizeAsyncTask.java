@@ -128,7 +128,7 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
     // Check for failure to recognize text
     if (textResult == null || textResult.equals("")) {
       ocrResultFailure = new OcrResultFailure(end - start);
-//      return false;
+      return false;
     }  
     
     // Get bounding boxes for characters and words
