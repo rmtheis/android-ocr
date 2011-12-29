@@ -19,10 +19,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="edu.sfsu.cs.orange.ocr"
           android:installLocation="preferExternal" 
-          android:versionName="0.5.10" 
-          android:versionCode="29"
+          android:versionName="0.5.11" 
+          android:versionCode="30"
           >
-  <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="15"/>
+  <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="13"/>
   <supports-screens android:xlargeScreens="true"
                     android:largeScreens="true"
                     android:normalScreens="true"
@@ -35,7 +35,7 @@
                android:label="@string/app_name">
     <activity android:name=".CaptureActivity"
               android:screenOrientation="landscape"
-              android:configChanges="orientation|keyboardHidden"
+              android:configChanges="orientation|keyboardHidden|screenSize"
               android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
               android:windowSoftInputMode="stateAlwaysHidden"              
               >
