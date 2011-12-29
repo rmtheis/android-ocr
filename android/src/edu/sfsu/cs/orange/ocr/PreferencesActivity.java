@@ -27,7 +27,6 @@ import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 /**
  * Class to handle preferences that are saved across sessions of the app. Shows
@@ -86,7 +85,6 @@ public class PreferencesActivity extends PreferenceActivity implements
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    Log.e("PreferencesActivity", "onCreate()");
     addPreferencesFromResource(R.xml.preferences);
     
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -120,10 +118,7 @@ public class PreferencesActivity extends PreferenceActivity implements
    */
   @Override
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-      String key) {
-    
-    Log.e("PreferencesActivity", "onSharedPreferenceChanged()");
-    
+      String key) {    
     // Update preference summary values to show current preferences
     if (key.equals(KEY_TRANSLATOR)) {
       listPreferenceTranslator.setSummary(sharedPreferences.getString(key, CaptureActivity.DEFAULT_TRANSLATOR));
@@ -227,15 +222,6 @@ public class PreferencesActivity extends PreferenceActivity implements
   @Override
   protected void onResume() {
     super.onResume();
-//    Log.e("PreferencesActivity", "onResume()");
-//    
-//    // what's going on?
-//    Log.w("PreferencesActivity", "the stored value for KEY_TARGET_LANGUAGE_PREFERENCE is now: " + sharedPreferences.getString(KEY_TARGET_LANGUAGE_PREFERENCE, "default..."));
-//    
-//    // Refresh the sharedPreferences
-//    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-//    Log.e("PreferencesActivity", "onResume(): KEY_TARGET_LANGUAGE_PREFERENCE is " + sharedPreferences.getString(KEY_TARGET_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE));
-//    
     // Set up the initial summary values
     listPreferenceTranslator.setSummary(sharedPreferences.getString(KEY_TRANSLATOR, CaptureActivity.DEFAULT_TRANSLATOR));
     listPreferenceSourceLanguage.setSummary(LanguageCodeHelper.getOcrLanguageName(getBaseContext(), sharedPreferences.getString(KEY_SOURCE_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE)));
