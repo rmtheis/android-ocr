@@ -174,7 +174,7 @@ public final class ViewfinderView extends View {
           for (int i = 0; i < wordBoundingBoxes.size(); i++) {
             boolean isWordBlank = true;
             try {
-              if (!words[i].equals(""))) {
+              if (!words[i].equals("")) {
                 isWordBlank = false;
               }
             } catch (ArrayIndexOutOfBoundsException e) {
