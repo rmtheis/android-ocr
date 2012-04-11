@@ -20,7 +20,6 @@ import java.util.List;
 
 import edu.sfsu.cs.orange.ocr.R;
 import edu.sfsu.cs.orange.ocr.camera.CameraManager;
-import edu.sfsu.cs.orange.ocr.language.PseudoTranslator;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -175,7 +174,7 @@ public final class ViewfinderView extends View {
           for (int i = 0; i < wordBoundingBoxes.size(); i++) {
             boolean isWordBlank = true;
             try {
-              if (!words[i].equals("") && !words[i].equalsIgnoreCase(PseudoTranslator.UNKNOWN_WORD)) {
+              if (!words[i].equals(""))) {
                 isWordBlank = false;
               }
             } catch (ArrayIndexOutOfBoundsException e) {
