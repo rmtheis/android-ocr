@@ -183,6 +183,7 @@
 		<item>de</item> <!-- German -->
 		<item>el</item> <!-- Greek -->
 		<item>iw</item> <!-- Hebrew -->
+		<item>hi</item> <!-- Hindi -->
 		<item>hu</item> <!-- Hungarian -->
 		<item>is</item> <!-- Icelandic -->
 		<item>id</item> <!-- Indonesian -->
@@ -240,6 +241,7 @@
 		<item>German</item>
 		<item>Greek</item>
 		<item>Hebrew</item>
+		<item>Hindi</item>
 		<item>Hungarian</item>
 		<item>Icelandic</item>
 		<item>Indonesian</item>
@@ -278,6 +280,7 @@
 	<string-array name="translationtargetiso6391_microsoft">
         <item>ar</item> <!-- Arabic -->
         <item>bg</item> <!-- Bulgarian -->
+        <item>ca</item> <!-- Catalan -->
         <item>zh-CHS</item> <!-- Chinese (Simplified) -->
         <item>zh-CHT</item> <!-- Chinese (Traditional) -->
         <item>cs</item> <!-- Czech -->
@@ -291,6 +294,7 @@
         <item>el</item> <!-- Greek -->
         <item>ht</item> <!-- Haitian Creole -->
         <item>he</item> <!-- Hebrew -->
+        <item>hi</item> <!-- Hindi -->
         <item>hu</item> <!-- Hungarian -->
         <item>id</item> <!-- Indonesian -->
         <item>it</item> <!-- Italian -->
@@ -318,6 +322,7 @@
 	<string-array name="translationtargetlanguagenames_microsoft">
         <item>Arabic</item>
         <item>Bulgarian</item>
+        <item>Catalan</item>
         <item>Chinese (Simplified)</item>
         <item>Chinese (Traditional)</item>
         <item>Czech</item>
@@ -331,6 +336,7 @@
         <item>Greek</item>
         <item>Haitian Creole</item>
         <item>Hebrew</item>
+        <item>Hindi</item>
         <item>Hungarian</item>
         <item>Indonesian</item>
         <item>Italian</item>

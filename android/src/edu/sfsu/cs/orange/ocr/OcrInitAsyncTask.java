@@ -692,7 +692,12 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
   @Override
   protected void onPostExecute(Boolean result) {
     super.onPostExecute(result);
-    indeterminateDialog.dismiss();
+    
+    try {
+      indeterminateDialog.dismiss();
+    } catch (IllegalArgumentException e) {
+      // Catch "View not attached to window manager" error, and continue
+    }
 
     if (result) {
       // Restart recognition

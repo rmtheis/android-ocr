@@ -17,7 +17,7 @@ package edu.sfsu.cs.orange.ocr;
 
 import java.util.List;
 
-import com.googlecode.eyesfree.textdetect.Thresholder;
+//import com.googlecode.eyesfree.textdetect.Thresholder;
 import com.googlecode.leptonica.android.Binarize;
 import com.googlecode.leptonica.android.Pix;
 import com.googlecode.leptonica.android.ReadFile;
@@ -40,10 +40,9 @@ import android.util.Log;
  */
 final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
 
-//  private static final boolean PERFORM_EDGE_THRESHOLDING = false; 
-//  private static final boolean PERFORM_FISHER_THRESHOLDING = false; 
-//  private static final boolean PERFORM_OTSU_THRESHOLDING = false; 
-//  private static final boolean PERFORM_SOBEL_THRESHOLDING = false; 
+  private static final boolean PERFORM_FISHER_THRESHOLDING = false; 
+  private static final boolean PERFORM_OTSU_THRESHOLDING = false; 
+  private static final boolean PERFORM_SOBEL_THRESHOLDING = false; 
   
 //  private static final boolean PERFORM_PSEUDOTRANSLATION = false;
   
@@ -84,18 +83,13 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
     end = start;
     
     try {
-//      if (PERFORM_EDGE_THRESHOLDING) {
-//        Pix thresholdedImage = Thresholder.edgeAdaptiveThreshold(ReadFile.readBitmap(bitmap), 32, 64, 32, 1);
-//        Log.e("OcrRecognizeAsyncTask", "thresholding completed. converting to bmp. size:" + bitmap.getWidth() + "x" + bitmap.getHeight());
-//        bitmap = WriteFile.writeBitmap(thresholdedImage);
-//      }
 //      if (PERFORM_FISHER_THRESHOLDING) {
 //        Pix thresholdedImage = Thresholder.fisherAdaptiveThreshold(ReadFile.readBitmap(bitmap), 48, 48, 0.1F, 2.5F);
 //        Log.e("OcrRecognizeAsyncTask", "thresholding completed. converting to bmp. size:" + bitmap.getWidth() + "x" + bitmap.getHeight());
 //        bitmap = WriteFile.writeBitmap(thresholdedImage);
 //      }
 //      if (PERFORM_OTSU_THRESHOLDING) {
-//        Pix thresholdedImage = Binarize.otsuAdaptiveThreshold(ReadFile.readBitmap(bitmap), 64, 64, 2, 2, 0.1F);
+//        Pix thresholdedImage = Binarize.otsuAdaptiveThreshold(ReadFile.readBitmap(bitmap), 48, 48, 9, 9, 0.1F);
 //        Log.e("OcrRecognizeAsyncTask", "thresholding completed. converting to bmp. size:" + bitmap.getWidth() + "x" + bitmap.getHeight());
 //        bitmap = WriteFile.writeBitmap(thresholdedImage);
 //      }
@@ -104,12 +98,13 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
 //        Log.e("OcrRecognizeAsyncTask", "thresholding completed. converting to bmp. size:" + bitmap.getWidth() + "x" + bitmap.getHeight());
 //        bitmap = WriteFile.writeBitmap(thresholdedImage);
 //      }
-      Log.e("OcrRecognizeAsyncTask", "converted to bitmap. doing setImage()...");
+      
+      Log.d("OcrRecognizeAsyncTask", "calling setImage()...");
       baseApi.setImage(bitmap);
       
-      Log.e("OcrRecognizeAsyncTask", "setImage() completed");
+      Log.d("OcrRecognizeAsyncTask", "setImage() completed");
       textResult = baseApi.getUTF8Text();
-      Log.e("OcrRecognizeAsyncTask", "getUTF8Text() completed");
+      Log.d("OcrRecognizeAsyncTask", "getUTF8Text() completed");
       wordConfidences = baseApi.wordConfidences();
       overallConf = baseApi.meanConfidence();
       end = System.currentTimeMillis();

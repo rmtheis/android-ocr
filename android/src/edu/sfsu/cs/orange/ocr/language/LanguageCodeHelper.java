@@ -19,7 +19,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.Log;
 
-import edu.sfsu.cs.orange.ocr.PreferencesActivity;
 import edu.sfsu.cs.orange.ocr.R;
 
 /**
