@@ -76,7 +76,7 @@ public final class CameraManager {
    * @param holder The surface object which the camera will draw preview frames into.
    * @throws IOException Indicates the camera driver failed to open.
    */
-  public void openDriver(SurfaceHolder holder) throws IOException {
+  public synchronized void openDriver(SurfaceHolder holder) throws IOException {
     Camera theCamera = camera;
     if (theCamera == null) {
       theCamera = Camera.open();
@@ -104,7 +104,7 @@ public final class CameraManager {
   /**
    * Closes the camera driver if still in use.
    */
-  public void closeDriver() {
+  public synchronized void closeDriver() {
     if (camera != null) {
       camera.release();
       camera = null;
@@ -119,7 +119,7 @@ public final class CameraManager {
   /**
    * Asks the camera hardware to begin drawing preview frames to the screen.
    */
-  public void startPreview() {
+  public synchronized void startPreview() {
     Camera theCamera = camera;
     if (theCamera != null && !previewing) {
       theCamera.startPreview();
@@ -130,7 +130,7 @@ public final class CameraManager {
   /**
    * Tells the camera to stop drawing preview frames.
    */
-  public void stopPreview() {
+  public synchronized void stopPreview() {
     if (camera != null && previewing) {
       camera.stopPreview();
       previewCallback.setHandler(null, 0);
@@ -147,7 +147,7 @@ public final class CameraManager {
    * @param handler The handler to send the message to.
    * @param message The what field of the message to be sent.
    */
-  public void requestOcrDecode(Handler handler, int message) {
+  public synchronized void requestOcrDecode(Handler handler, int message) {
     Camera theCamera = camera;
     if (theCamera != null && previewing) {
       previewCallback.setHandler(handler, message);
@@ -161,7 +161,7 @@ public final class CameraManager {
    * @param handler The Handler to notify when the autofocus completes.
    * @param message The message to deliver.
    */
-  public void requestAutoFocus(Handler handler, int message) {
+  public synchronized void requestAutoFocus(Handler handler, int message) {
     if (camera != null && previewing) {
       autoFocusCallback.setHandler(handler, message);
       camera.autoFocus(autoFocusCallback);
@@ -175,12 +175,16 @@ public final class CameraManager {
    *
    * @return The rectangle to draw on screen in window coordinates.
    */
-  public Rect getFramingRect() {
+  public synchronized Rect getFramingRect() {
     if (framingRect == null) {
       if (camera == null) {
         return null;
       }
       Point screenResolution = configManager.getScreenResolution();
+      if (screenResolution == null) {
+        // Called early, before init even finished
+        return null;
+      }
       int width = screenResolution.x * 3/5;
       if (width < MIN_FRAME_WIDTH) {
         width = MIN_FRAME_WIDTH;
@@ -204,11 +208,15 @@ public final class CameraManager {
    * Like {@link #getFramingRect} but coordinates are in terms of the preview frame,
    * not UI / screen.
    */
-  public Rect getFramingRectInPreview() {
+  public synchronized Rect getFramingRectInPreview() {
     if (framingRectInPreview == null) {
       Rect rect = new Rect(getFramingRect());
       Point cameraResolution = configManager.getCameraResolution();
       Point screenResolution = configManager.getScreenResolution();
+      if (cameraResolution == null || screenResolution == null) {
+        // Called early, before init even finished
+        return null;
+      }
       rect.left = rect.left * cameraResolution.x / screenResolution.x;
       rect.right = rect.right * cameraResolution.x / screenResolution.x;
       rect.top = rect.top * cameraResolution.y / screenResolution.y;
@@ -224,7 +232,7 @@ public final class CameraManager {
    * @param deltaWidth Number of pixels to adjust the width
    * @param deltaHeight Number of pixels to adjust the height
    */
-  public void adjustFramingRect(int deltaWidth, int deltaHeight) {
+  public synchronized void adjustFramingRect(int deltaWidth, int deltaHeight) {
     if (initialized) {
       Point screenResolution = configManager.getScreenResolution();
 
