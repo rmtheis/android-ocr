@@ -449,6 +449,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   /** Initializes the camera and starts the handler to begin previewing. */
   private void initCamera(SurfaceHolder surfaceHolder) {
     Log.d(TAG, "initCamera()");
+    if (surfaceHolder == null) {
+      throw new IllegalStateException("No SurfaceHolder provided");
+    }
     try {
 
       // Open and initialize the camera
