@@ -24,6 +24,7 @@ import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import edu.sfsu.cs.orange.ocr.PlanarYUVLuminanceSource;
 import edu.sfsu.cs.orange.ocr.PreferencesActivity;
@@ -39,6 +40,8 @@ import java.io.IOException;
  */
 public final class CameraManager {
 
+  private static final String TAG = CameraManager.class.getSimpleName();
+  
   private static final int MIN_FRAME_WIDTH = 50; // originally 240
   private static final int MIN_FRAME_HEIGHT = 20; // originally 240
   private static final int MAX_FRAME_WIDTH = 800; // originally 480
@@ -164,7 +167,12 @@ public final class CameraManager {
   public synchronized void requestAutoFocus(Handler handler, int message) {
     if (camera != null && previewing) {
       autoFocusCallback.setHandler(handler, message);
-      camera.autoFocus(autoFocusCallback);
+      try {
+        camera.autoFocus(autoFocusCallback);
+      } catch (RuntimeException re) {
+        // Have heard RuntimeException reported in Android 4.0.x+; continue?
+        Log.w(TAG, "Unexpected exception while focusing", re);
+      }
     }
   }
   
