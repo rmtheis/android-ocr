@@ -292,7 +292,11 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
     }
     
     // Dismiss the progress dialog box, revealing the indeterminate dialog box behind it
-    dialog.dismiss();
+    try {
+      dialog.dismiss();
+    } catch (IllegalArgumentException e) {
+      // Catch "View not attached to window manager" error, and continue
+    }
 
     // Initialize the OCR engine
     if (baseApi.init(destinationDirBase + File.separator, languageCode, ocrEngineMode)) {
