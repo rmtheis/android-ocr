@@ -27,22 +27,22 @@ import android.graphics.Rect;
 /**
  * Encapsulates the result of OCR.
  */
-public final class OcrResult {
-  private final Bitmap bitmap;
-  private final String text;
+public class OcrResult {
+  private Bitmap bitmap;
+  private String text;
   
-  private final int[] wordConfidences;
-  private final int meanConfidence;
+  private int[] wordConfidences;
+  private int meanConfidence;
   
-  private final List<Rect> wordBoundingBoxes;
-  private final List<Rect> characterBoundingBoxes;
-  private final List<Rect> textlineBoundingBoxes;
-  private final List<Rect> regionBoundingBoxes;
+  private List<Rect> wordBoundingBoxes;
+  private List<Rect> characterBoundingBoxes;
+  private List<Rect> textlineBoundingBoxes;
+  private List<Rect> regionBoundingBoxes;
   
-  private final long timestamp;
-  private final long recognitionTimeRequired;
+  private long timestamp;
+  private long recognitionTimeRequired;
 
-  private final Paint paint;
+  private Paint paint;
   
   public OcrResult(Bitmap bitmap,
                    String text,
@@ -64,6 +64,11 @@ public final class OcrResult {
     this.recognitionTimeRequired = recognitionTimeRequired;
     this.timestamp = System.currentTimeMillis();
     
+    this.paint = new Paint();
+  }
+
+  public OcrResult() {
+    timestamp = System.currentTimeMillis();
     this.paint = new Paint();
   }
 
@@ -139,6 +144,42 @@ public final class OcrResult {
   
   public long getTimestamp() {
     return timestamp;
+  }
+  
+  public void setBitmap(Bitmap bitmap) {
+    this.bitmap = bitmap;
+  }
+  
+  public void setText(String text) {
+    this.text = text;
+  }
+
+  public void setWordConfidences(int[] wordConfidences) {
+    this.wordConfidences = wordConfidences;
+  }
+
+  public void setMeanConfidence(int meanConfidence) {
+    this.meanConfidence = meanConfidence;
+  }
+
+  public void setRecognitionTimeRequired(long recognitionTimeRequired) {
+    this.recognitionTimeRequired = recognitionTimeRequired;
+  }
+  
+  public void setCharacterBoundingBoxes(List<Rect> characterBoundingBoxes) {
+    this.characterBoundingBoxes = characterBoundingBoxes;
+  }
+  
+  public void setTextlineBoundingBoxes(List<Rect> textlineBoundingBoxes) {
+    this.textlineBoundingBoxes = textlineBoundingBoxes;
+  }
+  
+  public void setWordBoundingBoxes(List<Rect> wordBoundingBoxes) {
+    this.wordBoundingBoxes = wordBoundingBoxes;
+  }
+  
+  public void setRegionBoundingBoxes(List<Rect> regionBoundingBoxes) {
+    this.regionBoundingBoxes = regionBoundingBoxes;
   }
   
   @Override

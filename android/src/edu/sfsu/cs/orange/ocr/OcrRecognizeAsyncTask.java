@@ -15,99 +15,79 @@
  */
 package edu.sfsu.cs.orange.ocr;
 
-import java.util.List;
-
-//import com.googlecode.eyesfree.textdetect.Thresholder;
-import com.googlecode.leptonica.android.Binarize;
-import com.googlecode.leptonica.android.Pix;
 import com.googlecode.leptonica.android.ReadFile;
-import com.googlecode.leptonica.android.WriteFile;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
-//import edu.sfsu.cs.orange.ocr.language.PseudoTranslator;
-
-import android.app.ProgressDialog;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
 /**
- * Class to send OCR requests to the OCR engine in a separate thread and appropriately send a
- * success/failure message.
+ * Class to send OCR requests to the OCR engine in a separate thread, send a success/failure message,
+ * and dismiss the indeterminate progress dialog box. Used for non-continuous mode OCR only.
  */
 final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
 
-  private static final boolean PERFORM_FISHER_THRESHOLDING = false; 
-  private static final boolean PERFORM_OTSU_THRESHOLDING = false; 
-  private static final boolean PERFORM_SOBEL_THRESHOLDING = false; 
-  
-//  private static final boolean PERFORM_PSEUDOTRANSLATION = false;
-  
+  //  private static final boolean PERFORM_FISHER_THRESHOLDING = false; 
+  //  private static final boolean PERFORM_OTSU_THRESHOLDING = false; 
+  //  private static final boolean PERFORM_SOBEL_THRESHOLDING = false; 
+
   private CaptureActivity activity;
   private TessBaseAPI baseApi;
-  private Bitmap bitmap;
+  private byte[] data;
+  private int width;
+  private int height;
   private OcrResult ocrResult;
-  private OcrResultFailure ocrResultFailure;
-  private boolean isContinuous;
-  private ProgressDialog indeterminateDialog;
-  private long start;
-  private long end;
-  
-  // Constructor for single-shot mode
-  OcrRecognizeAsyncTask(CaptureActivity activity, TessBaseAPI baseApi, 
-      ProgressDialog indeterminateDialog, Bitmap bitmap) {
+  private long timeRequired;
+
+  OcrRecognizeAsyncTask(CaptureActivity activity, TessBaseAPI baseApi, byte[] data, int width, int height) {
     this.activity = activity;
     this.baseApi = baseApi;
-    this.indeterminateDialog = indeterminateDialog;
-    this.bitmap = bitmap;
-    isContinuous = false;
+    this.data = data;
+    this.width = width;
+    this.height = height;
   }
 
-  // Constructor for continuous recognition mode
-  OcrRecognizeAsyncTask(CaptureActivity activity, TessBaseAPI baseApi, Bitmap bitmap) {
-    this.activity = activity;
-    this.baseApi = baseApi;
-    this.bitmap = bitmap;
-    isContinuous = true;
-  }
-  
   @Override
   protected Boolean doInBackground(String... arg0) {
-    String textResult = null;   
-    int[] wordConfidences = null;
-    int overallConf = -1;
-    start = System.currentTimeMillis();
-    end = start;
-    
-    try {
-//      if (PERFORM_FISHER_THRESHOLDING) {
-//        Pix thresholdedImage = Thresholder.fisherAdaptiveThreshold(ReadFile.readBitmap(bitmap), 48, 48, 0.1F, 2.5F);
-//        Log.e("OcrRecognizeAsyncTask", "thresholding completed. converting to bmp. size:" + bitmap.getWidth() + "x" + bitmap.getHeight());
-//        bitmap = WriteFile.writeBitmap(thresholdedImage);
-//      }
-//      if (PERFORM_OTSU_THRESHOLDING) {
-//        Pix thresholdedImage = Binarize.otsuAdaptiveThreshold(ReadFile.readBitmap(bitmap), 48, 48, 9, 9, 0.1F);
-//        Log.e("OcrRecognizeAsyncTask", "thresholding completed. converting to bmp. size:" + bitmap.getWidth() + "x" + bitmap.getHeight());
-//        bitmap = WriteFile.writeBitmap(thresholdedImage);
-//      }
-//      if (PERFORM_SOBEL_THRESHOLDING) {
-//        Pix thresholdedImage = Thresholder.sobelEdgeThreshold(ReadFile.readBitmap(bitmap), 64);
-//        Log.e("OcrRecognizeAsyncTask", "thresholding completed. converting to bmp. size:" + bitmap.getWidth() + "x" + bitmap.getHeight());
-//        bitmap = WriteFile.writeBitmap(thresholdedImage);
-//      }
-      
-      Log.d("OcrRecognizeAsyncTask", "calling setImage()...");
-      baseApi.setImage(bitmap);
-      
-      Log.d("OcrRecognizeAsyncTask", "setImage() completed");
+    long start = System.currentTimeMillis();
+    Bitmap bitmap = activity.getCameraManager().buildLuminanceSource(data, width, height).renderCroppedGreyscaleBitmap();
+    String textResult;
+
+    //      if (PERFORM_FISHER_THRESHOLDING) {
+    //        Pix thresholdedImage = Thresholder.fisherAdaptiveThreshold(ReadFile.readBitmap(bitmap), 48, 48, 0.1F, 2.5F);
+    //        Log.e("OcrRecognizeAsyncTask", "thresholding completed. converting to bmp. size:" + bitmap.getWidth() + "x" + bitmap.getHeight());
+    //        bitmap = WriteFile.writeBitmap(thresholdedImage);
+    //      }
+    //      if (PERFORM_OTSU_THRESHOLDING) {
+    //        Pix thresholdedImage = Binarize.otsuAdaptiveThreshold(ReadFile.readBitmap(bitmap), 48, 48, 9, 9, 0.1F);
+    //        Log.e("OcrRecognizeAsyncTask", "thresholding completed. converting to bmp. size:" + bitmap.getWidth() + "x" + bitmap.getHeight());
+    //        bitmap = WriteFile.writeBitmap(thresholdedImage);
+    //      }
+    //      if (PERFORM_SOBEL_THRESHOLDING) {
+    //        Pix thresholdedImage = Thresholder.sobelEdgeThreshold(ReadFile.readBitmap(bitmap), 64);
+    //        Log.e("OcrRecognizeAsyncTask", "thresholding completed. converting to bmp. size:" + bitmap.getWidth() + "x" + bitmap.getHeight());
+    //        bitmap = WriteFile.writeBitmap(thresholdedImage);
+    //      }
+
+    try {     
+      baseApi.setImage(ReadFile.readBitmap(bitmap));
       textResult = baseApi.getUTF8Text();
-      Log.d("OcrRecognizeAsyncTask", "getUTF8Text() completed");
-      wordConfidences = baseApi.wordConfidences();
-      overallConf = baseApi.meanConfidence();
-      end = System.currentTimeMillis();
+      timeRequired = System.currentTimeMillis() - start;
+
+      // Check for failure to recognize text
+      if (textResult == null || textResult.equals("")) {
+        return false;
+      }
+      ocrResult = new OcrResult();
+      ocrResult.setWordConfidences(baseApi.wordConfidences());
+      ocrResult.setMeanConfidence( baseApi.meanConfidence());
+      ocrResult.setRegionBoundingBoxes(baseApi.getRegions().getBoxRects());
+      ocrResult.setTextlineBoundingBoxes(baseApi.getTextlines().getBoxRects());
+      ocrResult.setWordBoundingBoxes(baseApi.getWords().getBoxRects());
+      ocrResult.setCharacterBoundingBoxes(baseApi.getCharacters().getBoxRects());
     } catch (RuntimeException e) {
       Log.e("OcrRecognizeAsyncTask", "Caught RuntimeException in request to Tesseract. Setting state to CONTINUOUS_STOPPED.");
       e.printStackTrace();
@@ -119,63 +99,28 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
       }
       return false;
     }
-
-    // Check for failure to recognize text
-    if (textResult == null || textResult.equals("")) {
-      ocrResultFailure = new OcrResultFailure(end - start);
-      return false;
-    }  
-    
-    // Get bounding boxes for characters and words
-    List<Rect> wordBoxes = baseApi.getWords().getBoxRects();
-    List<Rect> characterBoxes = baseApi.getCharacters().getBoxRects();
-    List<Rect> textlineBoxes = baseApi.getTextlines().getBoxRects();
-    List<Rect> regionBoxes = baseApi.getRegions().getBoxRects();
-
-//    if (PERFORM_PSEUDOTRANSLATION) {
-//      textResult = PseudoTranslator.translate(textResult);
-//    }
-      
-    ocrResult = new OcrResult(bitmap, textResult, wordConfidences, overallConf, characterBoxes, 
-        textlineBoxes, wordBoxes, regionBoxes, (end - start));
+    timeRequired = System.currentTimeMillis() - start;
+    ocrResult.setBitmap(bitmap);
+    ocrResult.setText(textResult);
+    ocrResult.setRecognitionTimeRequired(timeRequired);
     return true;
   }
-  
+
   @Override
   protected void onPostExecute(Boolean result) {
     super.onPostExecute(result);
 
     Handler handler = activity.getHandler();
-    if (!isContinuous && handler != null) {
+    if (handler != null) {
       // Send results for single-shot mode recognition.
       if (result) {
         Message message = Message.obtain(handler, R.id.ocr_decode_succeeded, ocrResult);
         message.sendToTarget();
       } else {
-        bitmap.recycle();
         Message message = Message.obtain(handler, R.id.ocr_decode_failed, ocrResult);
         message.sendToTarget();
       }
-      indeterminateDialog.dismiss();
-    } else  if (handler != null) {
-      // Send results for continuous mode recognition.
-      if (result) {
-        try {
-          // Send the result to CaptureActivityHandler
-          Message message = Message.obtain(handler, R.id.ocr_continuous_decode_succeeded, ocrResult);
-          message.sendToTarget();
-        } catch (NullPointerException e) {
-          activity.stopHandler();
-        }
-      } else {
-        bitmap.recycle();
-        try {
-          Message message = Message.obtain(handler, R.id.ocr_continuous_decode_failed, ocrResultFailure);
-          message.sendToTarget();
-        } catch (NullPointerException e) {
-          activity.stopHandler();
-        }
-      }
+      activity.getProgressDialog().dismiss();
     }
     if (baseApi != null) {
       baseApi.clear();

@@ -206,6 +206,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     return handler;
   }
 
+  TessBaseAPI getBaseApi() {
+    return baseApi;
+  }
+  
   CameraManager getCameraManager() {
     return cameraManager;
   }
@@ -458,7 +462,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       cameraManager.openDriver(surfaceHolder);
       
       // Creating the handler starts the preview, which can also throw a RuntimeException.
-      handler = new CaptureActivityHandler(this, cameraManager, baseApi, isContinuousModeActive);
+      handler = new CaptureActivityHandler(this, cameraManager, isContinuousModeActive);
       
     } catch (IOException ioe) {
       showErrorMessage("Error", "Could not initialize camera. Please try restarting device.");
@@ -721,14 +725,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   boolean handleOcrDecode(OcrResult ocrResult) {
     lastResult = ocrResult;
     
-    try {
-      // Test whether the result is null
-      ocrResult.getText();
-    } catch (NullPointerException e) {
+    // Test whether the result is null
+    if (ocrResult.getText() == null || ocrResult.getText().equals("")) {
       Toast toast = Toast.makeText(this, "OCR failed. Please try again.", Toast.LENGTH_SHORT);
       toast.setGravity(Gravity.TOP, 0, 0);
       toast.show();
-      resumeContinuousDecoding();
       return false;
     }
     
@@ -1173,6 +1174,24 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     
     // Light
     prefs.edit().putBoolean(PreferencesActivity.KEY_TOGGLE_LIGHT, CaptureActivity.DEFAULT_TOGGLE_LIGHT).commit();
+  }
+  
+  void displayProgressDialog() {
+    // Set up the indeterminate progress dialog box
+    indeterminateDialog = new ProgressDialog(this);
+    indeterminateDialog.setTitle("Please wait");        
+    String ocrEngineModeName = getOcrEngineModeName();
+    if (ocrEngineModeName.equals("Both")) {
+      indeterminateDialog.setMessage("Performing OCR using Cube and Tesseract...");
+    } else {
+      indeterminateDialog.setMessage("Performing OCR using " + ocrEngineModeName + "...");
+    }
+    indeterminateDialog.setCancelable(false);
+    indeterminateDialog.show();
+  }
+  
+  ProgressDialog getProgressDialog() {
+    return indeterminateDialog;
   }
   
   /**

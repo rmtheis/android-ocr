@@ -16,13 +16,12 @@
  */
 package edu.sfsu.cs.orange.ocr;
 
-import com.googlecode.tesseract.android.TessBaseAPI;
-
 import edu.sfsu.cs.orange.ocr.CaptureActivity;
 import edu.sfsu.cs.orange.ocr.R;
 import edu.sfsu.cs.orange.ocr.camera.CameraManager;
 import edu.sfsu.cs.orange.ocr.OcrResult;
 
+import android.app.ProgressDialog;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -57,17 +56,14 @@ final class CaptureActivityHandler extends Handler {
     DONE
   }
 
-  CaptureActivityHandler(CaptureActivity activity, CameraManager cameraManager, TessBaseAPI baseApi, 
-      boolean isContinuousModeActive) {
+  CaptureActivityHandler(CaptureActivity activity, CameraManager cameraManager, boolean isContinuousModeActive) {
     this.activity = activity;
     this.cameraManager = cameraManager;
 
     // Start ourselves capturing previews (and decoding if using continuous recognition mode).
     cameraManager.startPreview();
     
-    decodeThread = new DecodeThread(activity, 
-        //new ViewfinderResultPointCallback(activity.getViewfinderView()), 
-        baseApi);
+    decodeThread = new DecodeThread(activity);
     decodeThread.start();
     
     if (isContinuousModeActive) {
@@ -268,9 +264,11 @@ final class CaptureActivityHandler extends Handler {
    */
   private void ocrDecode() {
     state = State.PREVIEW_PAUSED;
+
+    
     cameraManager.requestOcrDecode(decodeThread.getHandler(), R.id.ocr_decode);
   }
-
+  
   /**
    * Request OCR when the hardware shutter button is clicked.
    */

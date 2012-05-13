@@ -17,8 +17,6 @@
 
 package edu.sfsu.cs.orange.ocr;
 
-import com.googlecode.tesseract.android.TessBaseAPI;
-
 import edu.sfsu.cs.orange.ocr.CaptureActivity;
 import android.os.Handler;
 import android.os.Looper;
@@ -34,11 +32,9 @@ final class DecodeThread extends Thread {
   private final CaptureActivity activity;
   private Handler handler;
   private final CountDownLatch handlerInitLatch;
-  private final TessBaseAPI baseApi;
 
-  DecodeThread(CaptureActivity activity, TessBaseAPI baseApi) {
+  DecodeThread(CaptureActivity activity) {
     this.activity = activity;
-    this.baseApi = baseApi;
     handlerInitLatch = new CountDownLatch(1);
   }
 
@@ -54,7 +50,7 @@ final class DecodeThread extends Thread {
   @Override
   public void run() {
     Looper.prepare();
-    handler = new DecodeHandler(activity, baseApi);
+    handler = new DecodeHandler(activity);
     handlerInitLatch.countDown();
     Looper.loop();
   }
