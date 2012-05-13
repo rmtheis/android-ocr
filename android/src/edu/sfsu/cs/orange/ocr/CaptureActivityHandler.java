@@ -21,7 +21,6 @@ import edu.sfsu.cs.orange.ocr.R;
 import edu.sfsu.cs.orange.ocr.camera.CameraManager;
 import edu.sfsu.cs.orange.ocr.OcrResult;
 
-import android.app.ProgressDialog;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -41,17 +40,12 @@ final class CaptureActivityHandler extends Handler {
   private final DecodeThread decodeThread;
   private static State state;
   private final CameraManager cameraManager;
-  private static boolean isAutofocusLoopStarted = false;
-  private long delay;
 
   private enum State {
     PREVIEW,
-    PREVIEW_FOCUSING,
     PREVIEW_PAUSED,
     CONTINUOUS,
-    CONTINUOUS_FOCUSING,
     CONTINUOUS_PAUSED,
-    CONTINUOUS_WAITING_FOR_AUTOFOCUS_TO_FINISH,
     SUCCESS,
     DONE
   }
@@ -75,7 +69,6 @@ final class CaptureActivityHandler extends Handler {
       // Display a "be patient" message while first recognition request is running
       activity.setStatusViewForContinuous();
       
-      cameraManager.requestAutoFocus(this, R.id.auto_focus);
       restartOcrPreviewAndDecode();
     } else {
       state = State.SUCCESS;
@@ -91,44 +84,6 @@ final class CaptureActivityHandler extends Handler {
   public void handleMessage(Message message) {
     
     switch (message.what) {
-      case R.id.auto_focus:
-        // If the last autofocus was successful, use a longer delay.
-        if (message.getData().getBoolean("success")) {
-          delay = CaptureActivity.AUTOFOCUS_SUCCESS_INTERVAL_MS;
-        } else {
-          delay = CaptureActivity.AUTOFOCUS_FAILURE_INTERVAL_MS;
-        }
-        
-        // Submit another delayed autofocus request.
-        if (state == State.PREVIEW_FOCUSING || state == State.PREVIEW) {
-          state = State.PREVIEW;
-          requestDelayedAutofocus(delay, R.id.auto_focus);
-        } else if (state == State.CONTINUOUS_FOCUSING || state == State.CONTINUOUS) {
-          state = State.CONTINUOUS;
-          requestDelayedAutofocus(delay, R.id.auto_focus);
-        } else if (state == State.PREVIEW_FOCUSING) {
-          requestDelayedAutofocus(delay, R.id.auto_focus);
-        } else if (state == State.CONTINUOUS_FOCUSING) {
-          requestDelayedAutofocus(delay, R.id.auto_focus);
-        } else if (state == State.CONTINUOUS_WAITING_FOR_AUTOFOCUS_TO_FINISH) {
-          state = State.CONTINUOUS;
-          requestDelayedAutofocus(delay, R.id.auto_focus);
-          restartOcrPreviewAndDecode();
-        } else {
-          isAutofocusLoopStarted = false;
-        }
-        break;
-      case R.id.user_requested_auto_focus:
-        // Reset the state, but don't request more autofocusing.
-        if (state == State.PREVIEW_FOCUSING) {
-          state = State.PREVIEW;
-        } else if (state == State.CONTINUOUS_FOCUSING) {
-          state = State.CONTINUOUS;
-        } else if (state == State.CONTINUOUS_WAITING_FOR_AUTOFOCUS_TO_FINISH) {
-          state = State.CONTINUOUS;
-          restartOcrPreviewAndDecode();
-        }
-        break;
       case R.id.restart_preview:
         restartOcrPreview();
         break;
@@ -141,8 +96,6 @@ final class CaptureActivityHandler extends Handler {
         }
         if (state == State.CONTINUOUS) {
           restartOcrPreviewAndDecode();
-        } else if (state == State.CONTINUOUS_FOCUSING) {
-          state = State.CONTINUOUS_WAITING_FOR_AUTOFOCUS_TO_FINISH;
         }
         break;
       case R.id.ocr_continuous_decode_succeeded:
@@ -154,8 +107,6 @@ final class CaptureActivityHandler extends Handler {
         }
         if (state == State.CONTINUOUS) {
           restartOcrPreviewAndDecode();
-        } else if (state == State.CONTINUOUS_FOCUSING) {
-          state = State.CONTINUOUS_WAITING_FOR_AUTOFOCUS_TO_FINISH;
         }
         break;
       case R.id.ocr_decode_succeeded:
@@ -179,7 +130,6 @@ final class CaptureActivityHandler extends Handler {
     
     Log.d(TAG, "Setting state to CONTINUOUS_PAUSED.");
     state = State.CONTINUOUS_PAUSED;
-    removeMessages(R.id.auto_focus);
     removeMessages(R.id.ocr_continuous_decode);
     removeMessages(R.id.ocr_decode);
     removeMessages(R.id.ocr_continuous_decode_failed);
@@ -220,7 +170,6 @@ final class CaptureActivityHandler extends Handler {
     }
 
     // Be absolutely sure we don't send any queued up messages
-    removeMessages(R.id.auto_focus);
     removeMessages(R.id.ocr_continuous_decode);
     removeMessages(R.id.ocr_decode);
 
@@ -238,12 +187,6 @@ final class CaptureActivityHandler extends Handler {
       
       // Draw the viewfinder.
       activity.drawViewfinder();
-      
-      // Start cycling the autofocus
-      if (!isAutofocusLoopStarted) {
-        isAutofocusLoopStarted = true;
-        requestAutofocus(R.id.auto_focus);
-      }
     }
   }
   
@@ -264,8 +207,6 @@ final class CaptureActivityHandler extends Handler {
    */
   private void ocrDecode() {
     state = State.PREVIEW_PAUSED;
-
-    
     cameraManager.requestOcrDecode(decodeThread.getHandler(), R.id.ocr_decode);
   }
   
@@ -274,7 +215,7 @@ final class CaptureActivityHandler extends Handler {
    */
   void hardwareShutterButtonClick() {
     // Ensure that we're not in continuous recognition mode
-    if (state == State.PREVIEW || state == State.PREVIEW_FOCUSING) {
+    if (state == State.PREVIEW) {
       ocrDecode();
     }
   }
@@ -287,46 +228,5 @@ final class CaptureActivityHandler extends Handler {
     activity.setShutterButtonClickable(false);
     ocrDecode();
   }
-  
-  /**
-   * Request autofocus from the CameraManager if we're in an appropriate state.
-   * 
-   * @param message The message to deliver
-   */
-  private void requestAutofocus(int message) {
-    if (state == State.PREVIEW || state == State.CONTINUOUS){
-      if (state == State.PREVIEW) {
-        state = State.PREVIEW_FOCUSING;
-      } else if (state == State.CONTINUOUS){
-        state = State.CONTINUOUS_FOCUSING;
-      }
-      cameraManager.requestAutoFocus(this, message);
-    } else {
-      // If we're bumping up against a user-requested focus, enqueue another focus request,
-      // otherwise stop autofocusing until the next restartOcrPreview()
-      if (state == State.PREVIEW_FOCUSING && message == R.id.auto_focus) { 
-        //Log.d(TAG, "focusing now, so Requesting a new delayed autofocus");
-        requestDelayedAutofocus(CaptureActivity.AUTOFOCUS_FAILURE_INTERVAL_MS, message);
-      } else if (state == State.CONTINUOUS_FOCUSING && message == R.id.auto_focus) {
-        requestDelayedAutofocus(CaptureActivity.AUTOFOCUS_FAILURE_INTERVAL_MS, message);
-      } else if (message == R.id.auto_focus) {
-        isAutofocusLoopStarted = false;
-      }
-    }
-  }
-  
-  /**
-   * Request autofocus after the given delay.
-   * 
-   * @param delay The delay, in milliseconds, until autofocus will be requested
-   * @param message The message to deliver
-   */
-  void requestDelayedAutofocus(final long delay, final int message) {
-    Handler autofocusHandler = new Handler(); 
-    autofocusHandler.postDelayed(new Runnable() {
-      public void run() {
-        requestAutofocus(message);
-      }
-    }, delay);
-  } 
+
 }

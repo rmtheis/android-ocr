@@ -101,6 +101,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   /** The default page segmentation mode to use. */
   public static final String DEFAULT_PAGE_SEGMENTATION_MODE = "Auto";
   
+  /** Whether to use autofocus by default. */
+  public static final boolean DEFAULT_TOGGLE_AUTO_FOCUS = true;
+  
   /** Whether to beep by default when the shutter button is pressed. */
   public static final boolean DEFAULT_TOGGLE_BEEP = true;
   
@@ -149,12 +152,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   
   /** Minimum mean confidence score necessary to not reject single-shot OCR result. Currently unused. */
   static final int MINIMUM_MEAN_CONFIDENCE = 0; // 0 means don't reject any scored results
-  
-  /** Length of time before the next autofocus request, if the last one was successful. Used in CaptureActivityHandler. */
-  static final long AUTOFOCUS_SUCCESS_INTERVAL_MS = 3000L;
-  
-  /** Length of time before the next autofocus request, if the last request failed. Used in CaptureActivityHandler. */
-  static final long AUTOFOCUS_FAILURE_INTERVAL_MS = 1000L;
   
   // Context menu
   private static final int SETTINGS_ID = Menu.FIRST;
@@ -538,7 +535,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     } else if (keyCode == KeyEvent.KEYCODE_FOCUS) {      
       // Only perform autofocus if user is not holding down the button.
       if (event.getRepeatCount() == 0) {
-        handler.requestDelayedAutofocus(500L, R.id.user_requested_auto_focus);
+        cameraManager.requestAutoFocus(500L);
       }
       return true;
     }
@@ -998,7 +995,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   @Override
   public void onShutterButtonFocus(ShutterButton b, boolean pressed) {
-    requestDelayedAutofocus();
+    requestDelayedAutoFocus();
   }
   
   /**
@@ -1006,12 +1003,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
    * just wants to click the shutter button without focusing. Quick button press/release will 
    * trigger onShutterButtonClick() before the focus kicks in.
    */
-  private void requestDelayedAutofocus() {
+  private void requestDelayedAutoFocus() {
     // Wait 350 ms before focusing to avoid interfering with quick button presses when
     // the user just wants to take a picture without focusing.
-    if (handler != null) {
-      handler.requestDelayedAutofocus(350L, R.id.user_requested_auto_focus);
-    }
+    cameraManager.requestAutoFocus(350L);
   }
   
   static boolean getFirstLaunch() {
@@ -1155,6 +1150,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     // OCR Engine
     prefs.edit().putString(PreferencesActivity.KEY_OCR_ENGINE_MODE, CaptureActivity.DEFAULT_OCR_ENGINE_MODE).commit();
 
+    // Autofocus
+    prefs.edit().putBoolean(PreferencesActivity.KEY_AUTO_FOCUS, CaptureActivity.DEFAULT_TOGGLE_AUTO_FOCUS).commit();
+    
     // Beep
     prefs.edit().putBoolean(PreferencesActivity.KEY_PLAY_BEEP, CaptureActivity.DEFAULT_TOGGLE_BEEP).commit();
 

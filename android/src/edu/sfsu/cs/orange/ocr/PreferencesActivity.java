@@ -52,6 +52,7 @@ public class PreferencesActivity extends PreferenceActivity implements
   public static final String KEY_TRANSLATOR = "preference_translator";
   
   // Preference keys carried over from ZXing project
+  public static final String KEY_AUTO_FOCUS = "preferences_auto_focus";
   public static final String KEY_HELP_VERSION_SHOWN = "preferences_help_version_shown";
   public static final String KEY_NOT_OUR_RESULTS_SHOWN = "preferences_not_our_results_shown";
   public static final String KEY_REVERSE_IMAGE = "preferences_reverse_image";

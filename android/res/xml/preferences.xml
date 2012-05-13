@@ -59,6 +59,10 @@
 	        android:entryValues="@array/ocrenginemodes"/>
 	    
 	    <CheckBoxPreference
+	        android:key="preferences_auto_focus"
+	        android:title="Autofocus"/>
+	    
+	    <CheckBoxPreference
             android:key="preferences_play_beep"
             android:title="Beep"/>
 	    	    
