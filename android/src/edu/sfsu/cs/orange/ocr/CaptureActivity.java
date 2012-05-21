@@ -635,7 +635,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     	// Something else is wrong. It may be one of many other states, but all we need
       // to know is we can neither read nor write
     	Log.e(TAG, "External storage is unavailable");
-    	showErrorMessage("Error", "Required external storage (such as an SD card) is unavailable.");
+    	showErrorMessage("Error", "Required external storage (such as an SD card) is unavailable or corrupted.");
     }
     return null;
   }
@@ -986,9 +986,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     } else {
       if (handler != null) {
         handler.shutterButtonClick();
-      } else {
-        // Null handler. Why?
-        showErrorMessage("Null handler error", "Please report this error along with what type of device you are using.");
       }
     }
   }
