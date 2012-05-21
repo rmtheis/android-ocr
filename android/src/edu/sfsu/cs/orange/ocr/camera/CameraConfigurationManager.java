@@ -95,6 +95,8 @@ final class CameraConfigurationManager {
     String focusMode = null;
     if (prefs.getBoolean(PreferencesActivity.KEY_AUTO_FOCUS, true)) {
       focusMode = findSettableValue(parameters.getSupportedFocusModes(),
+                                    "continuous-video", // Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO in 4.0+
+                                    "continuous-picture", // Camera.Paramters.FOCUS_MODE_CONTINUOUS_PICTURE in 4.0+
                                     Camera.Parameters.FOCUS_MODE_AUTO);
     }
     // Maybe selected auto-focus but not available, so fall through here:
