@@ -28,7 +28,7 @@ import android.util.Log;
  * Class to send OCR requests to the OCR engine in a separate thread, send a success/failure message,
  * and dismiss the indeterminate progress dialog box. Used for non-continuous mode OCR only.
  */
-final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
+final class OcrRecognizeAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
   //  private static final boolean PERFORM_FISHER_THRESHOLDING = false; 
   //  private static final boolean PERFORM_OTSU_THRESHOLDING = false; 
@@ -51,7 +51,7 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
   }
 
   @Override
-  protected Boolean doInBackground(String... arg0) {
+  protected Boolean doInBackground(Void... arg0) {
     long start = System.currentTimeMillis();
     Bitmap bitmap = activity.getCameraManager().buildLuminanceSource(data, width, height).renderCroppedGreyscaleBitmap();
     String textResult;
