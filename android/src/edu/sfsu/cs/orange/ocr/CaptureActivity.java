@@ -160,6 +160,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   // Options menu, for copy to clipboard
   private static final int OPTIONS_COPY_RECOGNIZED_TEXT_ID = Menu.FIRST;
   private static final int OPTIONS_COPY_TRANSLATED_TEXT_ID = Menu.FIRST + 1;
+  private static final int OPTIONS_SHARE_RECOGNIZED_TEXT_ID = Menu.FIRST + 2;
+  private static final int OPTIONS_SHARE_TRANSLATED_TEXT_ID = Menu.FIRST + 3;
 
   private CameraManager cameraManager;
   private CaptureActivityHandler handler;
@@ -882,8 +884,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     super.onCreateContextMenu(menu, v, menuInfo);
     if (v.equals(ocrResultView)) {
       menu.add(Menu.NONE, OPTIONS_COPY_RECOGNIZED_TEXT_ID, Menu.NONE, "Copy recognized text");
+      menu.add(Menu.NONE, OPTIONS_SHARE_RECOGNIZED_TEXT_ID, Menu.NONE, "Share recognized text");
     } else if (v.equals(translationView)){
       menu.add(Menu.NONE, OPTIONS_COPY_TRANSLATED_TEXT_ID, Menu.NONE, "Copy translated text");
+      menu.add(Menu.NONE, OPTIONS_SHARE_TRANSLATED_TEXT_ID, Menu.NONE, "Share translated text");
     }
   }
 
@@ -900,6 +904,12 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         toast.show();
       }
       return true;
+    case OPTIONS_SHARE_RECOGNIZED_TEXT_ID:
+    	Intent shareRecognizedTextIntent = new Intent(android.content.Intent.ACTION_SEND);
+    	shareRecognizedTextIntent.setType("text/plain");
+    	shareRecognizedTextIntent.putExtra(android.content.Intent.EXTRA_TEXT, ocrResultView.getText());
+    	startActivity(Intent.createChooser(shareRecognizedTextIntent, "Share via"));
+    	return true;
     case OPTIONS_COPY_TRANSLATED_TEXT_ID:
         clipboardManager.setText(translationView.getText());
       if (clipboardManager.hasText()) {
@@ -908,6 +918,12 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         toast.show();
       }
       return true;
+    case OPTIONS_SHARE_TRANSLATED_TEXT_ID:
+    	Intent shareTranslatedTextIntent = new Intent(android.content.Intent.ACTION_SEND);
+    	shareTranslatedTextIntent.setType("text/plain");
+    	shareTranslatedTextIntent.putExtra(android.content.Intent.EXTRA_TEXT, translationView.getText());
+    	startActivity(Intent.createChooser(shareTranslatedTextIntent, "Share via"));
+    	return true;
     default:
       return super.onContextItemSelected(item);
     }
