@@ -427,6 +427,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     isPaused = false;
     resetStatusView();
     setStatusViewForContinuous();
+    DecodeHandler.resetDecodeState();
     handler.resetState();
     if (shutterButton != null && DISPLAY_SHUTTER_BUTTON) {
       shutterButton.setVisibility(View.VISIBLE);
