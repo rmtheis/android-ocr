@@ -3,15 +3,15 @@
 
 An experimental app for Android that performs optical character recognition (OCR) on images captured using the device camera.
 
-Runs the Tesseract 3.01 OCR engine using a fork of Tesseract Tools for Android.
+Runs the Tesseract 3.02 OCR engine using a fork of Tesseract Tools for Android.
 
-Most of the code making up the core structure of this project has been adapted from the ZXing Barcode Scanner. Along with Tesseract-OCR and Tesseract Tools for Android (tesseract-android-tools), several open source projects have been used in this project, including google-api-translate-java, microsoft-translator-java-api, and jtar.
+Most of the code making up the core structure of this project has been adapted from the ZXing Barcode Scanner. Along with Tesseract-OCR and Tesseract Tools for Android (tesseract-android-tools), several open source projects have been used in this project, including leptonica, google-api-translate-java, microsoft-translator-java-api, and jtar.
 
 ## Requires
 
-* Installation of [tess-two](https://github.com/rmtheis/tess-two) as a library project, to act as the OCR engine.
-* A [Bing API key](http://www.bing.com/developers/appids.aspx).
-* A [Google Translate API key](https://code.google.com/apis/console/?api=translate).
+* Installation of [tess-two](https://github.com/rmtheis/tess-two) as a [library project](http://developer.android.com/guide/developing/projects/projects-eclipse.html#SettingUpLibraryProject), to act as the OCR engine.
+* A Windows Azure Marketplace Client ID and Client Secret - [Documentation](http://msdn.microsoft.com/en-us/library/hh454950.aspx)
+* A Google Translate API key - [Documentation](https://code.google.com/apis/console/?api=translate).
 
 Installing the APK
 ==================
@@ -39,4 +39,4 @@ This project is licensed under the [Apache License, Version 2.0](http://www.apac
      * limitations under the License.
      */
 
-One of the jar files in the android/libs directory (google-api-translate-java-0.98-fork.jar) is licensed under the [GNU Lesser GPL](http://www.gnu.org/licenses/lgpl.html).
+One of the jar files in the android/libs directory (google-api-translate-java-0.98-mod2.jar) is licensed under the [GNU Lesser GPL](http://www.gnu.org/licenses/lgpl.html).
