@@ -24,21 +24,26 @@ import edu.sfsu.cs.orange.ocr.CaptureActivity;
 
 public class TranslatorBing {
   private static final String TAG = TranslatorBing.class.getSimpleName();
-  private static final String API_KEY = " [PUT YOUR API KEY HERE] ";
+  private static final String CLIENT_ID = " [PUT YOUR CLIENT ID HERE] ";
+  private static final String CLIENT_SECRET = " [PUT YOUR CLIENT SECRET HERE] ";
   
-  private TranslatorBing() {  
-    // Private constructor to enforce noninstantiability
-  }
-
-  // Translate using Microsoft Translate API
-  static String translate(String sourceLanguageCode, String targetLanguageCode, String sourceText) {      
-    Translate.setKey(API_KEY);
+  /**
+   *  Translate using Microsoft Translate API
+   * @param sourceLanguageCode Source language code, for example, "en"
+   * @param targetLanguageCode Target language code, for example, "es"
+   * @param sourceText Text to send for translation
+   * @return Translated text
+   */
+  static String translate(String sourceLanguageCode, String targetLanguageCode, String sourceText) {
+    Translate.setClientId(CLIENT_ID);
+    Translate.setClientSecret(CLIENT_SECRET);
     try {
       Log.d(TAG, sourceLanguageCode + " -> " + targetLanguageCode);
       return Translate.execute(sourceText, Language.fromString(sourceLanguageCode), 
           Language.fromString(targetLanguageCode));
     } catch (Exception e) {
       Log.e(TAG, "Caught exeption in translation request.");
+      e.printStackTrace();
       return Translator.BAD_TRANSLATION_MSG;
     }
   }
@@ -61,13 +66,6 @@ public class TranslatorBing {
     // Remove parentheses
     standardizedName = standardizedName.replace("(", "");   
     standardizedName = standardizedName.replace(")", "");
-    
-    // Hack to fix misspellings in microsoft-translator-java-api
-    if (standardizedName.equals("HAITIAN_CREOLE")) {
-      standardizedName = "HATIAN_CREOLE";
-    } else if (standardizedName.equals("UKRAINIAN")) {
-      standardizedName = "UKRANIAN";
-    }
     
     // Map Norwegian-Bokmal to Norwegian
     if (standardizedName.equals("NORWEGIAN_BOKMAL")) {
