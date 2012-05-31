@@ -33,12 +33,13 @@ public class OcrResult {
   
   private int[] wordConfidences;
   private int meanConfidence;
-  
-  private List<Rect> wordBoundingBoxes;
-  private List<Rect> characterBoundingBoxes;
-  private List<Rect> textlineBoundingBoxes;
+
   private List<Rect> regionBoundingBoxes;
-  
+  private List<Rect> textlineBoundingBoxes;
+  private List<Rect> wordBoundingBoxes;
+  private List<Rect> stripBoundingBoxes;  
+  private List<Rect> characterBoundingBoxes;
+
   private long timestamp;
   private long recognitionTimeRequired;
 
@@ -48,19 +49,21 @@ public class OcrResult {
                    String text,
                    int[] wordConfidences,
                    int meanConfidence,
-                   List<Rect> characterBoundingBoxes,
+                   List<Rect> regionBoundingBoxes,
                    List<Rect> textlineBoundingBoxes,
                    List<Rect> wordBoundingBoxes,
-                   List<Rect> regionBoxes, 
+                   List<Rect> stripBoundingBoxes,
+                   List<Rect> characterBoundingBoxes,
                    long recognitionTimeRequired) {
     this.bitmap = bitmap;
     this.text = text;
     this.wordConfidences = wordConfidences;
     this.meanConfidence = meanConfidence;
-    this.characterBoundingBoxes = characterBoundingBoxes;
+    this.regionBoundingBoxes = regionBoundingBoxes;
     this.textlineBoundingBoxes = textlineBoundingBoxes;
     this.wordBoundingBoxes = wordBoundingBoxes;
-    this.regionBoundingBoxes = regionBoxes;
+    this.stripBoundingBoxes = stripBoundingBoxes;
+    this.characterBoundingBoxes = characterBoundingBoxes;
     this.recognitionTimeRequired = recognitionTimeRequired;
     this.timestamp = System.currentTimeMillis();
     
@@ -73,11 +76,7 @@ public class OcrResult {
   }
 
   public Bitmap getBitmap() {
-    if (characterBoundingBoxes.isEmpty()) {
-      return bitmap;
-    } else {
-      return getAnnotatedBitmap();
-    }
+    return getAnnotatedBitmap();
   }
   
   private Bitmap getAnnotatedBitmap() {
@@ -85,10 +84,10 @@ public class OcrResult {
     
     // Draw bounding boxes around each word
     for (int i = 0; i < wordBoundingBoxes.size(); i++) {
-      paint.setAlpha(0xA0);
+      paint.setAlpha(0xFF);
       paint.setColor(0xFF00CCFF);
       paint.setStyle(Style.STROKE);
-      paint.setStrokeWidth(3);
+      paint.setStrokeWidth(2);
       Rect r = wordBoundingBoxes.get(i);
       canvas.drawRect(r, paint);
     }    
@@ -126,8 +125,8 @@ public class OcrResult {
     return new Point(bitmap.getWidth(), bitmap.getHeight()); 
   }
   
-  public List<Rect> getCharacterBoundingBoxes() {
-    return characterBoundingBoxes;
+  public List<Rect> getRegionBoundingBoxes() {
+    return regionBoundingBoxes;
   }
   
   public List<Rect> getTextlineBoundingBoxes() {
@@ -138,8 +137,12 @@ public class OcrResult {
     return wordBoundingBoxes;
   }
   
-  public List<Rect> getRegionBoundingBoxes() {
-    return regionBoundingBoxes;
+  public List<Rect> getStripBoundingBoxes() {
+  	return stripBoundingBoxes;
+  }
+  
+  public List<Rect> getCharacterBoundingBoxes() {
+    return characterBoundingBoxes;
   }
   
   public long getTimestamp() {
@@ -166,20 +169,24 @@ public class OcrResult {
     this.recognitionTimeRequired = recognitionTimeRequired;
   }
   
-  public void setCharacterBoundingBoxes(List<Rect> characterBoundingBoxes) {
-    this.characterBoundingBoxes = characterBoundingBoxes;
+  public void setRegionBoundingBoxes(List<Rect> regionBoundingBoxes) {
+    this.regionBoundingBoxes = regionBoundingBoxes;
   }
   
   public void setTextlineBoundingBoxes(List<Rect> textlineBoundingBoxes) {
     this.textlineBoundingBoxes = textlineBoundingBoxes;
   }
-  
+
   public void setWordBoundingBoxes(List<Rect> wordBoundingBoxes) {
     this.wordBoundingBoxes = wordBoundingBoxes;
   }
   
-  public void setRegionBoundingBoxes(List<Rect> regionBoundingBoxes) {
-    this.regionBoundingBoxes = regionBoundingBoxes;
+  public void setStripBoundingBoxes(List<Rect> stripBoundingBoxes) {
+  	this.stripBoundingBoxes = stripBoundingBoxes;
+  }
+
+  public void setCharacterBoundingBoxes(List<Rect> characterBoundingBoxes) {
+    this.characterBoundingBoxes = characterBoundingBoxes;
   }
   
   @Override

@@ -43,25 +43,28 @@ public final class ViewfinderView extends View {
   //private static final long ANIMATION_DELAY = 80L;
 
   /** Flag to draw boxes representing the results from TessBaseAPI::GetRegions(). */
-  private static final boolean DRAW_REGION_BOXES = false;
+  static final boolean DRAW_REGION_BOXES = false;
 
   /** Flag to draw boxes representing the results from TessBaseAPI::GetTextlines(). */
-  private static final boolean DRAW_TEXTLINE_BOXES = true;
+  static final boolean DRAW_TEXTLINE_BOXES = true;
+
+  /** Flag to draw boxes representing the results from TessBaseAPI::GetStrips(). */
+  static final boolean DRAW_STRIP_BOXES = false;
 
   /** Flag to draw boxes representing the results from TessBaseAPI::GetWords(). */
-  private static final boolean DRAW_WORD_BOXES = true;
+  static final boolean DRAW_WORD_BOXES = true;
 
   /** Flag to draw word text with a background varying from transparent to opaque. */
-  private static final boolean DRAW_TRANSPARENT_WORD_BACKGROUNDS = false;
+  static final boolean DRAW_TRANSPARENT_WORD_BACKGROUNDS = false;
 
   /** Flag to draw boxes representing the results from TessBaseAPI::GetCharacters(). */
-  private static final boolean DRAW_CHARACTER_BOXES = false;
+  static final boolean DRAW_CHARACTER_BOXES = false;
 
   /** Flag to draw the text of words within their respective boxes from TessBaseAPI::GetWords(). */
-  private static final boolean DRAW_WORD_TEXT = false;
+  static final boolean DRAW_WORD_TEXT = false;
 
   /** Flag to draw each character in its respective box from TessBaseAPI::GetCharacters(). */
-  private static final boolean DRAW_CHARACTER_TEXT = false;
+  static final boolean DRAW_CHARACTER_TEXT = false;
 
   private CameraManager cameraManager;
   private final Paint paint;
@@ -70,10 +73,11 @@ public final class ViewfinderView extends View {
   private final int cornerColor;
   private OcrResultText resultText;
   private String[] words;
+  private List<Rect> regionBoundingBoxes;
+  private List<Rect> textlineBoundingBoxes;
+  private List<Rect> stripBoundingBoxes;
   private List<Rect> wordBoundingBoxes;
   private List<Rect> characterBoundingBoxes;
-  private List<Rect> textlineBoundingBoxes;
-  private List<Rect> regionBoundingBoxes;
   //  Rect bounds;
   private Rect previewFrame;
   private Rect rect;
@@ -158,6 +162,21 @@ public final class ViewfinderView extends View {
           }
         }
 
+        if (DRAW_STRIP_BOXES) {
+          stripBoundingBoxes = resultText.getStripBoundingBoxes();
+          paint.setAlpha(0xFF);
+          paint.setColor(Color.YELLOW);
+          paint.setStyle(Style.STROKE);
+          paint.setStrokeWidth(1);
+          for (int i = 0; i < stripBoundingBoxes.size(); i++) {
+            rect = stripBoundingBoxes.get(i);
+            canvas.drawRect(frame.left + rect.left * scaleX,
+                frame.top + rect.top * scaleY, 
+                frame.left + rect.right * scaleX, 
+                frame.top + rect.bottom * scaleY, paint);
+          }        	
+        }
+
         if (DRAW_WORD_BOXES || DRAW_WORD_TEXT) {
           // Split the text into words
           wordBoundingBoxes = resultText.getWordBoundingBoxes();
@@ -167,6 +186,22 @@ public final class ViewfinderView extends View {
           //Log.d("ViewfinderView", "There are " + words.length + " words in the string array.");
           //Log.d("ViewfinderView", "There are " + wordBoundingBoxes.size() + " words with bounding boxes.");
         }
+
+        if (DRAW_WORD_BOXES) {
+          paint.setAlpha(0xFF);
+          paint.setColor(0xFF00CCFF);
+          paint.setStyle(Style.STROKE);
+          paint.setStrokeWidth(1);
+          for (int i = 0; i < wordBoundingBoxes.size(); i++) {
+            // Draw a bounding box around the word
+            rect = wordBoundingBoxes.get(i);
+            canvas.drawRect(
+                frame.left + rect.left * scaleX,
+                frame.top + rect.top * scaleY, 
+                frame.left + rect.right * scaleX, 
+                frame.top + rect.bottom * scaleY, paint);
+          }
+        }  
 
         if (DRAW_WORD_TEXT) { 
           words = resultText.getText().replace("\n"," ").split(" ");
@@ -234,23 +269,7 @@ public final class ViewfinderView extends View {
             }
 
           }
-        }
-
-        if (DRAW_WORD_BOXES) {
-          paint.setAlpha(0xA0);
-          paint.setColor(0xFF00CCFF);
-          paint.setStyle(Style.STROKE);
-          paint.setStrokeWidth(1);
-          for (int i = 0; i < wordBoundingBoxes.size(); i++) {
-            // Draw a bounding box around the word
-            rect = wordBoundingBoxes.get(i);
-            canvas.drawRect(
-                frame.left + rect.left * scaleX,
-                frame.top + rect.top * scaleY, 
-                frame.left + rect.right * scaleX, 
-                frame.top + rect.bottom * scaleY, paint);
-          }
-        }    
+        }  
 
         if (DRAW_CHARACTER_BOXES || DRAW_CHARACTER_TEXT) {
           characterBoundingBoxes = resultText.getCharacterBoundingBoxes();

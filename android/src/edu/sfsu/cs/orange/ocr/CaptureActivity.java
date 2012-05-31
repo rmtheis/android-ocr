@@ -801,10 +801,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
                                                    ocrResult.getWordConfidences(),
                                                    ocrResult.getMeanConfidence(),
                                                    ocrResult.getBitmapDimensions(),
-                                                   ocrResult.getCharacterBoundingBoxes(),
-                                                   ocrResult.getWordBoundingBoxes(),
+                                                   ocrResult.getRegionBoundingBoxes(),
                                                    ocrResult.getTextlineBoundingBoxes(),
-                                                   ocrResult.getRegionBoundingBoxes()));
+                                                   ocrResult.getStripBoundingBoxes(),
+                                                   ocrResult.getWordBoundingBoxes(),
+                                                   ocrResult.getCharacterBoundingBoxes()));
 
     Integer meanConfidence = ocrResult.getMeanConfidence();
     

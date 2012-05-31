@@ -138,7 +138,8 @@ final class DecodeHandler extends Handler {
     }
   }
 
-  private OcrResult getOcrResult() {
+  @SuppressWarnings("unused")
+	private OcrResult getOcrResult() {
     OcrResult ocrResult;
     String textResult;
     long start = System.currentTimeMillis();
@@ -155,10 +156,24 @@ final class DecodeHandler extends Handler {
       ocrResult = new OcrResult();
       ocrResult.setWordConfidences(baseApi.wordConfidences());
       ocrResult.setMeanConfidence( baseApi.meanConfidence());
-      ocrResult.setRegionBoundingBoxes(baseApi.getRegions().getBoxRects());
-      ocrResult.setTextlineBoundingBoxes(baseApi.getTextlines().getBoxRects());
+      if (ViewfinderView.DRAW_REGION_BOXES) {
+        ocrResult.setRegionBoundingBoxes(baseApi.getRegions().getBoxRects());
+      }
+      if (ViewfinderView.DRAW_TEXTLINE_BOXES) {
+        ocrResult.setTextlineBoundingBoxes(baseApi.getTextlines().getBoxRects());
+      }
+      if (ViewfinderView.DRAW_STRIP_BOXES) {
+        ocrResult.setStripBoundingBoxes(baseApi.getStrips().getBoxRects());
+      }
+      
+      // Always get the word bounding boxes--we want it for annotating the bitmap after the user
+      // presses the shutter button, in addition to maybe wanting to draw boxes/words during the
+      // continuous mode recognition.
       ocrResult.setWordBoundingBoxes(baseApi.getWords().getBoxRects());
-      ocrResult.setCharacterBoundingBoxes(baseApi.getCharacters().getBoxRects());
+      
+      if (ViewfinderView.DRAW_CHARACTER_BOXES || ViewfinderView.DRAW_CHARACTER_TEXT) {
+        ocrResult.setCharacterBoundingBoxes(baseApi.getCharacters().getBoxRects());
+      }
     } catch (RuntimeException e) {
       Log.e("OcrRecognizeAsyncTask", "Caught RuntimeException in request to Tesseract. Setting state to CONTINUOUS_STOPPED.");
       e.printStackTrace();

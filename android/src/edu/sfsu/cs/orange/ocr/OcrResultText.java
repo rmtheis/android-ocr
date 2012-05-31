@@ -29,27 +29,30 @@ public final class OcrResultText {
   private final int[] wordConfidences;
   private final int meanConfidence;
   private final Point bitmapDimensions;
+  private final List<Rect> regionBoundingBoxes;
+  private final List<Rect> textlineBoundingBoxes;
+  private final List<Rect> stripBoundingBoxes;
   private final List<Rect> wordBoundingBoxes;
   private final List<Rect> characterBoundingBoxes;
-  private final List<Rect> textlineBoundingBoxes;
-  private final List<Rect> regionBoundingBoxes;
   
   public OcrResultText(String text,
                    int[] wordConfidences,
                    int meanConfidence,
                    Point bitmapDimensions,
-                   List<Rect> characterBoundingBoxes,
-                   List<Rect> wordBoundingBoxes,
+                   List<Rect> regionBoundingBoxes,
                    List<Rect> textlineBoundingBoxes,
-                   List<Rect> regionBoundingBoxes) {
+                   List<Rect> stripBoundingBoxes,
+                   List<Rect> wordBoundingBoxes,
+                   List<Rect> characterBoundingBoxes) {
     this.text = text;
     this.wordConfidences = wordConfidences;
     this.meanConfidence = meanConfidence;
     this.bitmapDimensions = bitmapDimensions;
-    this.characterBoundingBoxes = characterBoundingBoxes;
-    this.wordBoundingBoxes = wordBoundingBoxes;
-    this.textlineBoundingBoxes = textlineBoundingBoxes;
     this.regionBoundingBoxes = regionBoundingBoxes;
+    this.textlineBoundingBoxes = textlineBoundingBoxes;
+    this.stripBoundingBoxes = stripBoundingBoxes;
+    this.wordBoundingBoxes = wordBoundingBoxes;
+    this.characterBoundingBoxes = characterBoundingBoxes;
   }
 
   public String getText() {
@@ -67,21 +70,25 @@ public final class OcrResultText {
   public int getMeanConfidence() {
     return meanConfidence;
   }
-
-  public List<Rect> getCharacterBoundingBoxes() {
-    return characterBoundingBoxes;
+  
+  public List<Rect> getRegionBoundingBoxes() {
+    return regionBoundingBoxes;
   }
   
   public List<Rect> getTextlineBoundingBoxes() {
     return textlineBoundingBoxes;
   }
   
+  public List<Rect> getStripBoundingBoxes() {
+  	return stripBoundingBoxes;
+  }
+  
   public List<Rect> getWordBoundingBoxes() {
     return wordBoundingBoxes;
   }
   
-  public List<Rect> getRegionBoundingBoxes() {
-    return regionBoundingBoxes;
+  public List<Rect> getCharacterBoundingBoxes() {
+    return characterBoundingBoxes;
   }
   
   @Override
