@@ -10,8 +10,8 @@ Most of the code making up the core structure of this project has been adapted f
 ## Requires
 
 * Installation of [tess-two](https://github.com/rmtheis/tess-two) as a [library project](http://developer.android.com/guide/developing/projects/projects-eclipse.html#SettingUpLibraryProject), to act as the OCR engine.
-* A Windows Azure Marketplace Client ID and Client Secret - [Documentation](http://msdn.microsoft.com/en-us/library/hh454950.aspx)
-* A Google Translate API key - [Documentation](https://code.google.com/apis/console/?api=translate).
+* A Windows Azure Marketplace Client ID and Client Secret (for translation) - [Documentation](http://msdn.microsoft.com/en-us/library/hh454950.aspx)
+* A Google Translate API key (for translation) - [Documentation](https://code.google.com/apis/console/?api=translate)
 
 Installing the APK
 ==================
