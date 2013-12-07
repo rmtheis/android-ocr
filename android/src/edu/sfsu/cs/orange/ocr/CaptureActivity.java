@@ -185,7 +185,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private String sourceLanguageCodeTranslation; // ISO 639-1 language code
   private String targetLanguageCodeTranslation; // ISO 639-1 language code
   private String targetLanguageReadable; // Language name, for example, "English"
-  private int pageSegmentationMode = TessBaseAPI.PageSegMode.PSM_AUTO;
+  private int pageSegmentationMode = TessBaseAPI.PageSegMode.PSM_AUTO_OSD;
   private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
   private String characterBlacklist;
   private String characterWhitelist;
