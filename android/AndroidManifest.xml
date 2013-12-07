@@ -22,7 +22,7 @@
           android:versionName="0.5.13" 
           android:versionCode="32"
           >
-  <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="13"/>
+  <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="10"/>
   <supports-screens android:xlargeScreens="true"
                     android:largeScreens="true"
                     android:normalScreens="true"
