@@ -17,17 +17,8 @@
 
 package edu.sfsu.cs.orange.ocr;
 
-import edu.sfsu.cs.orange.ocr.BeepManager;
-
-import com.googlecode.tesseract.android.TessBaseAPI;
-
-import edu.sfsu.cs.orange.ocr.camera.CameraManager;
-import edu.sfsu.cs.orange.ocr.camera.ShutterButton;
-import edu.sfsu.cs.orange.ocr.HelpActivity;
-import edu.sfsu.cs.orange.ocr.OcrResult;
-import edu.sfsu.cs.orange.ocr.PreferencesActivity;
-import edu.sfsu.cs.orange.ocr.language.LanguageCodeHelper;
-import edu.sfsu.cs.orange.ocr.language.TranslateAsyncTask;
+import java.io.File;
+import java.io.IOException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -54,6 +45,7 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -64,13 +56,16 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.IOException;
+import com.googlecode.tesseract.android.TessBaseAPI;
+
+import edu.sfsu.cs.orange.ocr.camera.CameraManager;
+import edu.sfsu.cs.orange.ocr.camera.ShutterButton;
+import edu.sfsu.cs.orange.ocr.language.LanguageCodeHelper;
+import edu.sfsu.cs.orange.ocr.language.TranslateAsyncTask;
 
 /**
  * This activity opens the camera and does the actual scanning on a background thread. It draws a
@@ -103,6 +98,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   
   /** Whether to use autofocus by default. */
   public static final boolean DEFAULT_TOGGLE_AUTO_FOCUS = true;
+  
+  /** Whether to initially disable continuous-picture and continuous-video focus modes. */
+  public static final boolean DEFAULT_DISABLE_CONTINUOUS_FOCUS = true;
   
   /** Whether to beep by default when the shutter button is pressed. */
   public static final boolean DEFAULT_TOGGLE_BEEP = true;
@@ -190,7 +188,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private String characterBlacklist;
   private String characterWhitelist;
   private ShutterButton shutterButton;
-//  private ToggleButton torchButton;
   private boolean isTranslationActive; // Whether we want to show translations
   private boolean isContinuousModeActive; // Whether we are doing OCR in continuous mode
   private SharedPreferences prefs;
@@ -1168,9 +1165,12 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     // Autofocus
     prefs.edit().putBoolean(PreferencesActivity.KEY_AUTO_FOCUS, CaptureActivity.DEFAULT_TOGGLE_AUTO_FOCUS).commit();
     
+    // Disable problematic focus modes
+    prefs.edit().putBoolean(PreferencesActivity.KEY_DISABLE_CONTINUOUS_FOCUS, CaptureActivity.DEFAULT_DISABLE_CONTINUOUS_FOCUS).commit();
+    
     // Beep
     prefs.edit().putBoolean(PreferencesActivity.KEY_PLAY_BEEP, CaptureActivity.DEFAULT_TOGGLE_BEEP).commit();
-
+    
     // Character blacklist
     prefs.edit().putString(PreferencesActivity.KEY_CHARACTER_BLACKLIST, 
         OcrCharacterHelper.getDefaultBlacklist(CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE)).commit();
@@ -1184,7 +1184,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     // Reversed camera image
     prefs.edit().putBoolean(PreferencesActivity.KEY_REVERSE_IMAGE, CaptureActivity.DEFAULT_TOGGLE_REVERSED_IMAGE).commit();
-    
+
     // Light
     prefs.edit().putBoolean(PreferencesActivity.KEY_TOGGLE_LIGHT, CaptureActivity.DEFAULT_TOGGLE_LIGHT).commit();
   }

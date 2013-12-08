@@ -16,10 +16,6 @@
  */
 package edu.sfsu.cs.orange.ocr;
 
-import edu.sfsu.cs.orange.ocr.language.LanguageCodeHelper;
-import edu.sfsu.cs.orange.ocr.language.TranslatorBing;
-import edu.sfsu.cs.orange.ocr.language.TranslatorGoogle;
-
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -27,6 +23,9 @@ import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import edu.sfsu.cs.orange.ocr.language.LanguageCodeHelper;
+import edu.sfsu.cs.orange.ocr.language.TranslatorBing;
+import edu.sfsu.cs.orange.ocr.language.TranslatorGoogle;
 
 /**
  * Class to handle preferences that are saved across sessions of the app. Shows
@@ -53,6 +52,7 @@ public class PreferencesActivity extends PreferenceActivity implements
   
   // Preference keys carried over from ZXing project
   public static final String KEY_AUTO_FOCUS = "preferences_auto_focus";
+  public static final String KEY_DISABLE_CONTINUOUS_FOCUS = "preferences_disable_continuous_focus";
   public static final String KEY_HELP_VERSION_SHOWN = "preferences_help_version_shown";
   public static final String KEY_NOT_OUR_RESULTS_SHOWN = "preferences_not_our_results_shown";
   public static final String KEY_REVERSE_IMAGE = "preferences_reverse_image";
@@ -62,17 +62,13 @@ public class PreferencesActivity extends PreferenceActivity implements
   public static final String TRANSLATOR_BING = "Bing Translator";
   public static final String TRANSLATOR_GOOGLE = "Google Translate";
   
-  //private CheckBoxPreference checkBoxPreferenceContinuousPreview;
   private ListPreference listPreferenceSourceLanguage;
-  //private CheckBoxPreference checkBoxTranslate;
   private ListPreference listPreferenceTargetLanguage;  
   private ListPreference listPreferenceTranslator;
   private ListPreference listPreferenceOcrEngineMode;
-  //private CheckBoxPreference checkBoxBeep;
   private EditTextPreference editTextPreferenceCharacterBlacklist;
   private EditTextPreference editTextPreferenceCharacterWhitelist;
   private ListPreference listPreferencePageSegmentationMode;
-  //private CheckBoxPreference checkBoxReversedImage;
   
   private static SharedPreferences sharedPreferences;
   

@@ -63,6 +63,11 @@
 	        android:title="Autofocus"/>
 	    
 	    <CheckBoxPreference
+	        android:key="preferences_disable_continuous_focus"
+	        android:defaultValue="true"
+	        android:title="Standard focus mode" />
+	    
+	    <CheckBoxPreference
             android:key="preferences_play_beep"
             android:title="Beep"/>
 	    	    
