@@ -103,7 +103,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   public static final boolean DEFAULT_DISABLE_CONTINUOUS_FOCUS = true;
   
   /** Whether to beep by default when the shutter button is pressed. */
-  public static final boolean DEFAULT_TOGGLE_BEEP = true;
+  public static final boolean DEFAULT_TOGGLE_BEEP = false;
   
   /** Whether to initially show a looping, real-time OCR display. */
   public static final boolean DEFAULT_TOGGLE_CONTINUOUS = false;

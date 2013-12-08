@@ -19,6 +19,7 @@ package edu.sfsu.cs.orange.ocr.camera;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.SoundEffectConstants;
 import android.widget.ImageView;
 
 /**
@@ -116,6 +117,7 @@ public class ShutterButton extends ImageView {
 	 @Override
 	 public boolean performClick() {
 		 boolean result = super.performClick();
+		 playSoundEffect(SoundEffectConstants.CLICK);
 		 if (mListener != null) {
 			 mListener.onShutterButtonClick(this);
 		 }
