@@ -19,8 +19,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="edu.sfsu.cs.orange.ocr"
           android:installLocation="preferExternal" 
-          android:versionName="0.5.13" 
-          android:versionCode="32"
+          android:versionName="0.5.14" 
+          android:versionCode="33"
           >
   <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="10"/>
   <supports-screens android:xlargeScreens="true"
