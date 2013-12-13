@@ -1,6 +1,5 @@
 .settings
 .svn
-ant.properties
 local.properties
 orig-build.xml
 android/proguard
