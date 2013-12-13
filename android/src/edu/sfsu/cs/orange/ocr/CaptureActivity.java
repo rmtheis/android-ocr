@@ -69,7 +69,7 @@ import edu.sfsu.cs.orange.ocr.language.TranslateAsyncTask;
 
 /**
  * This activity opens the camera and does the actual scanning on a background thread. It draws a
- * viewfinder to help the user place the barcode correctly, shows feedback as the image processing
+ * viewfinder to help the user place the text correctly, shows feedback as the image processing
  * is happening, and then overlays the results when a scan is successful.
  * 
  * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing/
@@ -88,7 +88,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   public static final String DEFAULT_TARGET_LANGUAGE_CODE = "es";
   
   /** The default online machine translation service to use. */
-  public static final String DEFAULT_TRANSLATOR = "Bing Translator";
+  public static final String DEFAULT_TRANSLATOR = "Google Translate";
   
   /** The default OCR engine to use. */
   public static final String DEFAULT_OCR_ENGINE_MODE = "Tesseract";
@@ -1116,6 +1116,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         pageSegmentationMode = TessBaseAPI.PageSegMode.PSM_SINGLE_WORD;
       } else if (pageSegmentationModeName.equals(pageSegmentationModes[7])) {
         pageSegmentationMode = TessBaseAPI.PageSegMode.PSM_SINGLE_BLOCK_VERT_TEXT;
+      } else if (pageSegmentationModeName.equals(pageSegmentationModes[8])) {
+        pageSegmentationMode = TessBaseAPI.PageSegMode.PSM_SPARSE_TEXT;
       }
       
       // Retrieve from preferences, and set in this Activity, the OCR engine mode

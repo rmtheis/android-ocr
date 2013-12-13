@@ -129,15 +129,10 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
     boolean isCubeSupported = false;
     for (String s : CaptureActivity.CUBE_SUPPORTED_LANGUAGES) {
       if (s.equals(languageCode)) {
-        isCubeSupported = true;
-        destinationFilenameBase = "tesseract-ocr-3.01." + languageCode + ".tar";
+        isCubeSupported = true;   
       }
     }
-    
-    // Hack for Thai, which is a Tesseract-only language but packaged as a tar.
-    if (languageCode.equals("tha")) {
-      destinationFilenameBase = "tesseract-ocr-3.01.tha.tar";
-    }
+    destinationFilenameBase = "tesseract-ocr-3.02." + languageCode + ".tar";   
 
     // Check for, and create if necessary, folder to hold model data
     String destinationDirBase = params[0]; // The storage directory, minus the
@@ -579,6 +574,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
         size += entry.getSize();
       }
     }
+    tis.close();
     return size;
   }
 
