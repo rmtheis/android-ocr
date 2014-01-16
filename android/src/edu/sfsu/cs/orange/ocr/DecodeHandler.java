@@ -171,9 +171,9 @@ final class DecodeHandler extends Handler {
       // continuous mode recognition.
       ocrResult.setWordBoundingBoxes(baseApi.getWords().getBoxRects());
       
-      if (ViewfinderView.DRAW_CHARACTER_BOXES || ViewfinderView.DRAW_CHARACTER_TEXT) {
-        ocrResult.setCharacterBoundingBoxes(baseApi.getCharacters().getBoxRects());
-      }
+//      if (ViewfinderView.DRAW_CHARACTER_BOXES || ViewfinderView.DRAW_CHARACTER_TEXT) {
+//        ocrResult.setCharacterBoundingBoxes(baseApi.getCharacters().getBoxRects());
+//      }
     } catch (RuntimeException e) {
       Log.e("OcrRecognizeAsyncTask", "Caught RuntimeException in request to Tesseract. Setting state to CONTINUOUS_STOPPED.");
       e.printStackTrace();

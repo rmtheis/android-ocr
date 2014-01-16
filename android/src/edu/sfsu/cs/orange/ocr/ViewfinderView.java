@@ -271,80 +271,80 @@ public final class ViewfinderView extends View {
           }
         }  
 
-        if (DRAW_CHARACTER_BOXES || DRAW_CHARACTER_TEXT) {
-          characterBoundingBoxes = resultText.getCharacterBoundingBoxes();
-        }
-
-        if (DRAW_CHARACTER_BOXES) {
-          // Draw bounding boxes around each character
-          paint.setAlpha(0xA0);
-          paint.setColor(0xFF00FF00);
-          paint.setStyle(Style.STROKE);
-          paint.setStrokeWidth(1);
-          for (int c = 0; c < characterBoundingBoxes.size(); c++) {
-            Rect characterRect = characterBoundingBoxes.get(c);
-            canvas.drawRect(frame.left + characterRect.left * scaleX,
-                frame.top + characterRect.top * scaleY, 
-                frame.left + characterRect.right * scaleX, 
-                frame.top + characterRect.bottom * scaleY, paint);
-          }
-        }
-
-        if (DRAW_CHARACTER_TEXT) {
-          // Draw letters individually
-          for (int i = 0; i < characterBoundingBoxes.size(); i++) {
-            Rect r = characterBoundingBoxes.get(i);
-
-            // Draw a white background for every letter
-            int meanConfidence = resultText.getMeanConfidence();
-            paint.setColor(Color.WHITE);
-            paint.setAlpha(meanConfidence * (255 / 100));
-            paint.setStyle(Style.FILL);
-            canvas.drawRect(frame.left + r.left * scaleX,
-                frame.top + r.top * scaleY, 
-                frame.left + r.right * scaleX, 
-                frame.top + r.bottom * scaleY, paint);
-
-            // Draw each letter, in black
-            paint.setColor(Color.BLACK);
-            paint.setAlpha(0xFF);
-            paint.setAntiAlias(true);
-            paint.setTextAlign(Align.LEFT);
-            String letter = "";
-            try {
-              char c = resultText.getText().replace("\n","").replace(" ", "").charAt(i);
-              letter = Character.toString(c);
-
-              if (!letter.equals("-") && !letter.equals("_")) {
-
-                // Adjust text size to fill rect
-                paint.setTextSize(100);
-                paint.setTextScaleX(1.0f);
-
-                // ask the paint for the bounding rect if it were to draw this text
-                Rect bounds = new Rect();
-                paint.getTextBounds(letter, 0, letter.length(), bounds);
-
-                // get the height that would have been produced
-                int h = bounds.bottom - bounds.top;
-
-                // figure out what textSize setting would create that height of text
-                float size  = (((float)(r.height())/h)*100f);
-
-                // and set it into the paint
-                paint.setTextSize(size);
-
-                // Draw the text as is. We don't really need to set the text scale, because the dimensions
-                // of the Rect should already be suited for drawing our letter. 
-                canvas.drawText(letter, frame.left + r.left * scaleX, frame.top + r.bottom * scaleY, paint);
-              }
-            } catch (StringIndexOutOfBoundsException e) {
-              e.printStackTrace();
-            } catch (Exception e) {
-              e.printStackTrace();
-            }
-          }
-        }
+//        if (DRAW_CHARACTER_BOXES || DRAW_CHARACTER_TEXT) {
+//          characterBoundingBoxes = resultText.getCharacterBoundingBoxes();
+//        }
+//
+//        if (DRAW_CHARACTER_BOXES) {
+//          // Draw bounding boxes around each character
+//          paint.setAlpha(0xA0);
+//          paint.setColor(0xFF00FF00);
+//          paint.setStyle(Style.STROKE);
+//          paint.setStrokeWidth(1);
+//          for (int c = 0; c < characterBoundingBoxes.size(); c++) {
+//            Rect characterRect = characterBoundingBoxes.get(c);
+//            canvas.drawRect(frame.left + characterRect.left * scaleX,
+//                frame.top + characterRect.top * scaleY, 
+//                frame.left + characterRect.right * scaleX, 
+//                frame.top + characterRect.bottom * scaleY, paint);
+//          }
+//        }
+//
+//        if (DRAW_CHARACTER_TEXT) {
+//          // Draw letters individually
+//          for (int i = 0; i < characterBoundingBoxes.size(); i++) {
+//            Rect r = characterBoundingBoxes.get(i);
+//
+//            // Draw a white background for every letter
+//            int meanConfidence = resultText.getMeanConfidence();
+//            paint.setColor(Color.WHITE);
+//            paint.setAlpha(meanConfidence * (255 / 100));
+//            paint.setStyle(Style.FILL);
+//            canvas.drawRect(frame.left + r.left * scaleX,
+//                frame.top + r.top * scaleY, 
+//                frame.left + r.right * scaleX, 
+//                frame.top + r.bottom * scaleY, paint);
+//
+//            // Draw each letter, in black
+//            paint.setColor(Color.BLACK);
+//            paint.setAlpha(0xFF);
+//            paint.setAntiAlias(true);
+//            paint.setTextAlign(Align.LEFT);
+//            String letter = "";
+//            try {
+//              char c = resultText.getText().replace("\n","").replace(" ", "").charAt(i);
+//              letter = Character.toString(c);
+//
+//              if (!letter.equals("-") && !letter.equals("_")) {
+//
+//                // Adjust text size to fill rect
+//                paint.setTextSize(100);
+//                paint.setTextScaleX(1.0f);
+//
+//                // ask the paint for the bounding rect if it were to draw this text
+//                Rect bounds = new Rect();
+//                paint.getTextBounds(letter, 0, letter.length(), bounds);
+//
+//                // get the height that would have been produced
+//                int h = bounds.bottom - bounds.top;
+//
+//                // figure out what textSize setting would create that height of text
+//                float size  = (((float)(r.height())/h)*100f);
+//
+//                // and set it into the paint
+//                paint.setTextSize(size);
+//
+//                // Draw the text as is. We don't really need to set the text scale, because the dimensions
+//                // of the Rect should already be suited for drawing our letter. 
+//                canvas.drawText(letter, frame.left + r.left * scaleX, frame.top + r.bottom * scaleY, paint);
+//              }
+//            } catch (StringIndexOutOfBoundsException e) {
+//              e.printStackTrace();
+//            } catch (Exception e) {
+//              e.printStackTrace();
+//            }
+//          }
+//        }
       }
 
     }

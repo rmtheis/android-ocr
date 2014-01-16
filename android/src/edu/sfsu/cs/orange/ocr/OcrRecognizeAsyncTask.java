@@ -88,7 +88,7 @@ final class OcrRecognizeAsyncTask extends AsyncTask<Void, Void, Boolean> {
       ocrResult.setTextlineBoundingBoxes(baseApi.getTextlines().getBoxRects());
       ocrResult.setWordBoundingBoxes(baseApi.getWords().getBoxRects());
       ocrResult.setStripBoundingBoxes(baseApi.getStrips().getBoxRects());
-      ocrResult.setCharacterBoundingBoxes(baseApi.getCharacters().getBoxRects());
+      //ocrResult.setCharacterBoundingBoxes(baseApi.getCharacters().getBoxRects());
     } catch (RuntimeException e) {
       Log.e("OcrRecognizeAsyncTask", "Caught RuntimeException in request to Tesseract. Setting state to CONTINUOUS_STOPPED.");
       e.printStackTrace();
