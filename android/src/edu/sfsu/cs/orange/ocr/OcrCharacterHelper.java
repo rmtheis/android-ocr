@@ -321,61 +321,61 @@ public class OcrCharacterHelper {
   }
   
   public static String getWhitelist(SharedPreferences prefs, String languageCode) {
-    if (languageCode.equals("afr")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_AFRIKAANS, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("sqi")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_ALBANIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("ara")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_ARABIC, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("aze")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_AZERI, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("eus")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_BASQUE, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("bel")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_BELARUSIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("ben")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_BENGALI, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("bul")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_BULGARIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("cat")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_CATALAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("chi_sim")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_CHINESE_SIMPLIFIED, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("chi_tra")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_CHINESE_TRADITIONAL, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("hrv")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_CROATIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("ces")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_CZECH, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("dan")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_DANISH, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("nld")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_DUTCH, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("eng")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_ENGLISH, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("est")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_ESTONIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("fin")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_FINNISH, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("fra")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_FRENCH, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("glg")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_GALICIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("deu")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_GERMAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("ell")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_GREEK, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("heb")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_HEBREW, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("hin")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_HINDI, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("hun")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_HUNGARIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("isl")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_ICELANDIC, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("ind")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_INDONESIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("ita")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_ITALIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("jpn")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_JAPANESE, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("kan")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_KANNADA, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("kor")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_KOREAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("lav")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_LATVIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("lit")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_LITHUANIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("mkd")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_MACEDONIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("msa")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_MALAY, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("mal")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_MALAYALAM, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("mlt")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_MALTESE, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("nor")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_NORWEGIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("pol")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_POLISH, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("por")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_PORTUGUESE, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("ron")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_ROMANIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("rus")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_RUSSIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("srp")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_SERBIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("slk")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_SLOVAK, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("slv")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_SLOVENIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("spa")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_SPANISH, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("swa")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_SWAHILI, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("swe")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_SWEDISH, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("tgl")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_TAGALOG, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("tam")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_TAMIL, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("tel")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_TELUGU, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("tha")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_THAI, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("tur")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_TURKISH, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("ukr")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_UKRAINIAN, getDefaultWhitelist(languageCode)); }
-    else if (languageCode.equals("vie")) { return prefs.getString(KEY_CHARACTER_BLACKLIST_VIETNAMESE, getDefaultWhitelist(languageCode)); }
+    if (languageCode.equals("afr")) { return prefs.getString(KEY_CHARACTER_WHITELIST_AFRIKAANS, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("sqi")) { return prefs.getString(KEY_CHARACTER_WHITELIST_ALBANIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("ara")) { return prefs.getString(KEY_CHARACTER_WHITELIST_ARABIC, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("aze")) { return prefs.getString(KEY_CHARACTER_WHITELIST_AZERI, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("eus")) { return prefs.getString(KEY_CHARACTER_WHITELIST_BASQUE, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("bel")) { return prefs.getString(KEY_CHARACTER_WHITELIST_BELARUSIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("ben")) { return prefs.getString(KEY_CHARACTER_WHITELIST_BENGALI, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("bul")) { return prefs.getString(KEY_CHARACTER_WHITELIST_BULGARIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("cat")) { return prefs.getString(KEY_CHARACTER_WHITELIST_CATALAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("chi_sim")) { return prefs.getString(KEY_CHARACTER_WHITELIST_CHINESE_SIMPLIFIED, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("chi_tra")) { return prefs.getString(KEY_CHARACTER_WHITELIST_CHINESE_TRADITIONAL, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("hrv")) { return prefs.getString(KEY_CHARACTER_WHITELIST_CROATIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("ces")) { return prefs.getString(KEY_CHARACTER_WHITELIST_CZECH, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("dan")) { return prefs.getString(KEY_CHARACTER_WHITELIST_DANISH, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("nld")) { return prefs.getString(KEY_CHARACTER_WHITELIST_DUTCH, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("eng")) { return prefs.getString(KEY_CHARACTER_WHITELIST_ENGLISH, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("est")) { return prefs.getString(KEY_CHARACTER_WHITELIST_ESTONIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("fin")) { return prefs.getString(KEY_CHARACTER_WHITELIST_FINNISH, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("fra")) { return prefs.getString(KEY_CHARACTER_WHITELIST_FRENCH, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("glg")) { return prefs.getString(KEY_CHARACTER_WHITELIST_GALICIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("deu")) { return prefs.getString(KEY_CHARACTER_WHITELIST_GERMAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("ell")) { return prefs.getString(KEY_CHARACTER_WHITELIST_GREEK, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("heb")) { return prefs.getString(KEY_CHARACTER_WHITELIST_HEBREW, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("hin")) { return prefs.getString(KEY_CHARACTER_WHITELIST_HINDI, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("hun")) { return prefs.getString(KEY_CHARACTER_WHITELIST_HUNGARIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("isl")) { return prefs.getString(KEY_CHARACTER_WHITELIST_ICELANDIC, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("ind")) { return prefs.getString(KEY_CHARACTER_WHITELIST_INDONESIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("ita")) { return prefs.getString(KEY_CHARACTER_WHITELIST_ITALIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("jpn")) { return prefs.getString(KEY_CHARACTER_WHITELIST_JAPANESE, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("kan")) { return prefs.getString(KEY_CHARACTER_WHITELIST_KANNADA, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("kor")) { return prefs.getString(KEY_CHARACTER_WHITELIST_KOREAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("lav")) { return prefs.getString(KEY_CHARACTER_WHITELIST_LATVIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("lit")) { return prefs.getString(KEY_CHARACTER_WHITELIST_LITHUANIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("mkd")) { return prefs.getString(KEY_CHARACTER_WHITELIST_MACEDONIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("msa")) { return prefs.getString(KEY_CHARACTER_WHITELIST_MALAY, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("mal")) { return prefs.getString(KEY_CHARACTER_WHITELIST_MALAYALAM, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("mlt")) { return prefs.getString(KEY_CHARACTER_WHITELIST_MALTESE, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("nor")) { return prefs.getString(KEY_CHARACTER_WHITELIST_NORWEGIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("pol")) { return prefs.getString(KEY_CHARACTER_WHITELIST_POLISH, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("por")) { return prefs.getString(KEY_CHARACTER_WHITELIST_PORTUGUESE, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("ron")) { return prefs.getString(KEY_CHARACTER_WHITELIST_ROMANIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("rus")) { return prefs.getString(KEY_CHARACTER_WHITELIST_RUSSIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("srp")) { return prefs.getString(KEY_CHARACTER_WHITELIST_SERBIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("slk")) { return prefs.getString(KEY_CHARACTER_WHITELIST_SLOVAK, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("slv")) { return prefs.getString(KEY_CHARACTER_WHITELIST_SLOVENIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("spa")) { return prefs.getString(KEY_CHARACTER_WHITELIST_SPANISH, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("swa")) { return prefs.getString(KEY_CHARACTER_WHITELIST_SWAHILI, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("swe")) { return prefs.getString(KEY_CHARACTER_WHITELIST_SWEDISH, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("tgl")) { return prefs.getString(KEY_CHARACTER_WHITELIST_TAGALOG, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("tam")) { return prefs.getString(KEY_CHARACTER_WHITELIST_TAMIL, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("tel")) { return prefs.getString(KEY_CHARACTER_WHITELIST_TELUGU, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("tha")) { return prefs.getString(KEY_CHARACTER_WHITELIST_THAI, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("tur")) { return prefs.getString(KEY_CHARACTER_WHITELIST_TURKISH, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("ukr")) { return prefs.getString(KEY_CHARACTER_WHITELIST_UKRAINIAN, getDefaultWhitelist(languageCode)); }
+    else if (languageCode.equals("vie")) { return prefs.getString(KEY_CHARACTER_WHITELIST_VIETNAMESE, getDefaultWhitelist(languageCode)); }
     else {
       throw new IllegalArgumentException();
     }        
@@ -443,61 +443,61 @@ public class OcrCharacterHelper {
   }
   
   public static void setWhitelist(SharedPreferences prefs, String languageCode, String whitelist) {
-    if (languageCode.equals("afr")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_AFRIKAANS, whitelist).commit(); }
-    else if (languageCode.equals("sqi")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_ALBANIAN, whitelist).commit(); }
-    else if (languageCode.equals("ara")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_ARABIC, whitelist).commit(); }
-    else if (languageCode.equals("aze")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_AZERI, whitelist).commit(); }
-    else if (languageCode.equals("eus")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_BASQUE, whitelist).commit(); }
-    else if (languageCode.equals("bel")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_BELARUSIAN, whitelist).commit(); }
-    else if (languageCode.equals("ben")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_BENGALI, whitelist).commit(); }
-    else if (languageCode.equals("bul")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_BULGARIAN, whitelist).commit(); }
-    else if (languageCode.equals("cat")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_CATALAN, whitelist).commit(); }
-    else if (languageCode.equals("chi_sim")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_CHINESE_SIMPLIFIED, whitelist).commit(); }
-    else if (languageCode.equals("chi_tra")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_CHINESE_TRADITIONAL, whitelist).commit(); }
-    else if (languageCode.equals("hrv")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_CROATIAN, whitelist).commit(); }
-    else if (languageCode.equals("ces")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_CZECH, whitelist).commit(); }
-    else if (languageCode.equals("dan")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_DANISH, whitelist).commit(); }
-    else if (languageCode.equals("nld")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_DUTCH, whitelist).commit(); }
-    else if (languageCode.equals("eng")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_ENGLISH, whitelist).commit(); }
-    else if (languageCode.equals("est")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_ESTONIAN, whitelist).commit(); }
-    else if (languageCode.equals("fin")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_FINNISH, whitelist).commit(); }
-    else if (languageCode.equals("fra")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_FRENCH, whitelist).commit(); }
-    else if (languageCode.equals("glg")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_GALICIAN, whitelist).commit(); }
-    else if (languageCode.equals("deu")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_GERMAN, whitelist).commit(); }
-    else if (languageCode.equals("ell")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_GREEK, whitelist).commit(); }
-    else if (languageCode.equals("heb")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_HEBREW, whitelist).commit(); }
-    else if (languageCode.equals("hin")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_HINDI, whitelist).commit(); }
-    else if (languageCode.equals("hun")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_HUNGARIAN, whitelist).commit(); }
-    else if (languageCode.equals("isl")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_ICELANDIC, whitelist).commit(); }
-    else if (languageCode.equals("ind")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_INDONESIAN, whitelist).commit(); }
-    else if (languageCode.equals("ita")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_ITALIAN, whitelist).commit(); }
-    else if (languageCode.equals("jpn")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_JAPANESE, whitelist).commit(); }
-    else if (languageCode.equals("kan")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_KANNADA, whitelist).commit(); }
-    else if (languageCode.equals("kor")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_KOREAN, whitelist).commit(); }
-    else if (languageCode.equals("lav")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_LATVIAN, whitelist).commit(); }
-    else if (languageCode.equals("lit")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_LITHUANIAN, whitelist).commit(); }
-    else if (languageCode.equals("mkd")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_MACEDONIAN, whitelist).commit(); }
-    else if (languageCode.equals("msa")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_MALAY, whitelist).commit(); }
-    else if (languageCode.equals("mal")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_MALAYALAM, whitelist).commit(); }
-    else if (languageCode.equals("mlt")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_MALTESE, whitelist).commit(); }
-    else if (languageCode.equals("nor")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_NORWEGIAN, whitelist).commit(); }
-    else if (languageCode.equals("pol")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_POLISH, whitelist).commit(); }
-    else if (languageCode.equals("por")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_PORTUGUESE, whitelist).commit(); }
-    else if (languageCode.equals("ron")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_ROMANIAN, whitelist).commit(); }
-    else if (languageCode.equals("rus")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_RUSSIAN, whitelist).commit(); }
-    else if (languageCode.equals("srp")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_SERBIAN, whitelist).commit(); }
-    else if (languageCode.equals("slk")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_SLOVAK, whitelist).commit(); }
-    else if (languageCode.equals("slv")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_SLOVENIAN, whitelist).commit(); }
-    else if (languageCode.equals("spa")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_SPANISH, whitelist).commit(); }
-    else if (languageCode.equals("swa")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_SWAHILI, whitelist).commit(); }
-    else if (languageCode.equals("swe")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_SWEDISH, whitelist).commit(); }
-    else if (languageCode.equals("tgl")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_TAGALOG, whitelist).commit(); }
-    else if (languageCode.equals("tam")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_TAMIL, whitelist).commit(); }
-    else if (languageCode.equals("tel")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_TELUGU, whitelist).commit(); }
-    else if (languageCode.equals("tha")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_THAI, whitelist).commit(); }
-    else if (languageCode.equals("tur")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_TURKISH, whitelist).commit(); }
-    else if (languageCode.equals("ukr")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_UKRAINIAN, whitelist).commit(); }
-    else if (languageCode.equals("vie")) { prefs.edit().putString(KEY_CHARACTER_BLACKLIST_VIETNAMESE, whitelist).commit(); }
+    if (languageCode.equals("afr")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_AFRIKAANS, whitelist).commit(); }
+    else if (languageCode.equals("sqi")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_ALBANIAN, whitelist).commit(); }
+    else if (languageCode.equals("ara")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_ARABIC, whitelist).commit(); }
+    else if (languageCode.equals("aze")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_AZERI, whitelist).commit(); }
+    else if (languageCode.equals("eus")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_BASQUE, whitelist).commit(); }
+    else if (languageCode.equals("bel")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_BELARUSIAN, whitelist).commit(); }
+    else if (languageCode.equals("ben")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_BENGALI, whitelist).commit(); }
+    else if (languageCode.equals("bul")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_BULGARIAN, whitelist).commit(); }
+    else if (languageCode.equals("cat")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_CATALAN, whitelist).commit(); }
+    else if (languageCode.equals("chi_sim")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_CHINESE_SIMPLIFIED, whitelist).commit(); }
+    else if (languageCode.equals("chi_tra")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_CHINESE_TRADITIONAL, whitelist).commit(); }
+    else if (languageCode.equals("hrv")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_CROATIAN, whitelist).commit(); }
+    else if (languageCode.equals("ces")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_CZECH, whitelist).commit(); }
+    else if (languageCode.equals("dan")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_DANISH, whitelist).commit(); }
+    else if (languageCode.equals("nld")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_DUTCH, whitelist).commit(); }
+    else if (languageCode.equals("eng")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_ENGLISH, whitelist).commit(); }
+    else if (languageCode.equals("est")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_ESTONIAN, whitelist).commit(); }
+    else if (languageCode.equals("fin")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_FINNISH, whitelist).commit(); }
+    else if (languageCode.equals("fra")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_FRENCH, whitelist).commit(); }
+    else if (languageCode.equals("glg")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_GALICIAN, whitelist).commit(); }
+    else if (languageCode.equals("deu")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_GERMAN, whitelist).commit(); }
+    else if (languageCode.equals("ell")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_GREEK, whitelist).commit(); }
+    else if (languageCode.equals("heb")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_HEBREW, whitelist).commit(); }
+    else if (languageCode.equals("hin")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_HINDI, whitelist).commit(); }
+    else if (languageCode.equals("hun")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_HUNGARIAN, whitelist).commit(); }
+    else if (languageCode.equals("isl")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_ICELANDIC, whitelist).commit(); }
+    else if (languageCode.equals("ind")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_INDONESIAN, whitelist).commit(); }
+    else if (languageCode.equals("ita")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_ITALIAN, whitelist).commit(); }
+    else if (languageCode.equals("jpn")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_JAPANESE, whitelist).commit(); }
+    else if (languageCode.equals("kan")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_KANNADA, whitelist).commit(); }
+    else if (languageCode.equals("kor")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_KOREAN, whitelist).commit(); }
+    else if (languageCode.equals("lav")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_LATVIAN, whitelist).commit(); }
+    else if (languageCode.equals("lit")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_LITHUANIAN, whitelist).commit(); }
+    else if (languageCode.equals("mkd")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_MACEDONIAN, whitelist).commit(); }
+    else if (languageCode.equals("msa")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_MALAY, whitelist).commit(); }
+    else if (languageCode.equals("mal")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_MALAYALAM, whitelist).commit(); }
+    else if (languageCode.equals("mlt")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_MALTESE, whitelist).commit(); }
+    else if (languageCode.equals("nor")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_NORWEGIAN, whitelist).commit(); }
+    else if (languageCode.equals("pol")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_POLISH, whitelist).commit(); }
+    else if (languageCode.equals("por")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_PORTUGUESE, whitelist).commit(); }
+    else if (languageCode.equals("ron")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_ROMANIAN, whitelist).commit(); }
+    else if (languageCode.equals("rus")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_RUSSIAN, whitelist).commit(); }
+    else if (languageCode.equals("srp")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_SERBIAN, whitelist).commit(); }
+    else if (languageCode.equals("slk")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_SLOVAK, whitelist).commit(); }
+    else if (languageCode.equals("slv")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_SLOVENIAN, whitelist).commit(); }
+    else if (languageCode.equals("spa")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_SPANISH, whitelist).commit(); }
+    else if (languageCode.equals("swa")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_SWAHILI, whitelist).commit(); }
+    else if (languageCode.equals("swe")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_SWEDISH, whitelist).commit(); }
+    else if (languageCode.equals("tgl")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_TAGALOG, whitelist).commit(); }
+    else if (languageCode.equals("tam")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_TAMIL, whitelist).commit(); }
+    else if (languageCode.equals("tel")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_TELUGU, whitelist).commit(); }
+    else if (languageCode.equals("tha")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_THAI, whitelist).commit(); }
+    else if (languageCode.equals("tur")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_TURKISH, whitelist).commit(); }
+    else if (languageCode.equals("ukr")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_UKRAINIAN, whitelist).commit(); }
+    else if (languageCode.equals("vie")) { prefs.edit().putString(KEY_CHARACTER_WHITELIST_VIETNAMESE, whitelist).commit(); }
     else {
       throw new IllegalArgumentException();
     }    
