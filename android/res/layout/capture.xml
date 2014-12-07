@@ -141,7 +141,7 @@
                         android:layout_height="wrap_content"
                         >
             
-              <ProgressBar android:id="@+android:id/progress_small"
+              <ProgressBar android:id="@+id/progress_small"
 		                   style="?android:attr/progressBarStyleSmall" 
 		                   android:layout_width="wrap_content"
                            android:layout_height="wrap_content"
