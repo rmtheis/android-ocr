@@ -3,13 +3,13 @@
 
 An experimental app for Android that performs optical character recognition (OCR) on images captured using the device camera.
 
-Runs the Tesseract 3.03 OCR engine using a fork of Tesseract Tools for Android.
+Runs the Tesseract OCR engine using a fork of Tesseract Tools for Android.
 
 Most of the code making up the core structure of this project has been adapted from the ZXing Barcode Scanner. Along with Tesseract-OCR and Tesseract Tools for Android (tesseract-android-tools), several open source projects have been used in this project, including leptonica, google-api-translate-java, microsoft-translator-java-api, and jtar.
 
 ## Requires
 
-* Installation of [tess-two](https://github.com/rmtheis/tess-two) as a [library project](http://developer.android.com/guide/developing/projects/projects-eclipse.html#ReferencingLibraryProject), to act as the OCR engine.
+* Building [tess-two](https://github.com/rmtheis/tess-two), to act as the OCR engine, by following its [build instructions](https://github.com/rmtheis/tess-two#build).
 * A Windows Azure Marketplace Client ID and Client Secret (for translation) - [Documentation](http://msdn.microsoft.com/en-us/library/hh454950.aspx)
 * A Google Translate API key (for translation) - [Documentation](https://code.google.com/apis/console/?api=translate)
 
