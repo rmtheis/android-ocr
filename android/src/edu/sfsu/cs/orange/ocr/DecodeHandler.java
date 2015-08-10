@@ -19,12 +19,12 @@ package edu.sfsu.cs.orange.ocr;
 
 import edu.sfsu.cs.orange.ocr.BeepManager;
 
+import com.googlecode.leptonica.android.Pixa;
 import com.googlecode.leptonica.android.ReadFile;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import edu.sfsu.cs.orange.ocr.CaptureActivity;
 import edu.sfsu.cs.orange.ocr.R;
-
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
@@ -157,19 +157,27 @@ final class DecodeHandler extends Handler {
       ocrResult.setWordConfidences(baseApi.wordConfidences());
       ocrResult.setMeanConfidence( baseApi.meanConfidence());
       if (ViewfinderView.DRAW_REGION_BOXES) {
-        ocrResult.setRegionBoundingBoxes(baseApi.getRegions().getBoxRects());
+        Pixa regions = baseApi.getRegions();
+        ocrResult.setRegionBoundingBoxes(regions.getBoxRects());
+        regions.recycle();
       }
       if (ViewfinderView.DRAW_TEXTLINE_BOXES) {
-        ocrResult.setTextlineBoundingBoxes(baseApi.getTextlines().getBoxRects());
+        Pixa textlines = baseApi.getTextlines();
+        ocrResult.setTextlineBoundingBoxes(textlines.getBoxRects());
+        textlines.recycle();
       }
       if (ViewfinderView.DRAW_STRIP_BOXES) {
-        ocrResult.setStripBoundingBoxes(baseApi.getStrips().getBoxRects());
+        Pixa strips = baseApi.getStrips();
+        ocrResult.setStripBoundingBoxes(strips.getBoxRects());
+        strips.recycle();
       }
       
       // Always get the word bounding boxes--we want it for annotating the bitmap after the user
       // presses the shutter button, in addition to maybe wanting to draw boxes/words during the
       // continuous mode recognition.
-      ocrResult.setWordBoundingBoxes(baseApi.getWords().getBoxRects());
+      Pixa words = baseApi.getWords();
+      ocrResult.setWordBoundingBoxes(words.getBoxRects());
+      words.recycle();
       
 //      if (ViewfinderView.DRAW_CHARACTER_BOXES || ViewfinderView.DRAW_CHARACTER_TEXT) {
 //        ocrResult.setCharacterBoundingBoxes(baseApi.getCharacters().getBoxRects());
