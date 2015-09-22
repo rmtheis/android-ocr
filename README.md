@@ -9,7 +9,7 @@ Most of the code making up the core structure of this project has been adapted f
 
 ## Requires
 
-* Building [tess-two](https://github.com/rmtheis/tess-two), to act as the OCR engine, by following its [build instructions](https://github.com/rmtheis/tess-two#build).
+* Building [tess-two](https://github.com/rmtheis/tess-two), to act as the OCR engine, by following its [build instructions](https://github.com/rmtheis/tess-two#building).
 * A Windows Azure Marketplace Client ID and Client Secret (for translation) - [Documentation](http://msdn.microsoft.com/en-us/library/hh454950.aspx)
 * A Google Translate API key (for translation) - [Documentation](https://code.google.com/apis/console/?api=translate)
 
