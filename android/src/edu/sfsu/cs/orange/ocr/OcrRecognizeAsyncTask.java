@@ -15,15 +15,21 @@
  */
 package edu.sfsu.cs.orange.ocr;
 
-import com.googlecode.leptonica.android.ReadFile;
-import com.googlecode.tesseract.android.TessBaseAPI;
+import java.io.File;
+import java.util.ArrayList;
 
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.googlecode.leptonica.android.ReadFile;
+import com.googlecode.tesseract.android.ResultIterator;
+import com.googlecode.tesseract.android.TessBaseAPI;
+import com.googlecode.tesseract.android.TessBaseAPI.PageIteratorLevel;
 /**
  * Class to send OCR requests to the OCR engine in a separate thread, send a success/failure message,
  * and dismiss the indeterminate progress dialog box. Used for non-continuous mode OCR only.
@@ -88,7 +94,21 @@ final class OcrRecognizeAsyncTask extends AsyncTask<Void, Void, Boolean> {
       ocrResult.setTextlineBoundingBoxes(baseApi.getTextlines().getBoxRects());
       ocrResult.setWordBoundingBoxes(baseApi.getWords().getBoxRects());
       ocrResult.setStripBoundingBoxes(baseApi.getStrips().getBoxRects());
-      //ocrResult.setCharacterBoundingBoxes(baseApi.getCharacters().getBoxRects());
+
+      // Iterate through the results.
+      final ResultIterator iterator = baseApi.getResultIterator();
+      int[] lastBoundingBox;
+      ArrayList<Rect> charBoxes = new ArrayList<Rect>();
+      iterator.begin();
+      do {
+          lastBoundingBox = iterator.getBoundingBox(PageIteratorLevel.RIL_SYMBOL);
+          Rect lastRectBox = new Rect(lastBoundingBox[0], lastBoundingBox[1],
+                  lastBoundingBox[2], lastBoundingBox[3]);
+          charBoxes.add(lastRectBox);
+      } while (iterator.next(PageIteratorLevel.RIL_SYMBOL));
+      iterator.delete();
+      ocrResult.setCharacterBoundingBoxes(charBoxes);
+
     } catch (RuntimeException e) {
       Log.e("OcrRecognizeAsyncTask", "Caught RuntimeException in request to Tesseract. Setting state to CONTINUOUS_STOPPED.");
       e.printStackTrace();
