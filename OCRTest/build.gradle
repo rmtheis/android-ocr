@@ -1,0 +1,27 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        applicationId "edu.sfsu.cs.orange.ocr"
+        minSdkVersion 8
+        targetSdkVersion 10
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles 'proguard.cfg'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.rmtheis:tess-two:5.4.0'
+    compile files('libs/google-api-translate-java-0.98-mod2.jar')
+    compile files('libs/json_simple-1.1.jar')
+    compile files('libs/jtar-1.0.4.jar')
+    compile files('libs/microsoft-translator-java-api-0.6-mod.jar')
+}

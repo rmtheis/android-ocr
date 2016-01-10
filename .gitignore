@@ -25,3 +25,7 @@ jruby/
 rim/
 symbian/
 zxing.appspot.com/
+build/
+.gradle/
+.idea/
+*.iml

@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
- Copyright (C) 2010 ZXing authors
+ Copyright (C) 2008 ZXing authors
  Copyright 2011 Robert Theis
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,5 +16,17 @@
  limitations under the License.
  -->
 <resources>
-    <string name="app_name">OCR Test</string>
+  <item type="id" name="decode"/>
+  <item type="id" name="decode_failed"/>
+  <item type="id" name="decode_succeeded"/>
+
+  <item type="id" name="ocr_continuous_decode"/>
+  <item type="id" name="ocr_continuous_decode_failed"/>
+  <item type="id" name="ocr_continuous_decode_succeeded"/>
+  <item type="id" name="ocr_decode"/>
+  <item type="id" name="ocr_decode_failed"/>
+  <item type="id" name="ocr_decode_succeeded"/>
+  
+  <item type="id" name="quit"/>
+  <item type="id" name="restart_preview"/>
 </resources>

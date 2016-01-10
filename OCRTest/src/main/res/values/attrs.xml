@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
  Copyright (C) 2008 ZXing authors
- Copyright 2011 Robert Theis
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -16,17 +15,6 @@
  limitations under the License.
  -->
 <resources>
-  <item type="id" name="decode"/>
-  <item type="id" name="decode_failed"/>
-  <item type="id" name="decode_succeeded"/>
-
-  <item type="id" name="ocr_continuous_decode"/>
-  <item type="id" name="ocr_continuous_decode_failed"/>
-  <item type="id" name="ocr_continuous_decode_succeeded"/>
-  <item type="id" name="ocr_decode"/>
-  <item type="id" name="ocr_decode_failed"/>
-  <item type="id" name="ocr_decode_succeeded"/>
-  
-  <item type="id" name="quit"/>
-  <item type="id" name="restart_preview"/>
+  <declare-styleable name="ViewfinderView">
+  </declare-styleable>
 </resources>
