@@ -10,6 +10,10 @@ Most of the code making up the core structure of this project has been adapted f
 
 [![Video](http://img.youtube.com/vi/FOSgiPjGwx4/0.jpg)](http://www.youtube.com/watch?v=FOSgiPjGwx4)
 
+A slightly modified version:
+
+[![Video](http://img.youtube.com/vi/7vNepTmBTG8/0.jpg)](http://www.youtube.com/watch?v=7vNepTmBTG8)
+
 ## Requires
 
 * A Windows Azure Marketplace Client ID and Client Secret (for translation) - [Documentation](http://msdn.microsoft.com/en-us/library/hh454950.aspx)
