@@ -2,18 +2,27 @@
 
 An experimental app for Android that performs optical character recognition (OCR) on images captured using the device camera.
 
-Runs the Tesseract OCR engine using [a fork of Tesseract Tools for Android](https://github.com/rmtheis/tess-two).
+Runs the Tesseract OCR engine using [tess-two](https://github.com/rmtheis/tess-two), a fork of Tesseract Tools for Android.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/FOSgiPjGwx4" frameborder="0" allowfullscreen></iframe>
 
 Most of the code making up the core structure of this project has been adapted from the ZXing Barcode Scanner. Along with Tesseract-OCR and Tesseract Tools for Android (tesseract-android-tools), several open source projects have been used in this project, including leptonica, google-api-translate-java, microsoft-translator-java-api, and jtar.
+
 
 ## Requires
 
 * A Windows Azure Marketplace Client ID and Client Secret (for translation) - [Documentation](http://msdn.microsoft.com/en-us/library/hh454950.aspx)
 * A Google Translate API key (for translation) - [Documentation](https://code.google.com/apis/console/?api=translate)
 
-## Installing the APK
+## Training data for OCR
 
-The APK is available for download to an Android device from Android Market [here](https://market.android.com/details?id=edu.sfsu.cs.orange.ocr).
+A data file is required for every language you want to recognize. For English, this data file is included in the application assets and is automatically installed when the app is first run.
+
+For other languages (Spanish, French, Chinese, etc.), the app will try to download the training data from an old Google Code repository that is no longer available, and [the download fails](https://github.com/rmtheis/android-ocr/issues/55). So if you want to use training data for other languages, you'll need to package the appropriate [training data files](https://github.com/tesseract-ocr/tessdata) in the app or change the code to point to your own download location.
+
+## Installation
+
+To build and run the app, clone this project, open it as an existing project in Android Studio, and click Run.
 
 ## License
 
