@@ -1,4 +1,4 @@
-#android-ocr
+# android-ocr
 
 An experimental app for Android that performs optical character recognition (OCR) on images captured using the device camera.
 
