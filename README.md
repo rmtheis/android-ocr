@@ -23,7 +23,7 @@ A slightly modified version:
 
 A data file is required for every language you want to recognize. For English, this data file is included in the application assets and is automatically installed when the app is first run.
 
-For other languages (Spanish, French, Chinese, etc.), the app will try to download the training data from an old Google Code repository that is no longer available, and [the download fails](https://github.com/rmtheis/android-ocr/issues/55). So if you want to use training data for other languages, you'll need to package the appropriate [training data files](https://github.com/tesseract-ocr/tessdata) in the app or change the code to point to your own download location.
+For other languages (Spanish, French, Chinese, etc.), the app will try to download the training data from an old Google Code repository that is no longer available, and [the download fails](https://github.com/rmtheis/android-ocr/issues/55). So if you want to use training data for other languages, you'll need to package the appropriate [training data files](https://github.com/tesseract-ocr/tessdata/tree/3.04.00) in the app or change the code to point to your own download location.
 
 ## Installation
 
